@@ -1,0 +1,403 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<meta content="mobile_stack" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #f9f9ff;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 12px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 12px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary": "#ffffff",
+            "secondary-container": "#ff8162",
+            "on-surface-variant": "#3d4947",
+            "secondary": "#a33d23",
+            "on-error": "#ffffff",
+            "tertiary-container": "#66768d",
+            "tertiary": "#4d5d73",
+            "surface-container-low": "#f0f3ff",
+            "error-container": "#ffdad6",
+            "surface-container-high": "#dee8ff",
+            "primary": "#00685d",
+            "primary-accent": "#2A9D8F",
+            "surface-container-highest": "#d8e3fb",
+            "outline-variant": "#bcc9c6",
+            "primary-container": "#008376",
+            "surface-container": "#e7eeff",
+            "background": "#f9f9ff",
+            "inverse-on-surface": "#ecf1ff",
+            "surface-variant": "#d8e3fb",
+            "secondary-fixed": "#ffdad2",
+            "on-primary-container": "#f4fffb",
+            "secondary-fixed-dim": "#ffb4a2",
+            "inverse-surface": "#263143",
+            "on-tertiary-fixed-variant": "#38485d",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed": "#00201c",
+            "tertiary-fixed": "#d3e4fe",
+            "on-surface": "#111c2d",
+            "surface": "#f9f9ff",
+            "tertiary-fixed-dim": "#b7c8e1",
+            "primary-fixed": "#8cf5e4",
+            "inverse-primary": "#6fd8c8",
+            "on-primary-fixed-variant": "#005048",
+            "on-secondary-fixed-variant": "#83260e",
+            "on-secondary": "#ffffff",
+            "surface-bright": "#f9f9ff",
+            "on-tertiary-fixed": "#0b1c30",
+            "primary-fixed-dim": "#6fd8c8",
+            "surface-tint": "#006a60",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed": "#3c0700",
+            "on-background": "#111c2d",
+            "outline": "#6d7a77",
+            "error": "#ba1a1a",
+            "on-tertiary-container": "#fdfcff",
+            "on-secondary-container": "#731a04",
+            "on-error-container": "#93000a",
+            "surface-dim": "#cfdaf2"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1.25rem",
+            "3xl": "1.75rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            display: ["Inter"],
+            headline: ["Inter"],
+            body: ["Inter"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body text-on-surface flex flex-col h-screen w-screen overflow-hidden antialiased select-none">
+<!-- 1 & 2: 3D FOCUSED VIEWPORT (65-70% Height) with Floating Elements -->
+<div class="relative w-full h-[66vh] flex-shrink-0 overflow-hidden bg-surface-container">
+<!-- 3D Model Simulation Background / Canvas -->
+<div class="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-out transform scale-105" id="campus3DCanvas" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAYT_Tc6uSFsfZAbWWzAhCmsE6TLJ92s6VIPKQHtNw1wl0Md7_BujJZilwnVuQYoRJJs4oIYg2j4cXoxnGM-0vNpABYIVgsie31OA1JdRMQsz7HhydZ13xp45x0lgX9Qj9X3gae6P2sZHdWdvX9OOV6tO-mDi3G-ZZbzHifMXasECKgGJPFBs1g5QYkXK3KWnONId9xaUa2FsYQdaoTxXEB3RiUbG3G2M-5le_0xIzDxhFA-ZAp3tasA'); filter: saturate(1.08) contrast(1.02);"></div>
+<!-- Soft Vignette & Grid Depth Gradient -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-surface/90 pointer-events-none"></div>
+<!-- FLOATING TOP BAR -->
+<header class="absolute top-0 inset-x-0 z-30 pt-safe px-4 py-2">
+<div class="h-12 px-3 rounded-full bg-surface-container-lowest/80 backdrop-blur-md shadow-md border border-white/60 flex items-center justify-between">
+<button aria-label="Back" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors active:scale-95" onclick="history.back()">
+<span class="material-symbols-outlined text-[22px]">arrow_back</span>
+</button>
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+<span class="font-semibold text-[15px] text-on-surface tracking-tight">IT Block (Wing A)</span>
+</div>
+<span class="text-[11px] text-on-surface-variant font-medium">MNMJEC Campus Live 3D</span>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Bookmark Building" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container transition-colors active:scale-95" onclick="toggleBookmark(this)">
+<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+</button>
+<button aria-label="Share Location" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container transition-colors active:scale-95" onclick="triggerShareModal()">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</div>
+</header>
+<!-- 3D Focused Object Indicator & Lock-on Badge -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none -mt-4">
+<div class="relative flex flex-col items-center">
+<!-- Floating Lock-On Badge -->
+<div class="px-3 py-1 bg-primary text-on-primary rounded-full shadow-lg border border-primary-fixed/40 flex items-center gap-1.5 transform -translate-y-5 animate-bounce">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">my_location</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">3D Locked: IT Block</span>
+</div>
+<!-- 3D Reticle Target Rings -->
+<div class="w-28 h-28 rounded-full bg-primary/10 border-2 border-primary-accent flex items-center justify-center shadow-[0_0_30px_rgba(42,157,143,0.45)]">
+<div class="w-14 h-14 rounded-full bg-primary-accent/25 border border-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[24px]" style="font-variation-settings: 'FILL' 1;">domain</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Camera Orbit Control Indicator (Floating Top-Right) -->
+<div class="absolute top-20 right-4 flex flex-col items-end gap-2 z-20">
+<!-- Camera Orbit Indicator Pill -->
+<div class="px-2.5 py-1.5 rounded-full bg-surface-container-lowest/85 backdrop-blur-md border border-white/70 shadow-sm flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-primary-accent text-[18px] animate-spin" style="animation-duration: 9s;">360</span>
+<span class="text-[11px] font-semibold text-primary">Camera Orbit: Active</span>
+</div>
+<!-- Quick 3D View Angles Switcher -->
+<button aria-label="Toggle Isometric / Overhead" class="h-8 px-2.5 rounded-full bg-surface-container-lowest/85 backdrop-blur-md border border-white/70 shadow-sm flex items-center gap-1 text-[11px] font-medium text-on-surface-variant hover:text-primary transition-all active:scale-95" onclick="toggleViewAngle()">
+<span class="material-symbols-outlined text-[16px] text-primary">view_in_ar</span>
+<span id="angleLabel">45° Isometric</span>
+</button>
+<!-- Floor Stack Indicator Pill -->
+<div class="px-2.5 py-1 rounded-full bg-surface-container-lowest/85 backdrop-blur-md border border-white/70 shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[15px]">layers</span>
+<span class="text-[11px] font-bold text-on-surface" id="currentLevelBadge">G+3 Floors</span>
+</div>
+</div>
+<!-- Viewport Bottom Status Bar -->
+<div class="absolute bottom-4 left-4 z-20">
+<div class="px-2.5 py-1 rounded-full bg-surface-container-lowest/85 backdrop-blur-md shadow-sm border border-white/70 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-accent animate-pulse"></span>
+<span class="text-[11px] text-on-surface-variant font-medium">GPS Accuracy ±0.8m</span>
+</div>
+</div>
+</div>
+<!-- 3: STREAMLINED BOTTOM SHEET (Floating Sleek Drawer) -->
+<section class="relative -mt-6 flex-1 flex flex-col bg-surface-container-lowest rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] border-t border-white/80 z-40 overflow-hidden pb-safe">
+<!-- Drag Handle Pill -->
+<div class="w-full flex items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing">
+<div class="w-10 h-1 rounded-full bg-outline-variant/60"></div>
+</div>
+<!-- Scrollable Drawer Content -->
+<div class="flex-1 overflow-y-auto px-4 pt-1 pb-4 flex flex-col gap-3">
+<!-- Drawer Header: IT Block & Verified Badge -->
+<div class="flex items-start justify-between gap-2">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h2 class="text-[20px] font-bold text-on-surface tracking-tight leading-tight">IT Block</h2>
+<!-- Verified Pill -->
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary-fixed/30 text-primary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Verified</span>
+</span>
+<span class="text-[11px] font-semibold px-1.5 py-0.5 bg-surface-container rounded text-primary">Wing A</span>
+</div>
+<p class="text-[13px] text-on-surface-variant font-medium mt-0.5">
+            Information Technology &amp; CSE • 4 Floors (G+3)
+          </p>
+</div>
+<!-- Building Status Indicator -->
+<div class="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200 flex-shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span>Open Now</span>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="grid grid-cols-2 gap-2.5 pt-0.5">
+<!-- Primary Navigate Button (Teal #2A9D8F) -->
+<button class="h-11 rounded-xl text-on-primary font-semibold text-[14px] flex items-center justify-center gap-2 shadow-md hover:brightness-105 active:scale-[0.98] transition-all" onclick="triggerNavigation()" style="background-color: #2A9D8F;">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">navigation</span>
+<span>Navigate Here</span>
+</button>
+<!-- Indoor 3D Map Button -->
+<button class="h-11 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary font-semibold text-[14px] flex items-center justify-center gap-2 border border-primary/20 active:scale-[0.98] transition-all" onclick="openIndoorMap()">
+<span class="material-symbols-outlined text-[20px] text-primary">view_in_ar</span>
+<span>Indoor 3D Map</span>
+</button>
+</div>
+<!-- Quick Essential Chips -->
+<div class="flex items-center gap-2 overflow-x-auto pb-0.5 text-[12px]">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[16px]">door_front</span>
+<span class="font-medium text-on-surface-variant">Entrance:</span>
+<span class="font-semibold text-on-surface">East Portico (Ramp Access)</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-[16px]">schedule</span>
+<span class="font-medium text-on-surface-variant">Hours:</span>
+<span class="font-semibold text-on-surface">8:00 AM – 5:30 PM</span>
+</div>
+</div>
+<!-- Floor Directory: Compact Toggle Pills -->
+<div class="flex flex-col gap-2 pt-1 border-t border-surface-container">
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-bold uppercase tracking-wider text-outline">Floor Key Directory</span>
+<span class="text-[11px] text-primary font-medium" id="floorLevelHint">Viewing Ground Floor</span>
+</div>
+<!-- Compact Segmented Pills -->
+<div class="grid grid-cols-4 gap-1.5 p-1 bg-surface-container rounded-xl" role="tablist">
+<button class="floor-pill py-1.5 rounded-lg text-[12px] font-bold text-center transition-all bg-primary-container text-on-primary shadow-sm" id="tab-ground" onclick="setFloor('ground')">
+            Ground
+          </button>
+<button class="floor-pill py-1.5 rounded-lg text-[12px] font-medium text-on-surface-variant text-center hover:text-on-surface transition-all" id="tab-floor1" onclick="setFloor('floor1')">
+            1st Fl
+          </button>
+<button class="floor-pill py-1.5 rounded-lg text-[12px] font-medium text-on-surface-variant text-center hover:text-on-surface transition-all" id="tab-floor2" onclick="setFloor('floor2')">
+            2nd Fl
+          </button>
+<button class="floor-pill py-1.5 rounded-lg text-[12px] font-medium text-on-surface-variant text-center hover:text-on-surface transition-all" id="tab-floor3" onclick="setFloor('floor3')">
+            3rd Fl
+          </button>
+</div>
+<!-- Key Departments List for Selected Floor (Focused, uncluttered) -->
+<div class="flex flex-col gap-1.5" id="floorDepartmentCards">
+<!-- Populated by JS -->
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Toast Notification -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-inverse-surface/95 backdrop-blur-md text-inverse-on-surface px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 max-w-[85vw] transition-all transform duration-300 opacity-0 -translate-y-4 pointer-events-none" id="actionToast">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[18px]" id="toastIcon">navigation</span>
+<span class="text-[12px] font-medium" id="toastMessage">Calculating fastest route to IT Block...</span>
+</div>
+<script>
+    // Streamlined Floor Directory Data Model
+    const floorDirectory = {
+      ground: [
+        { name: "IT Dept. Main Office & Admin", room: "Room IT-G01", icon: "badge", badge: "Admin" },
+        { name: "Server Room & Network Ops", room: "Room IT-G04", icon: "dns", badge: "Secure" },
+        { name: "HOD Cabins & Faculty Lounge", room: "IT-G02, G03", icon: "meeting_room", badge: "Faculty" }
+      ],
+      floor1: [
+        { name: "Cloud Computing & AI Labs", room: "Room IT-101 (60 PCs)", icon: "memory", badge: "Research" },
+        { name: "Lecture Halls 102 & 103", room: "Multimedia Wing", icon: "co_present", badge: "Classes" },
+        { name: "Department Digital Library", room: "Room IT-105", icon: "local_library", badge: "Study" }
+      ],
+      floor2: [
+        { name: "Cybersecurity & Crypto Sandbox", room: "Room IT-201", icon: "lock", badge: "Lab" },
+        { name: "Big Data & Systems Lab", room: "Room IT-204", icon: "database", badge: "Lab" },
+        { name: "Seminar Hall & Audio-Visual Room", room: "Capacity 120", icon: "groups", badge: "Events" }
+      ],
+      floor3: [
+        { name: "Final Year Project Incubator", room: "Room IT-301", icon: "lightbulb", badge: "Incubation" },
+        { name: "IoT & Embedded Systems Lab", room: "Room IT-303", icon: "developer_board", badge: "Hardware" },
+        { name: "Placement Cell & Conference Room", room: "Room IT-308", icon: "handshake", badge: "Interviews" }
+      ]
+    };
+
+    function setFloor(key) {
+      // Toggle Tab Styles
+      document.querySelectorAll('.floor-pill').forEach(btn => {
+        btn.classList.remove('bg-primary-container', 'text-on-primary', 'shadow-sm', 'font-bold');
+        btn.classList.add('text-on-surface-variant', 'font-medium');
+      });
+
+      const activeBtn = document.getElementById('tab-' + key);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-primary-container', 'text-on-primary', 'shadow-sm', 'font-bold');
+        activeBtn.classList.remove('text-on-surface-variant', 'font-medium');
+      }
+
+      // Update Label Hints
+      const floorNames = { ground: 'Ground Floor', floor1: '1st Floor', floor2: '2nd Floor', floor3: '3rd Floor' };
+      document.getElementById('floorLevelHint').textContent = 'Viewing ' + (floorNames[key] || 'Ground Floor');
+      document.getElementById('currentLevelBadge').textContent = 'Level: ' + (floorNames[key] || 'G+3');
+
+      // Populate Departments
+      const container = document.getElementById('floorDepartmentCards');
+      const items = floorDirectory[key] || [];
+
+      let html = '';
+      items.forEach(dept => {
+        html += `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary flex-shrink-0">
+                <span class="material-symbols-outlined text-[18px]">${dept.icon}</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[13px] font-semibold text-on-surface truncate">${dept.name}</span>
+                <span class="text-[11px] text-on-surface-variant truncate">${dept.room}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-container text-tertiary">${dept.badge}</span>
+              <button onclick="showToast('Navigating to ' + '${dept.name.replace(/'/g, "\\'")}', 'directions_walk')" class="w-7 h-7 rounded-full flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors" aria-label="Route to department">
+                <span class="material-symbols-outlined text-[17px]">directions_walk</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // Initialize Default Floor
+    setFloor('ground');
+
+    // 3D View Angle Toggle Interaction
+    let isIsometric = true;
+    function toggleViewAngle() {
+      const canvas = document.getElementById('campus3DCanvas');
+      const label = document.getElementById('angleLabel');
+      isIsometric = !isIsometric;
+      if (isIsometric) {
+        canvas.style.transform = 'scale(1.05) perspective(800px) rotateX(15deg)';
+        label.textContent = '45° Isometric';
+        showToast('Camera switched to Isometric 3D view', 'view_in_ar');
+      } else {
+        canvas.style.transform = 'scale(1.0) perspective(0px) rotateX(0deg)';
+        label.textContent = 'Top-Down 2D';
+        showToast('Camera switched to Planar View', 'map');
+      }
+    }
+
+    function toggleBookmark(btn) {
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon.textContent === 'bookmark_border') {
+        icon.textContent = 'bookmark';
+        icon.style.fontVariationSettings = "'FILL' 1";
+        showToast('IT Block saved to My Places', 'bookmark');
+      } else {
+        icon.textContent = 'bookmark_border';
+        icon.style.fontVariationSettings = "'FILL' 0";
+        showToast('Removed from My Places', 'bookmark_border');
+      }
+    }
+
+    function triggerNavigation() {
+      showToast('Plotting fastest walking route to IT Block East Portico...', 'navigation');
+    }
+
+    function openIndoorMap() {
+      showToast('Opening Indoor 3D Floor Engine...', 'view_in_ar');
+    }
+
+    function triggerShareModal() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'IT Block - PATH FINDER',
+          text: 'Check out IT Block at MNM Jain Engineering College on campus map.',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        showToast('Campus link copied to clipboard', 'content_copy');
+      }
+    }
+
+    function showToast(message, iconName) {
+      const toast = document.getElementById('actionToast');
+      const msgEl = document.getElementById('toastMessage');
+      const iconEl = document.getElementById('toastIcon');
+
+      msgEl.textContent = message;
+      iconEl.textContent = iconName;
+
+      toast.classList.remove('opacity-0', '-translate-y-4', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4', 'pointer-events-none');
+      }, 2400);
+    }
+  </script>
+</body></html>

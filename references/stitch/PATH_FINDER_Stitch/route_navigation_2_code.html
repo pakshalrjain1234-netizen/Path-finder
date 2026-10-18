@@ -1,0 +1,368 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;height:100dvh;margin:0;padding:0;background-color:#f9f9ff;overflow:hidden;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,16px);}.pt-safe{padding-top:env(safe-area-inset-top,12px);}}::-webkit-scrollbar{display:none;}
+  .drawer-transition {
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  </style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-on-surface":"#ecf1ff","inverse-surface":"#263143","on-tertiary":"#ffffff","on-primary-fixed":"#00201c","error":"#ba1a1a","on-tertiary-container":"#fdfcff","error-container":"#ffdad6","primary":"#2A9D8F","tertiary":"#4d5d73","secondary":"#e76f51","background":"#f9f9ff","primary-container":"#21867a","surface-bright":"#f9f9ff","secondary-fixed-dim":"#ffb4a2","on-background":"#111c2d","on-secondary":"#ffffff","on-primary-container":"#f4fffb","on-secondary-fixed":"#3c0700","outline":"#6d7a77","outline-variant":"#bcc9c6","on-primary-fixed-variant":"#005048","primary-fixed-dim":"#6fd8c8","surface-dim":"#cfdaf2","surface-container-low":"#f0f3ff","surface-tint":"#2A9D8F","on-primary":"#ffffff","primary-fixed":"#8cf5e4","on-tertiary-fixed":"#0b1c30","tertiary-container":"#66768d","tertiary-fixed":"#d3e4fe","surface-container":"#e7eeff","surface-variant":"#d8e3fb","on-error":"#ffffff","surface-container-highest":"#d8e3fb","surface-container-high":"#dee8ff","tertiary-fixed-dim":"#b7c8e1","on-tertiary-fixed-variant":"#38485d","surface-container-lowest":"#ffffff","on-secondary-container":"#731a04","on-secondary-fixed-variant":"#83260e","on-surface":"#111c2d","on-surface-variant":"#3d4947","secondary-container":"#ff8162","secondary-fixed":"#ffdad2","inverse-primary":"#6fd8c8","on-error-container":"#93000a","surface":"#f9f9ff"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-xs":"0.25rem",margin:"1rem",gutter:"1rem","space-md":"1rem","space-xl":"2rem","gutter-desktop":"1.5rem","space-sm":"0.5rem","space-lg":"1.5rem","margin-desktop":"2rem"},fontFamily:{"label-md":["Inter"],"headline-sm":["Inter"],"headline-md":["Inter"],"body-sm":["Inter"],"label-sm":["Inter"],display":["Inter"],"body-lg":["Inter"],"headline-lg":["Inter"],"headline-lg-mobile":["Inter"],"label-lg":["Inter"],"body-md":["Inter"]},fontSize:{"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],"headline-sm":["16px",{lineHeight:"22px",letterSpacing:"0em",fontWeight:"600"}],"headline-md":["20px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"16px",letterSpacing:"0.01em",fontWeight:"400"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.04em",fontWeight:"600"}],display:["36px",{lineHeight:"44px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-lg":["16px",{lineHeight:"24px",letterSpacing:"0em",fontWeight:"400"}],"headline-lg":["28px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-lg-mobile":["22px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"label-lg":["14px",{lineHeight:"18px",letterSpacing:"0.01em",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",letterSpacing:"0em",fontWeight:"400"}]}}}};</script></head>
+<body class="bg-surface font-body-md text-body-md text-on-surface w-full h-[100dvh] relative overflow-hidden select-none flex flex-col justify-between antialiased selection:bg-primary-fixed">
+<!-- 1. EXPANSIVE 3D VIEWPORT (~75-80% Screen) -->
+<div class="absolute inset-0 w-full h-full z-0 overflow-hidden bg-[#e4eaf3]">
+<!-- Stylized Campus Cartography Layer with Satellite / Road blending -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-35 mix-blend-luminosity filter contrast-125 scale-105" data-location="Misrimal Navajee Munoth Jain Engineering College Chennai Campus" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAYT_Tc6uSFsfZAbWWzAhCmsE6TLJ92s6VIPKQHtNw1wl0Md7_BujJZilwnVuQYoRJJs4oIYg2j4cXoxnGM-0vNpABYIVgsie31OA1JdRMQsz7HhydZ13xp45x0lgX9Qj9X3gae6P2sZHdWdvX9OOV6tO-mDi3G-ZZbzHifMXasECKgGJPFBs1g5QYkXK3KWnONId9xaUa2FsYQdaoTxXEB3RiUbG3G2M-5le_0xIzDxhFA-ZAp3tasA')"></div>
+<!-- Depth & Atmosphere Overlays -->
+<div class="absolute inset-0 bg-gradient-to-b from-[#111c2d]/15 via-transparent to-[#111c2d]/10 pointer-events-none"></div>
+<!-- Perspective 3D Campus Architectural Model & Glowing Route SVG -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice" viewBox="0 0 390 844" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Glowing Route Gradients -->
+<linearGradient id="routeTealGrad" x1="0%" x2="100%" y1="100%" y2="0%">
+<stop offset="0%" stop-color="#2A9D8F" stop-opacity="1"></stop>
+<stop offset="65%" stop-color="#38bdf8" stop-opacity="0.95"></stop>
+<stop offset="100%" stop-color="#e76f51" stop-opacity="1"></stop>
+</linearGradient>
+<filter height="160%" id="routeGlowShadow" width="160%" x="-30%" y="-30%">
+<feDropShadow dx="0" dy="2" flood-color="#2A9D8F" flood-opacity="0.6" stdDeviation="6"></feDropShadow>
+</filter>
+<filter height="140%" id="buildingElevation" width="140%" x="-20%" y="-20%">
+<feDropShadow dx="2" dy="6" flood-color="#0b1c30" flood-opacity="0.22" stdDeviation="5"></feDropShadow>
+</filter>
+<filter height="160%" id="pinShadow" width="160%" x="-30%" y="-30%">
+<feDropShadow dx="0" dy="4" flood-color="#000000" flood-opacity="0.3" stdDeviation="4"></feDropShadow>
+</filter>
+</defs>
+<!-- Campus Pathways & Boulevard Ground Decals -->
+<path d="M 50 640 L 140 520 L 260 410 L 290 280 L 330 200" fill="none" opacity="0.65" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"></path>
+<path d="M 50 640 L 140 520 L 260 410 L 290 280 L 330 200" fill="none" opacity="0.8" stroke="#d5dfec" stroke-linecap="round" stroke-linejoin="round" stroke-width="18"></path>
+<!-- Landscaped Courtyard Garden (Central Green) -->
+<path d="M 160 510 C 210 470, 240 440, 250 490 C 260 535, 180 560, 150 540 Z" fill="#2A9D8F" opacity="0.18"></path>
+<circle cx="195" cy="505" fill="#2A9D8F" opacity="0.35" r="7"></circle>
+<circle cx="218" cy="495" fill="#2A9D8F" opacity="0.3" r="9"></circle>
+<circle cx="178" cy="528" fill="#2A9D8F" opacity="0.4" r="6"></circle>
+<!-- Isometric Campus Buildings -->
+<!-- First Year Academic Block -->
+<g filter="url(#buildingElevation)">
+<polygon fill="#e2ebf8" points="50,470 125,430 185,455 110,495"></polygon>
+<polygon fill="#cad7eb" points="110,495 185,455 185,425 110,465"></polygon>
+<polygon fill="#b1c3de" points="50,470 110,495 110,465 50,440"></polygon>
+<rect fill="#4d5d73" height="6" opacity="0.6" transform="skewY(18)" width="8" x="75" y="458"></rect>
+<rect fill="#4d5d73" height="6" opacity="0.6" transform="skewY(18)" width="8" x="92" y="468"></rect>
+<text fill="#38485d" font-family="Inter" font-size="10" font-weight="700" letter-spacing="0.04em" x="85" y="452">FIRST YEAR</text>
+</g>
+<!-- Civil Engineering Block -->
+<g filter="url(#buildingElevation)">
+<polygon fill="#e2ebf8" points="220,380 295,340 355,365 280,405"></polygon>
+<polygon fill="#cad7eb" points="280,405 355,365 355,335 280,375"></polygon>
+<polygon fill="#b1c3de" points="220,380 280,405 280,375 220,350"></polygon>
+<rect fill="#4d5d73" height="7" opacity="0.6" transform="skewY(18)" width="9" x="240" y="368"></rect>
+<rect fill="#4d5d73" height="7" opacity="0.6" transform="skewY(18)" width="9" x="258" y="378"></rect>
+<text fill="#38485d" font-family="Inter" font-size="10" font-weight="700" letter-spacing="0.04em" x="255" y="362">CIVIL BLOCK</text>
+</g>
+<!-- Destination Target: IT Block & Portico -->
+<g filter="url(#buildingElevation)">
+<!-- Highlight base glow -->
+<polygon fill="#2A9D8F" opacity="0.3" points="245,230 335,185 390,210 300,255"></polygon>
+<!-- Walls -->
+<polygon fill="#1f7a6f" points="245,230 300,255 300,215 245,190"></polygon>
+<polygon fill="#2A9D8F" points="300,255 385,212 385,172 300,215"></polygon>
+<!-- Roof -->
+<polygon fill="#6fd8c8" points="245,190 330,148 385,172 300,215"></polygon>
+<!-- Portico Canopy -->
+<polygon fill="#ffb4a2" opacity="0.9" points="230,235 275,210 290,225 245,250"></polygon>
+<text fill="#00201c" font-family="Inter" font-size="11" font-weight="800" letter-spacing="0.05em" x="295" y="195">IT BLOCK</text>
+</g>
+<!-- GLOWING TEAL ROUTE PATH (Google Maps Style Chevron/Dash Flow) -->
+<!-- Ambient Outer Glow -->
+<path d="M 85 610 L 140 520 L 255 415 L 275 305 L 290 240" fill="none" filter="url(#routeGlowShadow)" opacity="0.45" stroke="#2A9D8F" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<!-- Solid Route Spine -->
+<path d="M 85 610 L 140 520 L 255 415 L 275 305 L 290 240" fill="none" opacity="0.95" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"></path>
+<!-- Animated Active Route Line -->
+<path d="M 85 610 L 140 520 L 255 415 L 275 305 L 290 240" fill="none" stroke="url(#routeTealGrad)" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+<animate attributeName="stroke-dashoffset" dur="1.6s" from="72" repeatCount="indefinite" to="0"></animate>
+</path>
+<!-- Origin Node: Gate 1 -->
+<g filter="url(#pinShadow)" transform="translate(85, 610)">
+<circle cx="0" cy="0" fill="#ffffff" r="14"></circle>
+<circle cx="0" cy="0" fill="#2A9D8F" r="8"></circle>
+<circle cx="0" cy="0" fill="#ffffff" r="3.5"></circle>
+<text fill="#111c2d" font-family="Inter" font-size="11" font-weight="700" x="18" y="4">Gate 1</text>
+</g>
+<!-- Real-time User Location & Direction Pulsar Beam -->
+<g transform="translate(178, 480)">
+<!-- Heading Cone -->
+<polygon fill="url(#routeTealGrad)" opacity="0.3" points="0,-36 18,-6 -18,-6"></polygon>
+<circle cx="0" cy="0" fill="#2A9D8F" opacity="0.25" r="22">
+<animate attributeName="r" dur="2s" repeatCount="indefinite" values="14;28;14"></animate>
+<animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0.35;0.05;0.35"></animate>
+</circle>
+<circle cx="0" cy="0" fill="#ffffff" filter="url(#pinShadow)" r="10"></circle>
+<circle cx="0" cy="0" fill="#2A9D8F" r="7"></circle>
+<polygon fill="#ffffff" points="0,-11 3.5,-5 -3.5,-5"></polygon>
+</g>
+<!-- Destination Node: IT Block Pin -->
+<g filter="url(#pinShadow)" transform="translate(290, 240)">
+<ellipse cx="0" cy="12" fill="#000000" opacity="0.3" rx="9" ry="4"></ellipse>
+<path d="M0 -22 C -8.5 -22 -14 -16.5 -14 -8 C -14 2 0 14 0 14 C 0 14 14 2 14 -8 C 14 -16.5 8.5 -22 0 -22 Z" fill="#e76f51"></path>
+<circle cx="0" cy="-9" fill="#ffffff" r="4.5"></circle>
+</g>
+</svg>
+</div>
+<!-- 2. FLOATING ROUTE INPUT PILL (TOP) -->
+<div class="relative z-30 pt-safe px-4 mt-1 w-full max-w-md mx-auto pointer-events-none">
+<div class="bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-[0_4px_20px_rgba(17,28,45,0.08)] border border-white/60 p-3 pointer-events-auto flex flex-col gap-2.5">
+<!-- Upper Status Row -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button aria-label="Go back" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95" onclick="history.back()">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[#1f7a6f] border border-[#2A9D8F]/30">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[11px] font-semibold tracking-wide">VERIFIED ROUTE</span>
+</div>
+</div>
+<!-- Step-Free / Accessible Badge -->
+<div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-surface-variant text-[11px] font-medium border border-outline-variant/40">
+<span class="material-symbols-outlined text-[14px] text-[#2A9D8F]">accessible</span>
+<span>Step-free</span>
+</div>
+</div>
+<!-- Origin & Destination Inputs + Swap Button -->
+<div class="flex items-center gap-2 pl-1">
+<!-- Visual Connecting Dots -->
+<div class="flex flex-col items-center justify-center py-1 flex-shrink-0">
+<span class="w-3 h-3 rounded-full border-2 border-white bg-[#2A9D8F] shadow-sm"></span>
+<span class="w-0.5 h-6 bg-slate-300 my-0.5 border-dashed"></span>
+<span class="w-3 h-3 rounded-full border-2 border-white bg-secondary shadow-sm"></span>
+</div>
+<!-- Texts Readout -->
+<div class="flex-1 min-w-0 flex flex-col gap-1.5">
+<div class="flex items-center justify-between bg-surface-container-low/70 px-2.5 py-1.5 rounded-lg border border-slate-200/50">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] uppercase tracking-wider text-outline leading-tight">Starting Point</span>
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface truncate">Main Entrance (Gate 1)</span>
+</div>
+<span class="material-symbols-outlined text-[#2A9D8F] text-[16px] ml-1">my_location</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low/70 px-2.5 py-1.5 rounded-lg border border-slate-200/50">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] uppercase tracking-wider text-outline leading-tight">Destination</span>
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface truncate">IT Block (Ground Portico)</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[16px] ml-1">place</span>
+</div>
+</div>
+<!-- Swap Route Action Button -->
+<button aria-label="Swap origin and destination" class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center transition-transform active:rotate-180 duration-300 shadow-sm flex-shrink-0" id="swapBtn">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 3. RIGHT FLOATING HUD CONTROLS -->
+<div class="absolute right-4 top-[32%] flex flex-col gap-2.5 z-20 items-end">
+<!-- Compass / North Reset -->
+<button aria-label="North orientation reset" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_10px_rgba(0,0,0,0.12)] border border-white/60 flex items-center justify-center transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-secondary">explore</span>
+</button>
+<!-- 3D / 2D Perspective Toggle -->
+<button aria-label="Toggle 2D or 3D perspective" class="h-10 px-3 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_10px_rgba(0,0,0,0.12)] border border-white/60 flex items-center justify-center gap-1 font-label-md text-label-md active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-[#2A9D8F]">view_in_ar</span>
+<span class="font-bold text-xs text-on-surface">3D</span>
+</button>
+<!-- Re-center View -->
+<button aria-label="Re-center view" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_10px_rgba(0,0,0,0.12)] border border-white/60 flex items-center justify-center transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[20px] text-[#2A9D8F]">near_me</span>
+</button>
+<!-- Audio / Voice Guidance Toggle -->
+<button aria-label="Toggle audio prompts" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_10px_rgba(0,0,0,0.12)] border border-white/60 flex items-center justify-center transition-transform active:scale-95" id="audioToggleBtn">
+<span class="material-symbols-outlined text-[20px] text-[#2A9D8F]">volume_up</span>
+</button>
+</div>
+<!-- 4. COMPACT BOTTOM NAVIGATION DRAWER (Collapsible Google Maps Style) -->
+<div class="relative z-30 w-full max-w-md mx-auto">
+<div class="bg-surface-container-lowest rounded-t-3xl shadow-[0_-6px_25px_rgba(17,28,45,0.12)] border-t border-slate-100 flex flex-col max-h-[82dvh] drawer-transition overflow-hidden pb-safe" id="navDrawer">
+<!-- Drag Handle -->
+<div class="w-full pt-3 pb-2 flex items-center justify-center cursor-pointer select-none" id="dragHeader">
+<div class="w-10 h-1.5 bg-slate-300 rounded-full"></div>
+</div>
+<div class="px-5 pt-1 pb-4 flex flex-col gap-3.5 overflow-y-auto">
+<!-- Key Route Summary Bar -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-[22px] font-bold text-[#2A9D8F]">4 min</span>
+<span class="text-outline-variant font-bold">•</span>
+<span class="text-on-surface-variant font-medium text-[15px]">320 m</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px] bg-surface-container-low px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[15px] text-[#2A9D8F]">check_circle</span>
+<span>Flat paved walkway</span>
+</div>
+</div>
+<!-- Next Immediate Turn Banner -->
+<div class="bg-surface-container-low/90 border border-slate-200/60 rounded-xl p-3 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-[#2A9D8F] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">straight</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-[10px] uppercase font-bold tracking-wider text-[#2A9D8F]">NEXT TURN</span>
+<span class="font-label-sm text-[11px] text-outline">80 m</span>
+</div>
+<p class="font-headline-sm text-[14px] font-semibold text-on-surface truncate mt-0.5">Head straight 80m towards Civil Block</p>
+</div>
+</div>
+<!-- Primary Action Button: Teal #2A9D8F -->
+<button class="w-full h-12 bg-[#2A9D8F] hover:bg-[#21867a] active:scale-[0.98] text-white font-headline-sm text-[15px] font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(42,157,143,0.35)] transition-all" id="startNavBtn">
+<span class="material-symbols-outlined text-[20px]">navigation</span>
+<span>Start Turn-by-Turn Navigation</span>
+</button>
+<!-- Collapsed Secondary Preview Trigger -->
+<button class="w-full py-1 text-center text-[13px] font-medium text-tertiary hover:text-primary flex items-center justify-center gap-1 transition-colors" id="expandStepsBtn">
+<span id="stepsBtnText">View All 4 Steps</span>
+<span class="material-symbols-outlined text-[18px] transition-transform duration-200" id="stepsArrow">expand_more</span>
+</button>
+<!-- Expandable Detailed Turn Sequence & Verified Landmarks (Initially Hidden) -->
+<div class="hidden flex-col gap-3 pt-2 border-t border-slate-100" id="detailedStepsSection">
+<div class="flex items-center justify-between px-1">
+<span class="font-headline-sm text-sm font-semibold text-on-surface">Detailed Waypoints</span>
+<span class="font-label-sm text-[11px] text-outline">MNMJEC Ground Campus</span>
+</div>
+<!-- Step 1 -->
+<div class="flex items-start gap-3 p-2 rounded-lg bg-surface-container-low/50">
+<div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-[#2A9D8F] flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">door_front</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between">
+<p class="text-[13px] font-semibold text-on-surface">Main Entrance (Gate 1)</p>
+<span class="text-[11px] text-outline">0 m</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Campus barrier &amp; security checkpost</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex items-start gap-3 p-2 rounded-lg bg-surface-container-low/50">
+<div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-[#2A9D8F] flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">turn_right</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between">
+<p class="text-[13px] font-semibold text-on-surface">Turn right before Civil Block</p>
+<span class="text-[11px] text-outline">110 m</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Follow the tree-lined pedestrian path</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex items-start gap-3 p-2 rounded-lg bg-surface-container-low/50">
+<div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-[#2A9D8F] flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">straight</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between">
+<p class="text-[13px] font-semibold text-on-surface">Proceed past First Year Lawn</p>
+<span class="text-[11px] text-outline">90 m</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Continue toward the shaded IT corridor</p>
+</div>
+</div>
+<!-- Step 4 (Arrival) -->
+<div class="flex items-start gap-3 p-2 rounded-lg bg-emerald-50/70 border border-[#2A9D8F]/20">
+<div class="w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between">
+<p class="text-[13px] font-semibold text-on-surface">Arrive at IT Block Portico</p>
+<span class="text-[11px] text-secondary font-bold">40 m</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Ground Floor Entrance with accessible ramp</p>
+</div>
+</div>
+<!-- Verified Landmarks Strip -->
+<div class="flex flex-col gap-1.5 mt-1">
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Wayfinding Landmarks</span>
+<div class="grid grid-cols-2 gap-2">
+<div class="relative rounded-xl overflow-hidden bg-slate-100 h-20 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="MNMJEC First Year academic block with modern red-brick facade and walking corridors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANOJeU-0P-fPsLHWfKfyT-SMRuvX-vwYOTWjdye955t4pY_7LbztjewhK2OSFW1dkmg6FMPcXZnAqSxuxVov1hXl1QELUEHiBxMADotkcjX_ZGcOIcAdAYVRx2Fh-lLO6b9WggWBD9Zkw8o7nNZD1HHcTGg71esWCcV99LaTadtHECqDGOq1VWXCvlpbY9ONoYS65isjXTyfrz1Sir3j5aWcgphV_O6jg_-xP5t88utKFYvqTqj2qb0Q">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-1.5">
+<span class="text-[11px] text-white font-medium">First Year Lawn</span>
+</div>
+</div>
+<div class="relative rounded-xl overflow-hidden bg-slate-100 h-20 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="IT Block entrance at Misrimal Navajee Munoth Jain Engineering College with wide glass facade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_eT5QLeZcPaWmFEj-YVaJZWPH5Bvl_2bM4Ls4S9eeNv12jFdibvUCUaFE9wlHSnTjsS_zPR3Uj19WKZ7XJYvqmDT85vfjPFOONUTAF8opNCxBAA_Mw4CaFgDMwRAw3NzvcHwsFgO0BrZmkq_K3uUc1tV3Nag6E2IB0GzcH1ikByjg6yOqmdMewRe04EWl1Wc6-vBmZt27SwcXK-HD-EXJcbY6MR3NLU7UGDQG5REc8Jza0H83lWnYRQ">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-1.5">
+<span class="text-[11px] text-white font-medium">IT Block Portico</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Client-side Interactive Behaviors -->
+<script>
+    (function initNavigationHUD() {
+      // Audio Mute/Unmute
+      const audioBtn = document.getElementById('audioToggleBtn');
+      let muted = false;
+      if (audioBtn) {
+        audioBtn.addEventListener('click', () => {
+          muted = !muted;
+          const icon = audioBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.textContent = muted ? 'volume_off' : 'volume_up';
+            icon.classList.toggle('text-outline', muted);
+            icon.classList.toggle('text-[#2A9D8F]', !muted);
+          }
+        });
+      }
+
+      // Live Navigation Button Action
+      const startBtn = document.getElementById('startNavBtn');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          startBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">sync</span><span>Starting GPS...</span>';
+          setTimeout(() => {
+            startBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">pause</span><span>Navigation Active</span>';
+            startBtn.classList.replace('bg-[#2A9D8F]', 'bg-[#1f7a6f]');
+          }, 800);
+        });
+      }
+
+      // Expandable Steps Drawer Toggle
+      const expandBtn = document.getElementById('expandStepsBtn');
+      const dragHeader = document.getElementById('dragHeader');
+      const stepsSection = document.getElementById('detailedStepsSection');
+      const stepsText = document.getElementById('stepsBtnText');
+      const stepsArrow = document.getElementById('stepsArrow');
+      let isExpanded = false;
+
+      function toggleSteps() {
+        isExpanded = !isExpanded;
+        if (isExpanded) {
+          stepsSection.classList.remove('hidden');
+          stepsSection.classList.add('flex');
+          stepsText.textContent = 'Hide Turn Details';
+          stepsArrow.style.transform = 'rotate(180deg)';
+        } else {
+          stepsSection.classList.add('hidden');
+          stepsSection.classList.remove('flex');
+          stepsText.textContent = 'View All 4 Steps';
+          stepsArrow.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      if (expandBtn) expandBtn.addEventListener('click', toggleSteps);
+      if (dragHeader) dragHeader.addEventListener('click', toggleSteps);
+
+      // Swap button animation
+      const swapBtn = document.getElementById('swapBtn');
+      if (swapBtn) {
+        swapBtn.addEventListener('click', () => {
+          swapBtn.classList.toggle('rotate-180');
+        });
+      }
+    })();
+  </script>
+</body></html>

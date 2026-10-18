@@ -1,0 +1,433 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-surface": "#263143", "tertiary-fixed-dim": "#b7c8e1", "inverse-on-surface": "#ecf1ff", "on-primary": "#ffffff", "on-tertiary-fixed-variant": "#38485d", "surface": "#f9f9ff", "tertiary-fixed": "#d3e4fe", "surface-tint": "#006a60", "surface-dim": "#cfdaf2", "inverse-primary": "#6fd8c8", "primary-fixed-dim": "#6fd8c8", "on-secondary-fixed": "#3c0700", "outline-variant": "#bcc9c6", "error": "#ba1a1a", "on-secondary-container": "#731a04", "on-surface-variant": "#3d4947", "on-primary-container": "#f4fffb", "background": "#f9f9ff", "secondary-fixed": "#ffdad2", "on-surface": "#111c2d", "secondary-container": "#ff8162", "on-background": "#111c2d", "primary": "#00685d", "surface-bright": "#f9f9ff", "surface-container-highest": "#d8e3fb", "outline": "#6d7a77", "secondary-fixed-dim": "#ffb4a2", "surface-container-lowest": "#ffffff", "tertiary-container": "#66768d", "on-secondary-fixed-variant": "#83260e", "surface-container-low": "#f0f3ff", "on-error": "#ffffff", "on-primary-fixed-variant": "#005048", "on-tertiary-container": "#fdfcff", "error-container": "#ffdad6", "tertiary": "#4d5d73", "surface-container-high": "#dee8ff", "on-primary-fixed": "#00201c", "surface-container": "#e7eeff", "on-tertiary": "#ffffff", "surface-variant": "#d8e3fb", "on-tertiary-fixed": "#0b1c30", "secondary": "#a33d23", "on-error-container": "#93000a", "on-secondary": "#ffffff", "primary-container": "#008376", "primary-fixed": "#8cf5e4" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin-desktop": "2rem", "space-lg": "1.5rem", "gutter-desktop": "1.5rem", "space-md": "1rem", "gutter": "1rem", "margin": "1rem" }, "fontFamily": { "label-sm": ["Inter"], "display": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Inter"], "label-lg": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "headline-lg-mobile": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-lg-mobile": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full h-full px-space-md flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-[0_2px_8px_rgba(0,104,93,0.25)]"><span class="material-symbols-outlined text-on-primary text-[22px]">explore</span></div><div><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase">PATH FINDER</span><span class="px-space-xs py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm">MNMJEC 3D</span></div><span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline-block">Misrimal Navajee Munoth Jain Engg. College</span></div></div><div class="h-5 w-px bg-surface-container-high hidden md:block"></div><div class="hidden md:flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-surface-container-low"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Live Campus Map</span></div></div><div class="flex items-center gap-space-md"><nav class="hidden xl:flex items-center gap-1" data-active-classes="bg-primary-container text-on-primary-container font-medium rounded-lg"><a class="px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="3d-campus-explorer" href="#">Explorer</a><a aria-current="page" class="px-space-sm py-1.5 transition-colors bg-primary-container text-on-primary-container font-medium rounded-lg" data-path="route-navigation" href="#">Directions</a><a class="px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="building-details-and-floor-selection" href="#">Buildings</a></nav><div class="flex items-center gap-space-xs"><div class="hidden lg:flex items-center gap-1 px-space-sm py-1 rounded-full bg-surface-container-low text-on-surface-variant"><span class="material-symbols-outlined text-[16px] text-primary">wifi</span><span class="font-label-sm text-label-sm">PWA Ready</span></div><button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Accessibility &amp; Facilities" type="button"><span class="material-symbols-outlined text-[20px]">accessibility_new</span></button><button class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Admin Management" type="button"><span class="material-symbols-outlined text-[20px]">admin_panel_settings</span></button><div class="h-5 w-px bg-surface-container-high"></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-96 bg-surface-container-lowest shadow-[0_4px_20px_rgba(0,0,0,0.06)] z-40 flex flex-col"><div class="p-space-md bg-surface-container-low/60 flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">apartment</span><span class="font-headline-sm text-headline-sm text-on-surface">Campus Navigation</span></div><div class="flex items-center gap-1"><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Filter Facilities" type="button"><span class="material-symbols-outlined text-[18px]">tune</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" title="Collapse Sidebar" type="button"><span class="material-symbols-outlined text-[18px]">first_page</span></button></div></div><nav class="flex items-center p-space-xs gap-1 bg-surface-container" data-active-classes="bg-primary text-on-primary shadow-sm"><a class="flex-1 flex items-center justify-center gap-1.5 py-2 px-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-all" data-path="3d-campus-explorer" href="#"><span class="material-symbols-outlined text-[18px]">explore</span><span>Explorer</span></a><a aria-current="page" class="flex-1 flex items-center justify-center gap-1.5 py-2 px-space-xs rounded-lg font-label-md transition-all bg-primary text-on-primary shadow-sm" data-path="route-navigation" href="#"><span class="material-symbols-outlined text-[18px]">alt_route</span><span>Directions</span></a><a class="flex-1 flex items-center justify-center gap-1.5 py-2 px-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-all" data-path="building-details-and-floor-selection" href="#"><span class="material-symbols-outlined text-[18px]">layers</span><span>Buildings</span></a></nav><div class="flex-1 overflow-y-auto"><div class="p-space-md"><div class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-xl mb-space-md"><span class="material-symbols-outlined text-on-surface-variant pl-space-xs text-[18px]">search</span><input class="w-full bg-transparent text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm outline-none px-space-xs" placeholder="Search labs, halls, blocks..." type="text"></div><div class="flex items-center justify-between text-on-surface-variant mb-space-sm"><span class="font-label-sm text-label-sm uppercase tracking-wider">Active Module View</span><span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-primary">Interactive</span></div><div class="rounded-xl bg-surface-container-low p-space-md flex flex-col gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface">Interactive Workspace</span><p class="font-body-sm text-body-sm text-on-surface-variant">Select a tab above to switch contextual panels between campus spatial overview, route guidance, and detailed department floor maps.</p></div></div></div><div class="p-space-md bg-surface-container-lowest shadow-[0_-2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full bg-primary"></div><span class="font-label-md text-label-md text-on-surface font-medium">Main Campus Gate 1</span></div><span class="font-label-sm text-label-sm text-on-surface-variant">GPS Locked</span></div></aside><div class="pl-96"><main class="relative pt-16 min-h-screen bg-surface"><div class="flex flex-col w-full relative">
+<!-- Interactive 3D Campus Viewport & Navigation Workspace -->
+<div class="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface flex">
+<!-- FLOATING LEFT PANEL: Route Planner & Waypoint Guidance (Hovering Glassmorphic Card) -->
+<div class="absolute left-6 top-6 bottom-6 w-[400px] z-20 flex flex-col pointer-events-none">
+<div class="pointer-events-auto flex-1 flex flex-col bg-surface-container-lowest/95 backdrop-blur-xl rounded-xl shadow-[0_16px_36px_-6px_rgba(17,28,45,0.14)] overflow-hidden">
+<!-- Planner Header & Mode Selector -->
+<div class="p-space-md bg-surface-container-low/70 flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<a class="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" data-path="3d-campus-explorer" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>Back to Campus Explorer</span>
+</a>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+              Live Route Mode
+            </span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">Campus Wayfinder</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">MNMJEC · ROUTE #04</span>
+</div>
+</div>
+<!-- Scrollable Guidance Body -->
+<div class="flex-1 overflow-y-auto p-space-md space-y-space-md">
+<!-- Origin & Destination Inputs Card -->
+<div class="relative bg-surface-container-low rounded-xl p-space-md shadow-sm">
+<div class="flex items-center gap-space-sm mb-3">
+<div class="flex flex-col items-center gap-1">
+<span class="w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center shadow-[0_0_8px_rgba(0,104,93,0.5)]">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</span>
+<span class="w-0.5 h-8 bg-surface-container-highest"></span>
+<span class="w-3.5 h-3.5 rounded-full bg-secondary flex items-center justify-center shadow-[0_0_8px_rgba(163,61,35,0.4)]">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</span>
+</div>
+<div class="flex-1 flex flex-col gap-2 min-w-0">
+<!-- Origin -->
+<div class="flex flex-col bg-surface-container-lowest rounded-lg px-space-sm py-1.5 shadow-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Start Point</span>
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">Main Entrance (Gate 1)</span>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+</div>
+<!-- Destination -->
+<div class="flex flex-col bg-surface-container-lowest rounded-lg px-space-sm py-1.5 shadow-sm">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Destination</span>
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">IT Block (Ground Portico)</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">pin_drop</span>
+</div>
+</div>
+</div>
+<!-- Swap Button -->
+<button class="w-9 h-9 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all flex items-center justify-center shadow-sm" title="Swap Origin and Destination" type="button">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+<!-- Route Preference Toggles -->
+<div class="pt-space-xs flex flex-col gap-2">
+<div class="flex items-center justify-between py-1.5 px-space-sm rounded-lg bg-surface-container-lowest">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">accessible</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Step-Free / Ramp Only</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Smooth paved campus walkways</span>
+</div>
+</div>
+<div class="w-9 h-5 rounded-full bg-primary flex items-center justify-end px-0.5 cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-surface-container-lowest shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-1.5 px-space-sm rounded-lg bg-surface-container-lowest/70">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">wb_shade</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Shaded Walkway Priority</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Avenue tree canopy path</span>
+</div>
+</div>
+<div class="w-9 h-5 rounded-full bg-surface-container-highest flex items-center justify-start px-0.5 cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-surface-container-lowest shadow-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Turn-by-Turn Waypoint Guidance -->
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Turn-by-Turn Landmark Route</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high font-label-sm text-label-sm text-on-surface">4 Waypoints</span>
+</div>
+<ol class="relative pl-6 space-y-3.5 before:absolute before:left-2 before:top-2 before:bottom-3 before:w-0.5 before:bg-surface-container-high">
+<!-- Step 1 -->
+<li class="relative">
+<span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-sm text-label-sm shadow-[0_0_8px_rgba(0,104,93,0.35)]">1</span>
+<div class="bg-surface-container-low p-space-sm rounded-lg">
+<span class="font-label-sm text-label-sm text-primary uppercase">Departure Gate</span>
+<p class="font-body-md text-body-md text-on-surface font-medium">Start at Main Entrance (Gate 1 Checkpoint)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Clear student turnstile security kiosk</p>
+</div>
+</li>
+<!-- Step 2 -->
+<li class="relative">
+<span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-sm text-label-sm">2</span>
+<div class="bg-surface-container-low p-space-sm rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Walkway Segment</span>
+<p class="font-body-md text-body-md text-on-surface font-medium">Proceed straight along Main Avenue with First Year Block on left</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Stay on the paved tactile walkway</p>
+</div>
+</li>
+<!-- Step 3 -->
+<li class="relative">
+<span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-sm text-label-sm">3</span>
+<div class="bg-surface-container-low p-space-sm rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Key Junction</span>
+<p class="font-body-md text-body-md text-on-surface font-medium">Follow walkway towards Civil Block junction</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Veer slight right at the central garden plaza fountain</p>
+</div>
+</li>
+<!-- Step 4 (Arrive) -->
+<li class="relative">
+<span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-label-sm text-label-sm shadow-[0_0_8px_rgba(163,61,35,0.4)]">4</span>
+<div class="bg-secondary-fixed/50 p-space-sm rounded-lg">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-semibold">Arrival Destination</span>
+<p class="font-body-md text-body-md text-on-surface font-medium">Arrive at IT Block (East Portico &amp; Ramp Entrance)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Main lobby elevators &amp; department reception ahead</p>
+</div>
+</li>
+</ol>
+</div>
+<!-- Waypoint Landmark Photographic Confirmations -->
+<div class="space-y-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Campus Visual Landmarks</span>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="group relative rounded-xl overflow-hidden bg-surface-container aspect-video shadow-sm">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Clear daytime architectural view of the lush First Year Block green lawn on college campus with manicured hedges, brick walkways, and modern engineering college faculty building in clean natural sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp3AvtTzmSeWb24cwBwFKav2mDi9ZF91M-jQnE-e3PhazceLfYYu2pdudwci__4Dngy7LOjnJvszPUUuC82uNk8T1h2UJb7RjgdhwnhtEoMjYZd0tTNDaaq4QPejM1i_9S5u2vjLdK8KbjsXCMrLzBtEBuizqLxrZOHRaemBBcibPlr2LVNDxxD9v-txYDP7GnJw9n4u6V8Z9qxDAjdnTjpIwzRsIr5G73KJJ44IqV0RqTvXQxlBxBfw">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-sm text-label-sm text-inverse-on-surface font-medium truncate">First Year Block Lawn</span>
+<span class="font-body-sm text-body-sm text-inverse-on-surface/80 text-[10px]">Turn checkpoint</span>
+</div>
+</div>
+<div class="group relative rounded-xl overflow-hidden bg-surface-container aspect-video shadow-sm">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Modern Indian technical university Information Technology block entrance portico with smooth ramp access, polished pillars, glass doors, and signboards welcoming students under clear blue sky." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB299dB-90uspDEoK9c0fEUqMAcotZMlYhAQqwCpWerIKi06D4P6pOSwSwS3iaK11ACLu-bJQwJQp9e_eGQjNUoix2cJHkQhDmnmKHYeQ8WTwG_DBU-SrJISLgUx38f0hESzd-GtPnnuR7GLX3OcMEi7y-qHR1HdTwRgMiAwgTBfjBoEsfjFCSjso5cAJb2WnYo1KHEnwIHyXITT_ykIxym1msHa_BZhEJevwtMr1yO6A3uui2oEiB-rA">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-sm text-label-sm text-inverse-on-surface font-medium truncate">IT Block Portico</span>
+<span class="font-body-sm text-body-sm text-inverse-on-surface/80 text-[10px]">Accessible entrance</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Campus Route Verification Notice -->
+<div class="p-space-sm rounded-xl bg-surface-container-low flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface font-semibold">MNMJEC Verified Route</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Mapped by campus wayfinding engine · Ground level validated</p>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Route Actions -->
+<div class="p-space-md bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.04)] flex flex-col gap-2">
+<button class="w-full h-11 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(0,104,93,0.3)] hover:brightness-95 active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">navigation</span>
+<span>Start Active Campus Navigation</span>
+</button>
+<button class="w-full h-9 rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-primary text-[18px]">floor</span>
+<span>Switch to IT Block Floor Directory</span>
+</button>
+</div>
+</div>
+</div>
+<!-- MAIN 3D CAMPUS VIEWPORT (Occupying 100% Canvas with Vector-rendered 3D Isometric Scene) -->
+<div class="relative w-full h-full bg-gradient-to-b from-surface-container-low via-surface to-surface-container-low overflow-hidden cursor-grab active:cursor-grabbing select-none">
+<!-- Stylized Vector Campus Isometric Architectural Canvas -->
+<svg class="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 850" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Ground Mesh Pattern -->
+<pattern height="40" id="campusGrid" patternUnits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" opacity="0.6" stroke="#D8E3FB" stroke-dasharray="2 3" stroke-width="0.8"></path>
+</pattern>
+<!-- Polyline Route Glow Filter -->
+<filter height="140%" id="routeGlow" width="140%" x="-20%" y="-20%">
+<feGaussianBlur result="blur" stdDeviation="4"></feGaussianBlur>
+<feMerge>
+<feMergeNode in="blur"></feMergeNode>
+<feMergeNode in="blur"></feMergeNode>
+<feMergeNode in="SourceGraphic"></feMergeNode>
+</feMerge>
+</filter>
+<!-- Linear Gradients for Isometric Campus Buildings -->
+<linearGradient id="mainBlockFront" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#dee8ff"></stop>
+<stop offset="100%" stop-color="#cfdaf2"></stop>
+</linearGradient>
+<linearGradient id="mainBlockSide" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#bcc9c6"></stop>
+<stop offset="100%" stop-color="#a3b4b0"></stop>
+</linearGradient>
+<linearGradient id="mainBlockTop" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffffff"></stop>
+<stop offset="100%" stop-color="#f0f3ff"></stop>
+</linearGradient>
+<!-- IT Block Destination Accent Building Gradient -->
+<linearGradient id="itBlockFront" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#8cf5e4"></stop>
+<stop offset="100%" stop-color="#008376"></stop>
+</linearGradient>
+<linearGradient id="itBlockSide" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0%" stop-color="#00685d"></stop>
+<stop offset="100%" stop-color="#005048"></stop>
+</linearGradient>
+<linearGradient id="itBlockTop" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffffff"></stop>
+<stop offset="100%" stop-color="#d8e3fb"></stop>
+</linearGradient>
+<!-- Tree foliage gradient -->
+<radialGradient cx="35%" cy="35%" id="foliageGrad" r="65%">
+<stop offset="0%" stop-color="#6fd8c8"></stop>
+<stop offset="60%" stop-color="#008376"></stop>
+<stop offset="100%" stop-color="#005048"></stop>
+</radialGradient>
+</defs>
+<!-- Base Coordinate Plane Grid -->
+<rect fill="url(#campusGrid)" height="100%" width="100%"></rect>
+<!-- Campus Road Network & Open Lawn Plazas -->
+<g id="campus-infrastructure" opacity="0.95">
+<!-- Main Avenue Paved Road (Isometric Perspective) -->
+<polygon fill="#e7eeff" points="380,780 430,810 980,480 930,450"></polygon>
+<polygon fill="#dee8ff" points="430,810 520,850 1070,520 980,480"></polygon>
+<!-- Secondary Walkways -->
+<polygon fill="#f0f3ff" points="610,640 650,660 760,590 720,570"></polygon>
+<polygon fill="#f0f3ff" points="760,590 910,670 940,650 790,575"></polygon>
+<polygon fill="#e7eeff" points="980,480 1030,505 1200,410 1150,385"></polygon>
+<!-- Landscaped Lawns / Central Court -->
+<polygon fill="#e2f5f1" points="630,520 820,415 890,455 700,560"></polygon>
+<polygon fill="#cbebe5" points="700,560 890,455 910,470 720,575"></polygon>
+<!-- Round Fountain at Central Court Junction -->
+<ellipse cx="800" cy="485" fill="#d3e4fe" rx="36" ry="18"></ellipse>
+<ellipse cx="800" cy="482" fill="#008376" opacity="0.3" rx="30" ry="14"></ellipse>
+<ellipse cx="800" cy="480" fill="#6fd8c8" rx="14" ry="7"></ellipse>
+</g>
+<!-- Stylized 3D Isometric Campus Buildings -->
+<g id="campus-buildings">
+<!-- 1. First Year Block (Left Avenue) -->
+<g transform="translate(480, 500)">
+<!-- Building Shadow -->
+<polygon fill="#111c2d" opacity="0.06" points="-10,50 160,140 220,105 50,15"></polygon>
+<!-- Building Base (Extrusion) -->
+<polygon fill="url(#mainBlockFront)" points="0,0 80,45 80,110 0,65"></polygon>
+<polygon fill="url(#mainBlockSide)" points="80,45 180,-10 180,55 80,110"></polygon>
+<!-- Building Roof -->
+<polygon fill="url(#mainBlockTop)" points="0,0 100,-55 180,-10 80,45"></polygon>
+<!-- Windows details -->
+<line opacity="0.4" stroke="#00685d" stroke-dasharray="4 4" stroke-width="2" x1="20" x2="65" y1="20" y2="45"></line>
+<line opacity="0.4" stroke="#00685d" stroke-dasharray="4 4" stroke-width="2" x1="20" x2="65" y1="35" y2="60"></line>
+<line opacity="0.4" stroke="#00685d" stroke-dasharray="4 4" stroke-width="2" x1="100" x2="160" y1="40" y2="5"></line>
+<!-- Building Label Badge -->
+<g transform="translate(90, -45)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="24" rx="12" width="100" x="-50" y="-12"></rect>
+<text fill="#111c2d" font-family="Inter" font-size="11" font-weight="600" text-anchor="middle" x="0" y="4">First Year Block</text>
+</g>
+</g>
+<!-- 2. Civil Engineering Block (Mid Junction) -->
+<g transform="translate(730, 340)">
+<!-- Shadow -->
+<polygon fill="#111c2d" opacity="0.06" points="-10,60 140,145 190,115 40,30"></polygon>
+<!-- Extrusion -->
+<polygon fill="url(#mainBlockFront)" points="0,20 70,60 70,120 0,80"></polygon>
+<polygon fill="url(#mainBlockSide)" points="70,60 160,10 160,70 70,120"></polygon>
+<!-- Roof -->
+<polygon fill="url(#mainBlockTop)" points="0,20 90,-30 160,10 70,60"></polygon>
+<!-- Label Badge -->
+<g transform="translate(80, -15)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="24" rx="12" width="84" x="-42" y="-12"></rect>
+<text fill="#111c2d" font-family="Inter" font-size="11" font-weight="600" text-anchor="middle" x="0" y="4">Civil Block</text>
+</g>
+</g>
+<!-- 3. Main Administrative Block (Background Left) -->
+<g transform="translate(420, 240)">
+<polygon fill="url(#mainBlockFront)" opacity="0.85" points="0,40 120,110 120,180 0,110"></polygon>
+<polygon fill="url(#mainBlockSide)" opacity="0.85" points="120,110 240,40 240,110 120,180"></polygon>
+<polygon fill="url(#mainBlockTop)" points="0,40 120,-30 240,40 120,110"></polygon>
+<g transform="translate(120, -10)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="24" opacity="0.95" rx="12" width="90" x="-45" y="-12"></rect>
+<text fill="#111c2d" font-family="Inter" font-size="11" font-weight="600" text-anchor="middle" x="0" y="4">Admin Block</text>
+</g>
+</g>
+<!-- 4. IT Block (Primary Destination Landmark) -->
+<g transform="translate(1040, 360)">
+<!-- Drop Shadow -->
+<polygon fill="#00685d" opacity="0.12" points="-20,60 160,165 240,120 60,15"></polygon>
+<!-- Building Structure -->
+<polygon fill="url(#itBlockFront)" points="0,15 90,65 90,150 0,100"></polygon>
+<polygon fill="url(#itBlockSide)" points="90,65 210,0 210,85 90,150"></polygon>
+<polygon fill="url(#itBlockTop)" points="0,15 120,-50 210,0 90,65"></polygon>
+<!-- Portico Entrance Structure -->
+<polygon fill="#ffffff" points="-25,75 25,102 25,130 -25,103"></polygon>
+<polygon fill="#dee8ff" points="25,102 55,85 55,113 25,130"></polygon>
+<polygon fill="#8cf5e4" points="-25,75 5,58 55,85 25,102"></polygon>
+<!-- Architectural Columns -->
+<rect fill="#00685d" height="22" width="4" x="-15" y="103"></rect>
+<rect fill="#00685d" height="22" width="4" x="0" y="112"></rect>
+<rect fill="#00685d" height="22" width="4" x="15" y="120"></rect>
+<!-- IT Block Destination Beacon & Glow Label -->
+<g transform="translate(105, -35)">
+<rect fill="#111c2d" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.18))" height="32" rx="16" width="130" x="-65" y="-16"></rect>
+<circle cx="-45" cy="0" fill="#ff8162" r="5"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="12" font-weight="700" letter-spacing="0.02em" text-anchor="middle" x="12" y="4">IT BLOCK</text>
+<!-- Portico Indicator -->
+<rect fill="#00685d" height="20" rx="10" width="110" x="-55" y="20"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="0" y="34">GROUND PORTICO</text>
+</g>
+</g>
+</g>
+<!-- Campus Tree Foliage (Canopy Avenue) -->
+<g id="campus-trees">
+<!-- Tree 1 -->
+<ellipse cx="440" cy="740" fill="url(#foliageGrad)" rx="16" ry="22"></ellipse>
+<path d="M438,760 L442,760 L441,770 Z" fill="#6d7a77"></path>
+<!-- Tree 2 -->
+<ellipse cx="500" cy="700" fill="url(#foliageGrad)" rx="18" ry="24"></ellipse>
+<!-- Tree 3 -->
+<ellipse cx="560" cy="660" fill="url(#foliageGrad)" rx="17" ry="23"></ellipse>
+<!-- Tree 4 -->
+<ellipse cx="710" cy="570" fill="url(#foliageGrad)" rx="18" ry="25"></ellipse>
+<!-- Tree 5 -->
+<ellipse cx="880" cy="460" fill="url(#foliageGrad)" rx="19" ry="26"></ellipse>
+<!-- Tree 6 (Near IT Block) -->
+<ellipse cx="1020" cy="470" fill="url(#foliageGrad)" rx="20" ry="26"></ellipse>
+<ellipse cx="1180" cy="390" fill="url(#foliageGrad)" rx="22" ry="28"></ellipse>
+</g>
+<!-- ILLUMINATED 3D NAVIGATION ROUTE POLYLINE (From Gate 1 -> First Year -> Civil -> IT Block) -->
+<g id="navigation-route">
+<!-- Soft underglow line -->
+<path d="M 450,770 L 610,675 L 755,590 L 920,490 L 1025,445" fill="none" filter="url(#routeGlow)" opacity="0.45" stroke="#6fd8c8" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"></path>
+<!-- Core vibrant route polyline with pulse animation -->
+<path d="M 450,770 L 610,675 L 755,590 L 920,490 L 1025,445" fill="none" stroke="#008376" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></path>
+<!-- Dynamic Directional Dash Overlay -->
+<path class="animate-[pulse_1.5s_infinite]" d="M 450,770 L 610,675 L 755,590 L 920,490 L 1025,445" fill="none" stroke="#f4fffb" stroke-dasharray="10 18" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<!-- Intermediate Waypoint Way-markers -->
+<circle cx="610" cy="675" fill="#00685d" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="755" cy="590" fill="#00685d" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="920" cy="490" fill="#00685d" r="5" stroke="#ffffff" stroke-width="2"></circle>
+</g>
+<!-- STARTING POINT 3D PIN (Gate 1 Checkpoint) -->
+<g id="origin-pin" transform="translate(450, 770)">
+<!-- Ground Beacon Waves -->
+<ellipse class="animate-ping" cx="0" cy="0" fill="#00685d" opacity="0.2" rx="24" ry="12"></ellipse>
+<ellipse cx="0" cy="0" fill="#00685d" opacity="0.3" rx="16" ry="8"></ellipse>
+<!-- Vertical Pin Pole & 3D Head -->
+<line stroke="#00685d" stroke-linecap="round" stroke-width="3" x1="0" x2="0" y1="0" y2="-44"></line>
+<g transform="translate(0, -44)">
+<circle cx="0" cy="0" fill="#00685d" filter="drop-shadow(0 4px 8px rgba(0,104,93,0.4))" r="14"></circle>
+<circle cx="0" cy="0" fill="#ffffff" r="6"></circle>
+<text fill="#00685d" font-family="Inter" font-size="10" font-weight="900" text-anchor="middle" x="0" y="4">A</text>
+</g>
+<!-- Label Callout -->
+<g transform="translate(0, -70)">
+<rect fill="#ffffff" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.12))" height="24" rx="12" width="130" x="-65" y="-12"></rect>
+<circle cx="-50" cy="0" fill="#00685d" r="4"></circle>
+<text fill="#111c2d" font-family="Inter" font-size="11" font-weight="700" text-anchor="middle" x="6" y="4">Gate 1 (Origin)</text>
+</g>
+</g>
+<!-- DESTINATION 3D PIN (IT Block Ground Portico) -->
+<g id="destination-pin" transform="translate(1025, 445)">
+<!-- Ground Target Rings -->
+<ellipse class="animate-pulse" cx="0" cy="0" fill="#a33d23" opacity="0.2" rx="30" ry="15"></ellipse>
+<ellipse cx="0" cy="0" fill="#ff8162" opacity="0.4" rx="18" ry="9"></ellipse>
+<!-- Vertical 3D Pin -->
+<line stroke="#a33d23" stroke-linecap="round" stroke-width="3" x1="0" x2="0" y1="0" y2="-48"></line>
+<g transform="translate(0, -48)">
+<circle cx="0" cy="0" fill="#a33d23" filter="drop-shadow(0 6px 14px rgba(163,61,35,0.45))" r="16"></circle>
+<circle cx="0" cy="0" fill="#ffffff" r="7"></circle>
+<text fill="#a33d23" font-family="Inter" font-size="11" font-weight="900" text-anchor="middle" x="0" y="4">B</text>
+</g>
+</g>
+</svg>
+<!-- FLOATING TOP ROUTE ATTRIBUTE BADGE / PILL (Verification HUD) -->
+<div class="absolute top-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+<div class="pointer-events-auto flex items-center gap-2.5 px-space-md py-2.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_8px_24px_-4px_rgba(30,41,59,0.12)]">
+<span class="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0 animate-pulse"></span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Campus Verified Direct Walkway</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">multiple_airports</span>
+            Paved &amp; Level Ground
+          </span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">accessible_forward</span>
+            Step-Free
+          </span>
+</div>
+</div>
+<!-- FLOATING BOTTOM SUMMARY CARD OVER VIEWPORT -->
+<div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-full max-w-xl px-4">
+<div class="pointer-events-auto bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl p-space-md shadow-[0_12px_32px_-6px_rgba(17,28,45,0.16)] flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[26px]">directions_walk</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Main Gate to IT Block</h3>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">Fastest Route</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">
+                Direct via Central Avenue Plaza • Ramp access confirmed at Portico
+              </p>
+</div>
+</div>
+<div class="flex items-center gap-2 flex-shrink-0">
+<button class="w-10 h-10 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center" title="Audio Turn-by-Turn Guidance" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary">volume_up</span>
+</button>
+<button class="h-10 px-space-md rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center gap-1.5 shadow-sm hover:brightness-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">near_me</span>
+<span>Guide Me</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><aside aria-label="3D Map HUD Controls" class="fixed right-space-md top-20 z-30 flex flex-col items-center gap-space-sm"><button class="w-11 h-11 rounded-full bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] flex items-center justify-center text-secondary hover:bg-surface-container-lowest hover:scale-105 active:scale-95 transition-all" title="Compass Orientation (Reset North)" type="button"><span class="material-symbols-outlined text-[22px]">explore</span></button><button class="px-space-sm h-9 rounded-full bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] flex items-center gap-1 text-on-surface hover:bg-surface-container-lowest active:scale-95 transition-all" title="Toggle 2D / 3D Isometric View" type="button"><span class="material-symbols-outlined text-[18px] text-primary">view_in_ar</span><span class="font-label-sm text-label-sm font-semibold">3D</span></button><div class="flex flex-col rounded-xl bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] overflow-hidden"><button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Zoom In" type="button"><span class="material-symbols-outlined text-[20px]">add</span></button><div class="w-full h-px bg-surface-container"></div><button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Zoom Out" type="button"><span class="material-symbols-outlined text-[20px]">remove</span></button></div><div class="flex flex-col items-center rounded-full bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] p-1 gap-1"><button class="w-8 h-8 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-bold flex items-center justify-center" type="button">3</button><button class="w-8 h-8 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-sm text-label-sm font-bold flex items-center justify-center transition-colors" type="button">2</button><button class="w-8 h-8 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-sm text-label-sm font-bold flex items-center justify-center transition-colors" type="button">1</button><button class="w-8 h-8 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-sm text-label-sm font-bold flex items-center justify-center transition-colors" type="button">G</button></div><button class="w-11 h-11 rounded-full bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] flex items-center justify-center text-primary hover:bg-surface-container-lowest hover:scale-105 active:scale-95 transition-all" title="Reset to Main Gate 1 Origin" type="button"><span class="material-symbols-outlined text-[22px]">my_location</span></button><button class="w-11 h-11 rounded-full bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_16px_-2px_rgba(30,41,59,0.08)] flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest transition-colors" title="Fullscreen Map View" type="button"><span class="material-symbols-outlined text-[20px]">fullscreen</span></button></aside></main></div></body></html>

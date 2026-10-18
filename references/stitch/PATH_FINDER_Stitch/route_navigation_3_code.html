@@ -1,0 +1,456 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;height:100dvh;margin:0;padding:0;background-color:#f0f4f8;overflow:hidden;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,16px);}.pt-safe{padding-top:env(safe-area-inset-top,12px);}}::-webkit-scrollbar{display:none;}
+  .drawer-transition {
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  </style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-on-surface":"#ecf1ff","inverse-surface":"#263143","on-tertiary":"#ffffff","on-primary-fixed":"#00201c","error":"#ba1a1a","on-tertiary-container":"#fdfcff","error-container":"#ffdad6","primary":"#2A9D8F","tertiary":"#4d5d73","secondary":"#e76f51","background":"#f9f9ff","primary-container":"#21867a","surface-bright":"#f9f9ff","secondary-fixed-dim":"#ffb4a2","on-background":"#111c2d","on-secondary":"#ffffff","on-primary-container":"#f4fffb","on-secondary-fixed":"#3c0700","outline":"#6d7a77","outline-variant":"#bcc9c6","on-primary-fixed-variant":"#005048","primary-fixed-dim":"#6fd8c8","surface-dim":"#cfdaf2","surface-container-low":"#f0f3ff","surface-tint":"#2A9D8F","on-primary":"#ffffff","primary-fixed":"#8cf5e4","on-tertiary-fixed":"#0b1c30","tertiary-container":"#66768d","tertiary-fixed":"#d3e4fe","surface-container":"#e7eeff","surface-variant":"#d8e3fb","on-error":"#ffffff","surface-container-highest":"#d8e3fb","surface-container-high":"#dee8ff","tertiary-fixed-dim":"#b7c8e1","on-tertiary-fixed-variant":"#38485d","surface-container-lowest":"#ffffff","on-secondary-container":"#731a04","on-secondary-fixed-variant":"#83260e","on-surface":"#111c2d","on-surface-variant":"#3d4947","secondary-container":"#ff8162","secondary-fixed":"#ffdad2","inverse-primary":"#6fd8c8","on-error-container":"#93000a","surface":"#f9f9ff"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-xs":"0.25rem",margin:"1rem",gutter:"1rem","space-md":"1rem","space-xl":"2rem","gutter-desktop":"1.5rem","space-sm":"0.5rem","space-lg":"1.5rem","margin-desktop":"2rem"},fontFamily:{"label-md":["Inter"],"headline-sm":["Inter"],"headline-md":["Inter"],"body-sm":["Inter"],"label-sm":["Inter"],display":["Inter"],"body-lg":["Inter"],"headline-lg":["Inter"],"headline-lg-mobile":["Inter"],"label-lg":["Inter"],"body-md":["Inter"]},fontSize:{"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],"headline-sm":["16px",{lineHeight:"22px",letterSpacing:"0em",fontWeight:"600"}],"headline-md":["20px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"16px",letterSpacing:"0.01em",fontWeight:"400"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.04em",fontWeight:"600"}],display":["36px",{lineHeight:"44px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-lg":["16px",{lineHeight:"24px",letterSpacing:"0em",fontWeight:"400"}],"headline-lg":["28px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-lg-mobile":["22px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"label-lg":["14px",{lineHeight:"18px",letterSpacing:"0.01em",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",letterSpacing:"0em",fontWeight:"400"}]}}}};</script></head>
+<body class="bg-[#e9edf5] font-body-md text-body-md text-on-surface w-full h-[100dvh] relative overflow-hidden select-none flex flex-col justify-between antialiased selection:bg-primary-fixed">
+<!-- 1. IMMERSIVE 3D COLLEGE CAMPUS VIEWPORT (~75-80% Screen) -->
+<div class="absolute inset-0 w-full h-full z-0 overflow-hidden bg-gradient-to-b from-[#e1e9f4] via-[#eaf0f9] to-[#d8e3f0]" id="campus3DViewport">
+<!-- Stylized Campus Architectural Isometric Ground & Geometry SVG -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice" viewBox="0 0 390 844" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Glowing Teal Route Gradients -->
+<linearGradient id="campusTealGrad" x1="0%" x2="100%" y1="100%" y2="0%">
+<stop offset="0%" stop-color="#2A9D8F" stop-opacity="1"></stop>
+<stop offset="60%" stop-color="#48cae4" stop-opacity="0.95"></stop>
+<stop offset="100%" stop-color="#2A9D8F" stop-opacity="1"></stop>
+</linearGradient>
+<radialGradient cx="50%" cy="50%" id="courtyardGlow" r="50%">
+<stop offset="0%" stop-color="#99e2b4" stop-opacity="0.45"></stop>
+<stop offset="100%" stop-color="#99e2b4" stop-opacity="0"></stop>
+</radialGradient>
+<filter height="180%" id="routeGlow" width="180%" x="-40%" y="-40%">
+<feDropShadow dx="0" dy="0" flood-color="#2A9D8F" flood-opacity="0.75" stdDeviation="6"></feDropShadow>
+</filter>
+<filter height="150%" id="buildingShadow" width="150%" x="-25%" y="-25%">
+<feDropShadow dx="4" dy="10" flood-color="#1e2c3f" flood-opacity="0.18" stdDeviation="7"></feDropShadow>
+</filter>
+<filter height="160%" id="pinGlowShadow" width="160%" x="-30%" y="-30%">
+<feDropShadow dx="0" dy="4" flood-color="#111c2d" flood-opacity="0.3" stdDeviation="5"></feDropShadow>
+</filter>
+<pattern height="40" id="groundTile" patternUnits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" opacity="0.15" stroke="#cbd5e1" stroke-width="0.75"></path>
+</pattern>
+</defs>
+<!-- Subtle Campus Spatial Grid -->
+<rect fill="url(#groundTile)" height="100%" opacity="0.6" width="100%"></rect>
+<!-- MNMJEC Campus Perimeter & Landscaped Lawns -->
+<polygon fill="#d8e8dc" opacity="0.6" points="15,720 375,590 375,180 15,310"></polygon>
+<!-- Central Quad / Courtyard Garden -->
+<path d="M 120 540 C 180 490, 240 470, 260 520 C 270 560, 190 590, 130 570 Z" fill="#b7dfc8" opacity="0.8"></path>
+<circle cx="195" cy="530" fill="url(#courtyardGlow)" r="65"></circle>
+<!-- Landscaped Trees & Canopy Clusters (Isometric Campus Flora) -->
+<g opacity="0.85">
+<!-- Trees along avenue -->
+<circle cx="65" cy="625" fill="#52b788" opacity="0.3" r="14"></circle>
+<circle cx="65" cy="622" fill="#2d6a4f" opacity="0.75" r="9"></circle>
+<circle cx="120" cy="575" fill="#52b788" opacity="0.3" r="12"></circle>
+<circle cx="120" cy="572" fill="#40916c" opacity="0.8" r="8"></circle>
+<circle cx="210" cy="460" fill="#52b788" opacity="0.3" r="13"></circle>
+<circle cx="210" cy="457" fill="#2d6a4f" opacity="0.8" r="8.5"></circle>
+<circle cx="225" cy="350" fill="#52b788" opacity="0.3" r="14"></circle>
+<circle cx="225" cy="347" fill="#40916c" opacity="0.8" r="9"></circle>
+<circle cx="340" cy="270" fill="#52b788" opacity="0.3" r="15"></circle>
+<circle cx="340" cy="267" fill="#2d6a4f" opacity="0.75" r="10"></circle>
+</g>
+<!-- Stylized Campus Walkways & Pedestrian Boulevards -->
+<path d="M 60 670 L 120 590 L 195 500 L 255 425 L 275 315 L 305 245" fill="none" opacity="0.9" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="26"></path>
+<path d="M 60 670 L 120 590 L 195 500 L 255 425 L 275 315 L 305 245" fill="none" opacity="0.75" stroke="#dbe4ef" stroke-linecap="round" stroke-linejoin="round" stroke-width="20"></path>
+<!-- Campus Branch Walkways (Connecting other buildings) -->
+<path d="M 120 590 L 40 540" fill="none" opacity="0.5" stroke="#ffffff" stroke-linecap="round" stroke-width="12"></path>
+<path d="M 195 500 L 320 440" fill="none" opacity="0.5" stroke="#ffffff" stroke-linecap="round" stroke-width="12"></path>
+<path d="M 255 425 L 170 370" fill="none" opacity="0.5" stroke="#ffffff" stroke-linecap="round" stroke-width="12"></path>
+<!-- STYLIZED 3D CAMPUS BUILDINGS (Architectural Volumes) -->
+<!-- 1. MAIN BLOCK (Administrative & Auditorium near entrance) -->
+<g filter="url(#buildingShadow)">
+<!-- Shadow base -->
+<polygon fill="#b7c5d7" opacity="0.3" points="5,590 55,550 100,575 50,615"></polygon>
+<!-- Left Wall -->
+<polygon fill="#94a6bf" points="12,580 50,605 50,560 12,535"></polygon>
+<!-- Right Wall -->
+<polygon fill="#b1c3d9" points="50,605 95,575 95,530 50,560"></polygon>
+<!-- Roof -->
+<polygon fill="#dce6f2" points="12,535 50,560 95,530 57,505"></polygon>
+<!-- Window Accents Skewed -->
+<line opacity="0.5" stroke="#4d5d73" stroke-width="2" x1="24" x2="42" y1="560" y2="572"></line>
+<line opacity="0.5" stroke="#4d5d73" stroke-width="2" x1="24" x2="42" y1="570" y2="582"></line>
+<line opacity="0.5" stroke="#4d5d73" stroke-width="2" x1="60" x2="85" y1="565" y2="549"></line>
+<text fill="#4d5d73" font-family="Inter" font-size="8.5" font-weight="700" letter-spacing="0.06em" x="25" y="522">MAIN BLOCK</text>
+</g>
+<!-- 2. FIRST YEAR BLOCK (Left of central pathway) -->
+<g filter="url(#buildingShadow)">
+<polygon fill="#9cb0ca" points="35,465 105,505 105,460 35,420"></polygon>
+<polygon fill="#b9cbdf" points="105,505 170,465 170,420 105,460"></polygon>
+<polygon fill="#e2edf8" points="35,420 105,460 170,420 100,380"></polygon>
+<!-- Architectural Louvers / Windows -->
+<rect fill="#4d5d73" height="5" opacity="0.5" transform="skewY(18)" width="8" x="55" y="440"></rect>
+<rect fill="#4d5d73" height="5" opacity="0.5" transform="skewY(18)" width="8" x="72" y="450"></rect>
+<rect fill="#4d5d73" height="5" opacity="0.5" transform="skewY(18)" width="8" x="88" y="460"></rect>
+<!-- Courtyard Atrium Cutout -->
+<polygon fill="#cad9ec" points="80,425 110,442 135,426 105,409"></polygon>
+<text fill="#38485d" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.05em" x="72" y="415">FIRST YEAR BLOCK</text>
+</g>
+<!-- 3. CIVIL ENGINEERING BLOCK (Right of central spine) -->
+<g filter="url(#buildingShadow)">
+<polygon fill="#9cb0ca" points="230,455 290,490 290,445 230,410"></polygon>
+<polygon fill="#b9cbdf" points="290,490 360,450 360,405 290,445"></polygon>
+<polygon fill="#e2edf8" points="230,410 290,445 360,405 300,370"></polygon>
+<!-- Windows -->
+<rect fill="#4d5d73" height="5.5" opacity="0.5" transform="skewY(-17)" width="8" x="305" y="445"></rect>
+<rect fill="#4d5d73" height="5.5" opacity="0.5" transform="skewY(-17)" width="8" x="322" y="435"></rect>
+<rect fill="#4d5d73" height="5.5" opacity="0.5" transform="skewY(-17)" width="8" x="339" y="425"></rect>
+<text fill="#38485d" font-family="Inter" font-size="9" font-weight="700" letter-spacing="0.05em" x="268" y="398">CIVIL BLOCK</text>
+</g>
+<!-- 4. DESTINATION TARGET: IT BLOCK & ENTRANCE PORTICO -->
+<g filter="url(#buildingShadow)">
+<!-- Highlight base podium -->
+<polygon fill="#2A9D8F" opacity="0.25" points="225,260 315,205 385,240 295,295"></polygon>
+<!-- IT Block 3D Solid Geometry -->
+<polygon fill="#1f7a6f" points="230,245 290,278 290,215 230,182"></polygon>
+<polygon fill="#2A9D8F" points="290,278 375,232 375,170 290,215"></polygon>
+<polygon fill="#5eead4" points="230,182 290,215 375,170 315,137"></polygon>
+<!-- Modern Glazed Roof Ribbon / Solar Canopy -->
+<polygon fill="#99f6e4" opacity="0.9" points="250,186 295,210 360,175 315,151"></polygon>
+<!-- Entrance Portico Canopy -->
+<polygon fill="#f97316" opacity="0.9" points="215,250 260,225 275,240 230,265"></polygon>
+<polygon fill="#ea580c" opacity="0.9" points="215,250 230,265 230,272 215,257"></polygon>
+<text fill="#00201c" font-family="Inter" font-size="11" font-weight="800" letter-spacing="0.06em" x="278" y="166">IT BLOCK</text>
+</g>
+<!-- ILLUMINATED GLOWING TEAL CAMPUS NAVIGATION ROUTE POLYLINE -->
+<!-- Ambient route glow -->
+<path d="M 75 650 L 120 590 L 195 500 L 255 425 L 275 315 L 292 245" fill="none" filter="url(#routeGlow)" opacity="0.65" stroke="#2A9D8F" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"></path>
+<!-- Clean white base track -->
+<path d="M 75 650 L 120 590 L 195 500 L 255 425 L 275 315 L 292 245" fill="none" opacity="0.98" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"></path>
+<!-- Vibrant Teal Route with animated directional chevron pulse -->
+<path d="M 75 650 L 120 590 L 195 500 L 255 425 L 275 315 L 292 245" fill="none" stroke="url(#campusTealGrad)" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.5">
+<animate attributeName="stroke-dashoffset" dur="1.5s" from="72" repeatCount="indefinite" to="0"></animate>
+</path>
+<!-- Directional Flow Arrows Along Route -->
+<g fill="#2A9D8F" opacity="0.85">
+<!-- Arrow 1 -->
+<path d="M 148 560 L 158 548 L 152 546 L 154 540 L 148 542 L 146 548 L 140 546 Z" transform="rotate(-38 148 550)"></path>
+<!-- Arrow 2 -->
+<path d="M 225 465 L 235 453 L 229 451 L 231 445 L 225 447 L 223 453 L 217 451 Z" transform="rotate(-40 225 455)"></path>
+<!-- Arrow 3 -->
+<path d="M 270 365 L 278 353 L 272 352 L 273 346 L 267 347 L 266 353 L 260 352 Z" transform="rotate(-20 270 355)"></path>
+</g>
+<!-- ORIGIN WAYPOINT: Main Entrance Gate 1 -->
+<g filter="url(#pinGlowShadow)" transform="translate(75, 650)">
+<circle cx="0" cy="0" fill="#ffffff" r="13"></circle>
+<circle cx="0" cy="0" fill="#2A9D8F" r="7.5"></circle>
+<circle cx="0" cy="0" fill="#ffffff" r="3"></circle>
+<!-- Waypoint Badge -->
+<rect fill="#ffffff" height="20" rx="10" stroke="#bcc9c6" stroke-width="0.75" width="82" x="14" y="-10"></rect>
+<circle cx="24" cy="0" fill="#2A9D8F" r="3.5"></circle>
+<text fill="#111c2d" font-family="Inter" font-size="10" font-weight="700" x="32" y="3.5">Gate 1 Entrance</text>
+</g>
+<!-- REAL-TIME USER POSITION & HEADING BEAM (Interactive Waypoint) -->
+<g transform="translate(195, 500)">
+<!-- Forward Orientation Projection Cone -->
+<polygon fill="url(#campusTealGrad)" opacity="0.32" points="0,-42 22,-8 -22,-8"></polygon>
+<!-- Pulsing GPS Rings -->
+<circle cx="0" cy="0" fill="#2A9D8F" opacity="0.25" r="24">
+<animate attributeName="r" dur="2.2s" repeatCount="indefinite" values="14;30;14"></animate>
+<animate attributeName="opacity" dur="2.2s" repeatCount="indefinite" values="0.38;0.05;0.38"></animate>
+</circle>
+<!-- User Dot Node -->
+<circle cx="0" cy="0" fill="#ffffff" filter="url(#pinGlowShadow)" r="11"></circle>
+<circle cx="0" cy="0" fill="#2A9D8F" r="8"></circle>
+<polygon fill="#ffffff" points="0,-12 4,-6 -4,-6"></polygon>
+</g>
+<!-- DESTINATION PIN: IT Block Portico -->
+<g filter="url(#pinGlowShadow)" transform="translate(292, 245)">
+<ellipse cx="0" cy="11" fill="#111c2d" opacity="0.3" rx="8" ry="4"></ellipse>
+<path d="M0 -24 C -9 -24 -15 -18 -15 -9 C -15 2 0 13 0 13 C 0 13 15 2 15 -9 C 15 -18 9 -24 0 -24 Z" fill="#e76f51"></path>
+<circle cx="0" cy="-10" fill="#ffffff" r="4.5"></circle>
+<!-- Destination Chip -->
+<g transform="translate(18, -24)">
+<rect fill="#111c2d" height="22" opacity="0.9" rx="11" width="88" x="0" y="0"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="10" font-weight="700" x="10" y="15">IT Portico</text>
+<circle cx="74" cy="11" fill="#e76f51" r="3.5"></circle>
+</g>
+</g>
+</svg>
+</div>
+<!-- 2. TOP FLOATING ROUTE SELECTOR (Compact card Start & Destination + Swap) -->
+<div class="relative z-30 pt-safe px-4 mt-1 w-full max-w-md mx-auto pointer-events-none">
+<div class="bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-[0_4px_22px_rgba(17,28,45,0.08)] border border-white/70 p-3 pointer-events-auto flex flex-col gap-2.5">
+<!-- Upper Header Row -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button aria-label="Go back" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95" onclick="history.back()">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2A9D8F]/10 text-[#1f7a6f] border border-[#2A9D8F]/25">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[11px] font-semibold tracking-wide">CAMPUS VERIFIED ROUTE</span>
+</div>
+</div>
+<!-- Step-Free / Accessible Toggle Badge -->
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-low text-on-surface text-[11px] font-medium border border-outline-variant/40 hover:bg-surface-container active:scale-95 transition-all" id="stepFreePill">
+<span class="material-symbols-outlined text-[14px] text-[#2A9D8F]">accessible</span>
+<span>Step-Free</span>
+</button>
+</div>
+<!-- Route Inputs (Start & Destination + Swap Button) -->
+<div class="flex items-center gap-2 pl-1">
+<!-- Visual Origin-to-Destination Nodes -->
+<div class="flex flex-col items-center justify-center py-1 flex-shrink-0">
+<span class="w-3 h-3 rounded-full border-2 border-white bg-[#2A9D8F] shadow-sm"></span>
+<span class="w-0.5 h-6 bg-slate-300 my-0.5 border-dashed"></span>
+<span class="w-3 h-3 rounded-full border-2 border-white bg-secondary shadow-sm"></span>
+</div>
+<!-- Text Labels -->
+<div class="flex-1 min-w-0 flex flex-col gap-1.5" id="routeTextGroup">
+<div class="flex items-center justify-between bg-surface-container-low/80 px-2.5 py-1.5 rounded-lg border border-slate-200/50">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] uppercase tracking-wider text-outline leading-tight">Start</span>
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface truncate" id="startLocationText">Main Entrance (Gate 1)</span>
+</div>
+<span class="material-symbols-outlined text-[#2A9D8F] text-[16px] ml-1">my_location</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low/80 px-2.5 py-1.5 rounded-lg border border-slate-200/50">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] uppercase tracking-wider text-outline leading-tight">Destination</span>
+<span class="font-headline-sm text-[13px] font-semibold text-on-surface truncate" id="destLocationText">IT Block (Portico)</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[16px] ml-1">place</span>
+</div>
+</div>
+<!-- Swap Button -->
+<button aria-label="Swap start and destination" class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center transition-transform active:rotate-180 duration-300 shadow-sm flex-shrink-0" id="swapBtn">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 3. FLOATING MAP CONTROLS (RIGHT: 3D orbit, compass, zoom, step-free path toggle) -->
+<div class="absolute right-4 top-[30%] flex flex-col gap-2.5 z-20 items-end">
+<!-- Compass / North Orientation -->
+<button aria-label="North orientation reset" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-white/70 flex items-center justify-center transition-transform active:scale-95 hover:bg-white" id="compassBtn">
+<span class="material-symbols-outlined text-[20px] text-secondary">explore</span>
+</button>
+<!-- 3D Orbit / Perspective Toggle -->
+<button aria-label="Toggle 3D orbit view" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-white/70 flex items-center justify-center transition-all active:scale-95 hover:bg-white" id="orbitBtn">
+<span class="material-symbols-outlined text-[20px] text-[#2A9D8F]">view_in_ar</span>
+</button>
+<!-- Zoom Controls (Combined Pill) -->
+<div class="flex flex-col rounded-full bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-white/70 overflow-hidden">
+<button aria-label="Zoom in" class="w-10 h-9 flex items-center justify-center text-on-surface hover:bg-surface-container-high active:scale-95 transition-colors border-b border-slate-100" id="zoomInBtn">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+<button aria-label="Zoom out" class="w-10 h-9 flex items-center justify-center text-on-surface hover:bg-surface-container-high active:scale-95 transition-colors" id="zoomOutBtn">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+</div>
+<!-- Step-Free Quick Toggle -->
+<button aria-label="Toggle Step-free accessible path" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-white/70 flex items-center justify-center transition-all active:scale-95 hover:bg-white" id="accessibleToggleBtn">
+<span class="material-symbols-outlined text-[20px] text-[#2A9D8F]">accessible_forward</span>
+</button>
+<!-- Recenter Current Location -->
+<button aria-label="Re-center view" class="w-10 h-10 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-on-surface shadow-[0_2px_12px_rgba(0,0,0,0.1)] border border-white/70 flex items-center justify-center transition-transform active:scale-95 hover:bg-white" id="recenterBtn">
+<span class="material-symbols-outlined text-[20px] text-[#2A9D8F]">near_me</span>
+</button>
+</div>
+<!-- 4. SLEEK COLLAPSIBLE BOTTOM SHEET (Essential Navigation Info & Verified Landmark Steps) -->
+<div class="relative z-30 w-full max-w-md mx-auto">
+<div class="bg-surface-container-lowest rounded-t-3xl shadow-[0_-6px_25px_rgba(17,28,45,0.1)] border-t border-slate-100 flex flex-col max-h-[82dvh] drawer-transition overflow-hidden pb-safe" id="navDrawer">
+<!-- Drag Handle -->
+<div class="w-full pt-3 pb-1 flex items-center justify-center cursor-pointer select-none" id="dragHeader">
+<div class="w-10 h-1.5 bg-slate-300 rounded-full"></div>
+</div>
+<div class="px-5 pt-2 pb-4 flex flex-col gap-3.5 overflow-y-auto">
+<!-- Route Title & Wayfinding Status -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-md text-[20px] font-bold text-on-surface">Route to IT Block</span>
+<span class="font-body-sm text-[12px] text-outline">Misrimal Navajee Munoth Jain Campus</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px] bg-surface-container-low px-2.5 py-1 rounded-full border border-slate-200/60">
+<span class="material-symbols-outlined text-[15px] text-[#2A9D8F]">check_circle</span>
+<span>Paved Walkway</span>
+</div>
+</div>
+<!-- Next Immediate Landmark Action Card -->
+<div class="bg-surface-container-low/90 border border-slate-200/70 rounded-2xl p-3 flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl bg-[#2A9D8F] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">straight</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="font-label-sm text-[10px] uppercase font-bold tracking-wider text-[#2A9D8F]">NEXT WAYPOINT</span>
+<p class="font-headline-sm text-[14px] font-semibold text-on-surface truncate mt-0.5">Walk straight along Main Avenue</p>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Keep First Year Block on your left</p>
+</div>
+</div>
+<!-- Prominent Teal Action Button: "Start Campus Navigation" -->
+<button class="w-full h-12 bg-[#2A9D8F] hover:bg-[#21867a] active:scale-[0.98] text-white font-headline-sm text-[15px] font-semibold rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(42,157,143,0.3)] transition-all" id="startNavBtn">
+<span class="material-symbols-outlined text-[20px]">navigation</span>
+<span>Start Campus Navigation</span>
+</button>
+<!-- Collapsible Landmark Details Toggle -->
+<button class="w-full py-1 text-center text-[13px] font-medium text-tertiary hover:text-primary flex items-center justify-center gap-1 transition-colors" id="expandStepsBtn">
+<span id="stepsBtnText">View Landmark Directions</span>
+<span class="material-symbols-outlined text-[18px] transition-transform duration-200" id="stepsArrow">expand_more</span>
+</button>
+<!-- Detailed Step-by-Step Campus Landmark Directions (Collapsible) -->
+<div class="hidden flex-col gap-2.5 pt-1 border-t border-slate-100" id="detailedStepsSection">
+<div class="flex items-center justify-between px-1">
+<span class="font-headline-sm text-sm font-semibold text-on-surface">Campus Waypoint Steps</span>
+<span class="font-label-sm text-[11px] text-[#2A9D8F] font-medium">3 Landmark Points</span>
+</div>
+<!-- Step 1: Pass First Year Block -->
+<div class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low/60 border border-slate-200/40">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-[#2A9D8F] flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">domain</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[13px] font-semibold text-on-surface">Pass First Year Block</p>
+<p class="text-[12px] text-on-surface-variant">Continue along the central shaded campus walkway past the lawn</p>
+</div>
+</div>
+<!-- Step 2: Turn toward Civil Block walkway -->
+<div class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low/60 border border-slate-200/40">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-[#2A9D8F] flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">turn_slight_right</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[13px] font-semibold text-on-surface">Turn toward Civil Block walkway</p>
+<p class="text-[12px] text-on-surface-variant">Follow the covered connection corridor towards the IT quadrangle</p>
+</div>
+</div>
+<!-- Step 3: Arrive at IT Block Portico -->
+<div class="flex items-start gap-3 p-2.5 rounded-xl bg-emerald-50/70 border border-[#2A9D8F]/25">
+<div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">apartment</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[13px] font-semibold text-on-surface">Arrive at IT Block Portico</p>
+<p class="text-[12px] text-on-surface-variant">Main ground portico entrance with wide step-free access ramp</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive UI Controls Script -->
+<script>
+    (function initNavigationScreen() {
+      // Start Campus Navigation Button
+      const startBtn = document.getElementById('startNavBtn');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          startBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">sync</span><span>Locating Pathway...</span>';
+          setTimeout(() => {
+            startBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">pause</span><span>Navigation Active</span>';
+            startBtn.classList.replace('bg-[#2A9D8F]', 'bg-[#1f7a6f]');
+          }, 600);
+        });
+      }
+
+      // Step-Free Path Toggles
+      const stepFreePill = document.getElementById('stepFreePill');
+      const accessibleToggleBtn = document.getElementById('accessibleToggleBtn');
+      let accessibleActive = true;
+
+      function updateAccessibleState(state) {
+        accessibleActive = state;
+        if (accessibleToggleBtn) {
+          accessibleToggleBtn.classList.toggle('bg-[#2A9D8F]', accessibleActive);
+          accessibleToggleBtn.classList.toggle('text-white', accessibleActive);
+          const icon = accessibleToggleBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.toggle('text-white', accessibleActive);
+            icon.classList.toggle('text-[#2A9D8F]', !accessibleActive);
+          }
+        }
+      }
+
+      if (stepFreePill) {
+        stepFreePill.addEventListener('click', () => updateAccessibleState(!accessibleActive));
+      }
+      if (accessibleToggleBtn) {
+        accessibleToggleBtn.addEventListener('click', () => updateAccessibleState(!accessibleActive));
+      }
+
+      // Expandable Steps Drawer Toggle
+      const expandBtn = document.getElementById('expandStepsBtn');
+      const dragHeader = document.getElementById('dragHeader');
+      const stepsSection = document.getElementById('detailedStepsSection');
+      const stepsText = document.getElementById('stepsBtnText');
+      const stepsArrow = document.getElementById('stepsArrow');
+      let isExpanded = false;
+
+      function toggleSteps() {
+        isExpanded = !isExpanded;
+        if (isExpanded) {
+          stepsSection.classList.remove('hidden');
+          stepsSection.classList.add('flex');
+          stepsText.textContent = 'Hide Landmark Directions';
+          stepsArrow.style.transform = 'rotate(180deg)';
+        } else {
+          stepsSection.classList.add('hidden');
+          stepsSection.classList.remove('flex');
+          stepsText.textContent = 'View Landmark Directions';
+          stepsArrow.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      if (expandBtn) expandBtn.addEventListener('click', toggleSteps);
+      if (dragHeader) dragHeader.addEventListener('click', toggleSteps);
+
+      // Swap button animation & values
+      const swapBtn = document.getElementById('swapBtn');
+      const startText = document.getElementById('startLocationText');
+      const destText = document.getElementById('destLocationText');
+      if (swapBtn && startText && destText) {
+        swapBtn.addEventListener('click', () => {
+          swapBtn.classList.toggle('rotate-180');
+          const temp = startText.textContent;
+          startText.textContent = destText.textContent;
+          destText.textContent = temp;
+        });
+      }
+
+      // 3D Orbit View Toggle Visual Feedback
+      const orbitBtn = document.getElementById('orbitBtn');
+      const campusViewport = document.getElementById('campus3DViewport');
+      let isPerspectiveTilted = false;
+      if (orbitBtn && campusViewport) {
+        orbitBtn.addEventListener('click', () => {
+          isPerspectiveTilted = !isPerspectiveTilted;
+          orbitBtn.classList.toggle('bg-[#2A9D8F]', isPerspectiveTilted);
+          const icon = orbitBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.toggle('text-white', isPerspectiveTilted);
+            icon.classList.toggle('text-[#2A9D8F]', !isPerspectiveTilted);
+          }
+          campusViewport.style.transition = 'transform 0.4s ease';
+          campusViewport.style.transform = isPerspectiveTilted ? 'scale(1.05) rotate(-1deg)' : 'scale(1) rotate(0deg)';
+        });
+      }
+
+      // Zoom Buttons feedback
+      const zoomIn = document.getElementById('zoomInBtn');
+      const zoomOut = document.getElementById('zoomOutBtn');
+      let currentScale = 1;
+      if (zoomIn && campusViewport) {
+        zoomIn.addEventListener('click', () => {
+          if (currentScale < 1.3) {
+            currentScale += 0.1;
+            campusViewport.style.transition = 'transform 0.3s ease';
+            campusViewport.style.transform = `scale(${currentScale})`;
+          }
+        });
+      }
+      if (zoomOut && campusViewport) {
+        zoomOut.addEventListener('click', () => {
+          if (currentScale > 0.9) {
+            currentScale -= 0.1;
+            campusViewport.style.transition = 'transform 0.3s ease';
+            campusViewport.style.transform = `scale(${currentScale})`;
+          }
+        });
+      }
+    })();
+  </script>
+</body></html>
