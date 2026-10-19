@@ -1,4 +1,4 @@
-import type { NavigationEdge, NavigationGraph, NavigationNode, Point3, RoutePlan, RoutePlanResult, RouteStep, RouteVerificationStatus } from '../types/navigation'
+import type { NavigationEdge, NavigationGraph, NavigationNode, Point3, RoutePlanResult, RouteStep, RouteVerificationStatus } from '../types/navigation'
 
 function distanceBetween([ax, ay, az]: Point3, [bx, by, bz]: Point3) {
   return Math.hypot(ax - bx, ay - by, az - bz)
@@ -54,7 +54,10 @@ export function createRoutePlan(graph: NavigationGraph, startId: string, destina
     } satisfies RouteStep
   })
 
-  const routeVerification = route.edgeStatuses.every((status) => status === 'verified') ? 'verified' : 'provisional'
+  const routeVerification = route.edgeStatuses.reduce<RouteVerificationStatus>(
+    (acc, status) => mergeStatus(acc, status),
+    'verified',
+  )
   const notes = new Set<string>()
   route.edgeNotes.forEach((note) => {
     if (note) notes.add(note)

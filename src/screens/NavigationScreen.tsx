@@ -1,172 +1,1005 @@
-import { useMemo, useState } from 'react'
+import {
+  AlertTriangle,
+  ArrowLeftRight,
+  ArrowUp,
+  ChevronDown,
+  ChevronUp,
+  Compass,
+  Footprints,
+  Info,
+  Layers,
+  MapPin,
+  Navigation,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Pause,
+  Play,
+  RotateCcw,
+  Sparkles,
+  StopCircle,
+} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Campus3D } from '../components/Campus3D'
 import { SurfaceCard } from '../components/SurfaceCard'
 import { buildings } from '../data/buildings'
+import { useSearchParams } from 'react-router-dom'
+import { type CampusBuildingId } from '../data/campusModelMapping'
+import {
+  campusDestinationNodesByBuildingId,
+  campusNavigationGraph,
+  campusNavigationNodesById,
+} from '../data/navigationGraph'
+import { createRoutePlan } from '../lib/routePlanner'
+import { computeCumulativeDistances, interpolatePolylineAtDistance } from '../lib/routeSimulation'
+import type { Point3, RoutePlan } from '../types/navigation'
+
+interface LocationOption {
+  id: string
+  label: string
+  nodeId: string | null
+  type: 'gate' | 'building'
+}
+
+type MobileSheetState = 'collapsed' | 'half' | 'expanded'
+type NavMode = 'manual' | 'simulation'
 
 export function NavigationScreen() {
-  const [from, setFrom] = useState(buildings[0]?.id ?? '')
-  const [to, setTo] = useState(buildings[1]?.id ?? '')
-  const [expanded, setExpanded] = useState(false)
+  const [searchParams] = useSearchParams()
+  const [fromId, setFromId] = useState<string>(() => searchParams.get('from') || 'main-gate-1')
+  const [toId, setToId] = useState<string>(() => searchParams.get('to') || 'it-block')
+  const [isNavigating, setIsNavigating] = useState<boolean>(false)
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(0)
+  const [showAllSteps, setShowAllSteps] = useState<boolean>(false)
 
-  const summary = useMemo(() => {
-    const start = buildings.find((building) => building.id === from)
-    const end = buildings.find((building) => building.id === to)
-    if (!start || !end) {
-      return null
+  // Simulation state
+  const [navMode, setNavMode] = useState<NavMode>(() => (searchParams.get('mode') as NavMode) || 'manual')
+  const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [simulatedDistance, setSimulatedDistance] = useState<number>(0)
+  const [simSpeed, setSimSpeed] = useState<number>(3.0) // 3.0 m/s walking simulation
+
+  // React to searchParam changes
+  useEffect(() => {
+    const qFrom = searchParams.get('from')
+    const qTo = searchParams.get('to')
+    const qMode = searchParams.get('mode') as NavMode | null
+    if (qFrom) setFromId(qFrom)
+    if (qTo) setToId(qTo)
+    if (qMode) setNavMode(qMode)
+  }, [searchParams])
+
+  // Layout states
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false)
+  const [mobileSheetState, setMobileSheetState] = useState<MobileSheetState>('half')
+
+  // Unified location options for Origin and Destination
+  const locationOptions = useMemo<LocationOption[]>(() => {
+    const gates: LocationOption[] = [
+      { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', nodeId: 'main-gate-1', type: 'gate' },
+      { id: 'west-entrance', label: 'West Entrance', nodeId: 'west-entrance', type: 'gate' },
+      { id: 'ground-entrance', label: 'Ground Entrance', nodeId: 'ground-entrance', type: 'gate' },
+    ]
+
+    const buildingOptions: LocationOption[] = buildings.map((b) => {
+      const destNodes = campusDestinationNodesByBuildingId.get(b.id as CampusBuildingId)
+      const mappedNode = destNodes && destNodes.length > 0 ? destNodes[0] : null
+      return {
+        id: b.id,
+        label: b.name,
+        nodeId: mappedNode ? mappedNode.id : null,
+        type: 'building',
+      }
+    })
+
+    return [...gates, ...buildingOptions]
+  }, [])
+
+  // Resolve start node
+  const originNodeId = useMemo(() => {
+    const opt = locationOptions.find((l) => l.id === fromId)
+    return opt?.nodeId ?? null
+  }, [fromId, locationOptions])
+
+  // Resolve destination node
+  const destinationNodeId = useMemo(() => {
+    const opt = locationOptions.find((l) => l.id === toId)
+    return opt?.nodeId ?? null
+  }, [toId, locationOptions])
+
+  // Calculate route plan
+  const routeCalculation = useMemo(() => {
+    if (!originNodeId) {
+      const fromOpt = locationOptions.find((l) => l.id === fromId)
+      return {
+        status: 'unverified' as const,
+        route: null,
+        message: `${fromOpt?.label ?? 'Origin location'} has no mapped entrance anchor in the campus 3D model. Position remains pending verification.`,
+      }
+    }
+
+    if (!destinationNodeId) {
+      const toOpt = locationOptions.find((l) => l.id === toId)
+      return {
+        status: 'unverified' as const,
+        route: null,
+        message: `${toOpt?.label ?? 'Destination location'} has no mapped entrance anchor in the campus 3D model. Position remains pending verification.`,
+      }
+    }
+
+    if (originNodeId === destinationNodeId) {
+      return {
+        status: 'same-node' as const,
+        route: null,
+        message: 'Origin and destination are the same location. Please choose a different destination.',
+      }
+    }
+
+    const result = createRoutePlan(campusNavigationGraph, originNodeId, destinationNodeId)
+    if (result.status === 'ok') {
+      return {
+        status: 'ok' as const,
+        route: result.route,
+        message: null,
+      }
+    }
+
+    if (result.status === 'no-route') {
+      const destOpt = locationOptions.find((l) => l.id === toId)
+      return {
+        status: 'disconnected' as const,
+        route: null,
+        message: `Pathway connectivity to ${destOpt?.label ?? 'this building'} is unverified or unavailable in the current campus model. Ground pathway survey is incomplete.`,
+      }
     }
 
     return {
-      start,
-      end,
-      note: 'Route geometry and distance will be available after campus model and route graph verification.',
+      status: 'error' as const,
+      route: null,
+      message: result.message,
     }
-  }, [from, to])
+  }, [originNodeId, destinationNodeId, fromId, toId, locationOptions])
 
-  return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6">
-      <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
-        <div className="relative min-h-[370px] bg-slate-100">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(42,157,143,0.10),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(231,111,81,0.12),transparent_28%),linear-gradient(to_bottom,#e4eaf3,#f8fafc)]" />
+  const route: RoutePlan | null = routeCalculation.route
 
-          <div className="absolute inset-0 opacity-40">
-            <svg viewBox="0 0 390 370" className="h-full w-full">
-              <path d="M 50 320 L 120 250 L 215 195 L 255 130 L 300 80" fill="none" stroke="#2A9D8F" strokeWidth="6" strokeDasharray="10 8" strokeLinecap="round" />
-              <circle cx="50" cy="320" r="8" fill="#2A9D8F" />
-              <circle cx="300" cy="80" r="8" fill="#E76F51" />
-            </svg>
+  // 3D route points for Campus3D
+  const routePoints = useMemo<Point3[]>(() => {
+    if (!route) return []
+    return route.nodeIds
+      .map((id) => campusNavigationNodesById.get(id)?.position)
+      .filter((pos): pos is Point3 => Boolean(pos))
+  }, [route])
+
+  // Polyline cumulative distances
+  const cumulativeDistances = useMemo(() => computeCumulativeDistances(routePoints), [routePoints])
+  const totalRouteDistance = useMemo(() => {
+    return cumulativeDistances.length > 0 ? cumulativeDistances[cumulativeDistances.length - 1] : 0
+  }, [cumulativeDistances])
+
+  // Continuous polyline progress
+  const simProgress = useMemo(() => {
+    return interpolatePolylineAtDistance(routePoints, cumulativeDistances, simulatedDistance)
+  }, [routePoints, cumulativeDistances, simulatedDistance])
+
+  // Map each route step to its cumulative distance along the polyline
+  const stepCumulativeDistances = useMemo(() => {
+    if (!route) return []
+    return route.steps.map((step) => {
+      const idx = route.nodeIds.indexOf(step.nodeId)
+      return idx >= 0 && idx < cumulativeDistances.length ? cumulativeDistances[idx] : 0
+    })
+  }, [route, cumulativeDistances])
+
+  // Active step index during simulation based on distance thresholds
+  const simulatedStepIndex = useMemo(() => {
+    if (!route || stepCumulativeDistances.length === 0) return 0
+    let currentIdx = 0
+    for (let i = 0; i < stepCumulativeDistances.length; i++) {
+      if (simulatedDistance >= stepCumulativeDistances[i] - 1.5) {
+        currentIdx = i
+      }
+    }
+    return Math.min(route.steps.length - 1, currentIdx)
+  }, [route, stepCumulativeDistances, simulatedDistance])
+
+  const effectiveStepIndex = navMode === 'simulation' ? simulatedStepIndex : activeStepIndex
+
+  // Animation frame loop for continuous simulation
+  useEffect(() => {
+    if (!isPlaying || navMode !== 'simulation' || totalRouteDistance <= 0) return
+
+    let lastTime = performance.now()
+    let animId: number
+
+    const tick = (now: number) => {
+      const deltaSec = Math.min((now - lastTime) / 1000, 0.1)
+      lastTime = now
+
+      setSimulatedDistance((prev) => {
+        const next = prev + simSpeed * deltaSec
+        if (next >= totalRouteDistance) {
+          setIsPlaying(false)
+          return totalRouteDistance
+        }
+        return next
+      })
+
+      animId = requestAnimationFrame(tick)
+    }
+
+    animId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animId)
+  }, [isPlaying, navMode, simSpeed, totalRouteDistance])
+
+  // Active step point in 3D for manual guidance
+  const activeStepPoint = useMemo<Point3 | null>(() => {
+    if (!isNavigating || !route || !route.steps[effectiveStepIndex]) return null
+    const nodeId = route.steps[effectiveStepIndex].nodeId
+    return campusNavigationNodesById.get(nodeId)?.position ?? null
+  }, [isNavigating, route, effectiveStepIndex])
+
+  // Landmarks passed along the route
+  const landmarksPassed = useMemo(() => {
+    if (!route) return []
+    const landmarks = new Set<string>()
+    for (const nodeId of route.nodeIds) {
+      const node = campusNavigationNodesById.get(nodeId)
+      if (node?.buildingId && node.buildingId !== toId && node.buildingId !== fromId) {
+        const b = buildings.find((item) => item.id === node.buildingId)
+        if (b) landmarks.add(b.name)
+      }
+    }
+    return Array.from(landmarks)
+  }, [route, toId, fromId])
+
+  // Swap origin and destination
+  const handleSwap = () => {
+    const prevFrom = fromId
+    const prevTo = toId
+    setFromId(prevTo)
+    setToId(prevFrom)
+    setActiveStepIndex(0)
+    setIsNavigating(false)
+    setIsPlaying(false)
+    setSimulatedDistance(0)
+  }
+
+  // Reset to default
+  const handleReset = () => {
+    setFromId('main-gate-1')
+    setToId('it-block')
+    setActiveStepIndex(0)
+    setIsNavigating(false)
+    setShowAllSteps(false)
+    setIsPlaying(false)
+    setSimulatedDistance(0)
+    setNavMode('manual')
+  }
+
+  // Handle building selection from 3D canvas
+  const handleBuildingSelect = (buildingId: string) => {
+    setToId(buildingId)
+    setActiveStepIndex(0)
+    setIsNavigating(false)
+    setIsPlaying(false)
+    setSimulatedDistance(0)
+    if (mobileSheetState === 'collapsed') {
+      setMobileSheetState('half')
+    }
+  }
+
+  const currentStep = route?.steps[effectiveStepIndex] ?? null
+
+  // Reusable Route Planning Controls content
+  const renderPlanningControls = (isMobile: boolean = false) => (
+    <div className="flex flex-col gap-3">
+      {/* Origin & Destination Selectors */}
+      <div className="space-y-2">
+        <div className="grid gap-2">
+          {/* From Input */}
+          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 focus-within:border-[#2A9D8F] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#2A9D8F]/20 transition-all">
+            <span className="h-2.5 w-2.5 rounded-full border border-white bg-[#2A9D8F] shadow-sm flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <label htmlFor={isMobile ? 'mobile-route-from-select' : 'route-from-select'} className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                From (Origin)
+              </label>
+              <select
+                id={isMobile ? 'mobile-route-from-select' : 'route-from-select'}
+                value={fromId}
+                onChange={(e) => {
+                  setFromId(e.target.value)
+                  setActiveStepIndex(0)
+                  setIsNavigating(false)
+                }}
+                className="w-full bg-transparent text-xs font-semibold text-slate-800 outline-none"
+              >
+                <optgroup label="Campus Entrances & Gates">
+                  {locationOptions
+                    .filter((opt) => opt.type === 'gate')
+                    .map((opt) => (
+                      <option key={`from-${opt.id}`} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Campus Buildings & Facilities">
+                  {locationOptions
+                    .filter((opt) => opt.type === 'building')
+                    .map((opt) => (
+                      <option key={`from-${opt.id}`} value={opt.id}>
+                        {opt.label} {!opt.nodeId ? '(Unverified position)' : ''}
+                      </option>
+                    ))}
+                </optgroup>
+              </select>
+            </div>
           </div>
 
-          <div className="absolute left-4 right-4 top-4 rounded-2xl bg-white/95 p-3 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl md:left-6 md:right-auto md:w-[390px]">
-            <div className="flex items-center justify-between">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#2A9D8F]/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#2A9D8F]">
-                <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: `'FILL' 1` }}>verified</span>
-                Verified Direct Route
-              </div>
-              <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
-                <span className="material-symbols-outlined text-[13px] text-[#2A9D8F]">accessible</span>
-                Step-free
-              </div>
-            </div>
-
-            <div className="mt-3 flex items-center gap-2">
-              <div className="flex flex-col items-center justify-center py-1">
-                <span className="h-3 w-3 rounded-full border-2 border-white bg-[#2A9D8F] shadow-sm" />
-                <span className="my-1 h-6 w-0.5 bg-slate-300" />
-                <span className="h-3 w-3 rounded-full border-2 border-white bg-[#E76F51] shadow-sm" />
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400">Starting Point</div>
-                  <div className="truncate text-sm font-semibold text-slate-900">Main Entrance (Gate 1)</div>
-                </div>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400">Destination</div>
-                  <div className="truncate text-sm font-semibold text-slate-900">IT Block (Ground Portico)</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-4 left-4 rounded-2xl bg-white/95 px-4 py-3 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl">
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
-                <span className="material-symbols-outlined text-[20px]">directions_walk</span>
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-slate-900">320 m • ~4 mins</div>
-                <div className="text-xs text-slate-500">Flat paved pathway</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute right-4 top-1/2 flex -translate-y-1/2 flex-col gap-2">
-            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl">
-              <span className="material-symbols-outlined text-[18px] text-[#E76F51]">explore</span>
+          {/* Swap Button Divider */}
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-x-0 h-px bg-slate-200" />
+            <button
+              type="button"
+              onClick={handleSwap}
+              className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:border-[#2A9D8F] hover:text-[#2A9D8F] transition-colors"
+              title="Swap origin and destination"
+              aria-label="Swap origin and destination"
+            >
+              <ArrowLeftRight size={13} />
             </button>
-            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl">
-              <span className="material-symbols-outlined text-[18px] text-[#2A9D8F]">near_me</span>
-            </button>
+          </div>
+
+          {/* To Input */}
+          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 focus-within:border-[#2A9D8F] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#2A9D8F]/20 transition-all">
+            <span className="h-2.5 w-2.5 rounded-full border border-white bg-[#E76F51] shadow-sm flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <label htmlFor={isMobile ? 'mobile-route-to-select' : 'route-to-select'} className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                To (Destination)
+              </label>
+              <select
+                id={isMobile ? 'mobile-route-to-select' : 'route-to-select'}
+                value={toId}
+                onChange={(e) => {
+                  setToId(e.target.value)
+                  setActiveStepIndex(0)
+                  setIsNavigating(false)
+                }}
+                className="w-full bg-transparent text-xs font-semibold text-slate-800 outline-none"
+              >
+                <optgroup label="Campus Buildings & Facilities">
+                  {locationOptions
+                    .filter((opt) => opt.type === 'building')
+                    .map((opt) => (
+                      <option key={`to-${opt.id}`} value={opt.id}>
+                        {opt.label} {!opt.nodeId ? '(Unverified position)' : ''}
+                      </option>
+                    ))}
+                </optgroup>
+                <optgroup label="Campus Entrances & Gates">
+                  {locationOptions
+                    .filter((opt) => opt.type === 'gate')
+                    .map((opt) => (
+                      <option key={`to-${opt.id}`} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                </optgroup>
+              </select>
+            </div>
           </div>
         </div>
+
+        {/* Status Badge & Metrics (Accurate: distance pending survey) */}
+        {routeCalculation.status === 'ok' && route && (
+          <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 text-xs text-slate-600 ring-1 ring-slate-100">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2A9D8F]/10 text-[#2A9D8F]">
+                <Footprints size={15} />
+              </div>
+              <div>
+                <div className="font-semibold text-slate-900">
+                  Distance pending campus survey
+                </div>
+                <div className="text-[10px] text-slate-500">Scale uncalibrated • Provisional route</div>
+              </div>
+            </div>
+            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+              Route provisional
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className="rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
-        <div className="border-b border-slate-200 p-4 md:p-5">
-          <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end">
-            <label className="text-sm">
-              <span className="mb-1 block font-medium text-slate-700">From</span>
-              <select value={from} onChange={(event) => setFrom(event.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
-                {buildings.map((building) => (
-                  <option key={building.id} value={building.id}>
-                    {building.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+      {/* Navigation Execution / Route Unavailable Feedback */}
+      <div className="flex-1">
+        {routeCalculation.status === 'ok' && route && currentStep && (
+          <div className="space-y-3">
+            {/* Mode Switcher Tabs */}
+            <div className="flex rounded-xl bg-slate-100 p-1 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setNavMode('manual')
+                  setIsPlaying(false)
+                }}
+                className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
+                  navMode === 'manual'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Manual Guidance
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNavMode('simulation')
+                  setIsNavigating(true)
+                }}
+                className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
+                  navMode === 'simulation'
+                    ? 'bg-[#2A9D8F] text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Simulate Walk (Virtual)
+              </button>
+            </div>
 
-            <button type="button" className="mx-auto rounded-full bg-slate-100 p-3 text-slate-600">
-              <span className="material-symbols-outlined text-[20px]">swap_vert</span>
+            {/* SIMULATION MODE */}
+            {navMode === 'simulation' ? (
+              <div className="space-y-2.5 rounded-2xl border border-[#2A9D8F]/30 bg-emerald-50/40 p-3">
+                {/* Clear Label & Disclaimer */}
+                <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-2.5 text-[11px] text-blue-900">
+                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-blue-800">
+                    <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                    Simulation Mode — Virtual Demo
+                  </div>
+                  <div className="mt-0.5 text-[10px] text-blue-700 leading-normal">
+                    Demonstrates continuous route progress along verified road centerlines. Virtual animation only — not live GPS positioning.
+                  </div>
+                </div>
+
+                {/* Simulation Controls: Play/Pause, Reset, Speed */}
+                <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (simProgress.isFinished) {
+                            setSimulatedDistance(0)
+                            setIsPlaying(true)
+                          } else {
+                            setIsPlaying((p) => !p)
+                          }
+                        }}
+                        className="flex items-center gap-1.5 rounded-xl bg-[#2A9D8F] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#238276] transition-all"
+                      >
+                        {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                        <span>{isPlaying ? 'Pause' : simProgress.isFinished ? 'Replay' : 'Play'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsPlaying(false)
+                          setSimulatedDistance(0)
+                        }}
+                        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-all"
+                        title="Reset simulation"
+                      >
+                        <RotateCcw size={13} />
+                        <span>Reset</span>
+                      </button>
+                    </div>
+
+                    {/* Speed selector */}
+                    <div className="flex items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[10px]">
+                      {[1.5, 3.0, 6.0].map((speed) => (
+                        <button
+                          key={speed}
+                          type="button"
+                          onClick={() => setSimSpeed(speed)}
+                          className={`rounded-md px-1.5 py-0.5 font-semibold transition ${
+                            simSpeed === speed ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                          }`}
+                        >
+                          {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Scrubber / Progress slider */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                      <span>Progress along route</span>
+                      <span className="font-semibold text-slate-800">
+                        {simulatedDistance.toFixed(1)} m / {totalRouteDistance.toFixed(1)} m ({Math.round(simProgress.progressRatio * 100)}%)
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={totalRouteDistance || 1}
+                      step={0.2}
+                      value={simulatedDistance}
+                      onChange={(e) => {
+                        setSimulatedDistance(parseFloat(e.target.value))
+                      }}
+                      className="w-full accent-[#2A9D8F] cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                {/* Auto-advancing step card */}
+                <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>STEP {simulatedStepIndex + 1} OF {route.steps.length} (AUTO)</span>
+                    <span className="font-medium text-[#2A9D8F]">{currentStep.verificationStatus}</span>
+                  </div>
+                  <div className="mt-2 flex items-start gap-2.5">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
+                      {simulatedStepIndex === 0 ? (
+                        <Compass size={18} />
+                      ) : simulatedStepIndex === route.steps.length - 1 ? (
+                        <MapPin size={18} />
+                      ) : (
+                        <ArrowUp size={18} />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-xs font-semibold text-slate-900 leading-snug">{currentStep.title}</h2>
+                      {currentStep.notes && (
+                        <p className="mt-0.5 text-[11px] text-slate-500 leading-normal">{currentStep.notes}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* MANUAL GUIDANCE MODE */
+              <div>
+                {!isNavigating ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNavigating(true)
+                      setActiveStepIndex(0)
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2A9D8F] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-emerald-900/10 hover:bg-[#238276] transition-all"
+                  >
+                    <Sparkles size={15} />
+                    <span>Start Turn-by-Turn Navigation</span>
+                  </button>
+                ) : (
+                  <div className="space-y-2.5 rounded-2xl border border-[#2A9D8F]/30 bg-emerald-50/40 p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2A9D8F]">
+                        <span className="h-2 w-2 rounded-full bg-[#2A9D8F] animate-pulse" />
+                        Live Guidance Active
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsNavigating(false)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                      >
+                        <StopCircle size={12} className="text-red-500" />
+                        Exit Guidance
+                      </button>
+                    </div>
+
+                    {/* Direction step highlight */}
+                    <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400">
+                        <span>STEP {activeStepIndex + 1} OF {route.steps.length}</span>
+                        <span className="font-medium text-[#2A9D8F]">{currentStep.verificationStatus}</span>
+                      </div>
+                      <div className="mt-2 flex items-start gap-2.5">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
+                          {activeStepIndex === 0 ? (
+                            <Compass size={18} />
+                          ) : activeStepIndex === route.steps.length - 1 ? (
+                            <MapPin size={18} />
+                          ) : (
+                            <ArrowUp size={18} />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-xs font-semibold text-slate-900 leading-snug">{currentStep.title}</h2>
+                          {currentStep.notes && (
+                            <p className="mt-0.5 text-[11px] text-slate-500 leading-normal">{currentStep.notes}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Step controls */}
+                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
+                        <button
+                          type="button"
+                          disabled={activeStepIndex === 0}
+                          onClick={() => setActiveStepIndex((idx) => Math.max(0, idx - 1))}
+                          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                          Previous Step
+                        </button>
+                        <button
+                          type="button"
+                          disabled={activeStepIndex === route.steps.length - 1}
+                          onClick={() => setActiveStepIndex((idx) => Math.min(route.steps.length - 1, idx + 1))}
+                          className="rounded-lg bg-[#2A9D8F] px-3 py-1 font-semibold text-white hover:bg-[#238276] disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                          Next Step
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Waypoints Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowAllSteps((v) => !v)}
+              className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              <span className="flex items-center gap-1.5">
+                <Layers size={14} className="text-[#2A9D8F]" />
+                Full Waypoints List ({route.steps.length} nodes)
+              </span>
+              <span className="text-[11px] text-[#2A9D8F] font-semibold">
+                {showAllSteps ? 'Hide' : 'View'}
+              </span>
             </button>
 
-            <label className="text-sm">
-              <span className="mb-1 block font-medium text-slate-700">To</span>
-              <select value={to} onChange={(event) => setTo(event.target.value)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
-                {buildings.map((building) => (
-                  <option key={building.id} value={building.id}>
-                    {building.name}
-                  </option>
+            {/* Expanded Waypoint List */}
+            {showAllSteps && (
+              <div className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 text-xs">
+                {route.steps.map((step, idx) => (
+                  <div
+                    key={`step-${step.nodeId}-${idx}`}
+                    onClick={() => {
+                      if (navMode === 'simulation') {
+                        const dist = stepCumulativeDistances[idx] ?? 0
+                        setSimulatedDistance(dist)
+                      } else {
+                        setActiveStepIndex(idx)
+                        setIsNavigating(true)
+                      }
+                    }}
+                    className={`flex cursor-pointer items-start justify-between rounded-lg p-2 transition-colors ${
+                      idx === effectiveStepIndex
+                        ? 'bg-[#2A9D8F]/10 ring-1 ring-[#2A9D8F]/30 font-semibold text-slate-900'
+                        : 'hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    <div className="truncate pr-2">
+                      <span className="text-slate-400 mr-1.5">{idx + 1}.</span>
+                      <span>{step.title}</span>
+                    </div>
+                    <span className="text-[10px] text-amber-600 uppercase flex-shrink-0">
+                      {step.verificationStatus}
+                    </span>
+                  </div>
                 ))}
-              </select>
-            </label>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Disconnected or Unverified Destination Message */}
+        {routeCalculation.status !== 'ok' && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-900">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle size={18} className="mt-0.5 text-amber-600 flex-shrink-0" />
+              <div className="space-y-1">
+                <h2 className="font-semibold text-amber-900">
+                  {routeCalculation.status === 'unverified'
+                    ? 'Entrance Pending Verification'
+                    : routeCalculation.status === 'same-node'
+                      ? 'Identical Start & End'
+                      : 'Route Unavailable — Disconnected'}
+                </h2>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  {routeCalculation.message}
+                </p>
+                <p className="text-[10px] text-amber-700 pt-1">
+                  Per strict campus navigation safety rules, unmapped or speculative paths are not generated.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Landmarks Traversed */}
+      {landmarksPassed.length > 0 && (
+        <div className="border-t border-slate-100 pt-2.5">
+          <div className="text-[11px] font-semibold text-slate-600">Landmarks along this path:</div>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {landmarksPassed.map((landmark) => (
+              <span
+                key={landmark}
+                className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700"
+              >
+                {landmark}
+              </span>
+            ))}
           </div>
         </div>
+      )}
 
-        <div className="p-4 md:p-5">
-          <button
-            type="button"
-            onClick={() => setExpanded((value) => !value)}
-            className="mb-4 w-full rounded-xl bg-[#2A9D8F] px-4 py-3 text-sm font-semibold text-white shadow-sm"
-          >
-            Start Turn-by-Turn Navigation
-          </button>
+      {/* Honest Technical Note */}
+      <div className="border-t border-slate-100 pt-2 text-[10px] text-slate-400">
+        <span className="font-medium text-slate-500">Route Engine:</span> Dijkstra calculation on campus 3D model graph. All paths marked provisional pending field ground-truthing.
+      </div>
+    </div>
+  )
 
-          <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#2A9D8F]">Next Turn</div>
-              <div className="text-xs text-slate-500">Step 1 of 4</div>
-            </div>
-            <div className="mt-3 flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
-                <span className="material-symbols-outlined text-[22px]">straight</span>
+  return (
+    <div className="relative min-h-[calc(100vh-4rem)] p-3 md:p-4 overflow-x-hidden">
+      {/* ============================================================== */}
+      {/* DESKTOP LAYOUT (md:flex): Proper 2-Column Sibling Workspace   */}
+      {/* ============================================================== */}
+      <div className="hidden md:flex h-[calc(100vh-6.5rem)] min-h-[640px] w-full gap-4">
+        {/* Left Column: Dedicated Collapsible Route Sidebar */}
+        <aside
+          className={`flex flex-col h-full bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden transition-all duration-300 relative flex-shrink-0 ${
+            isSidebarCollapsed ? 'w-14 items-center' : 'w-[360px] xl:w-[380px]'
+          }`}
+        >
+          {/* Collapsed Mini-Sidebar View */}
+          {isSidebarCollapsed ? (
+            <div className="flex flex-col items-center py-4 gap-4 h-full">
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#2A9D8F] hover:text-white transition-colors"
+                title="Expand route planner"
+                aria-label="Expand route planner"
+              >
+                <PanelLeftOpen size={18} />
+              </button>
+              <div className="h-px w-8 bg-slate-200" />
+              <button
+                type="button"
+                onClick={handleReset}
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                title="Reset route"
+                aria-label="Reset route"
+              >
+                <RotateCcw size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={handleSwap}
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                title="Swap origin and destination"
+                aria-label="Swap origin and destination"
+              >
+                <ArrowLeftRight size={16} />
+              </button>
+              <div className="mt-auto flex flex-col items-center pb-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2A9D8F] animate-pulse" title="Campus Navigator Active" />
               </div>
-              <div>
-                <div className="text-sm font-semibold text-slate-900">Head straight from Main Entrance</div>
-                <div className="mt-0.5 text-sm text-slate-500">Walk along the central boulevard past security booth</div>
-                <div className="mt-1 text-sm font-semibold text-[#2A9D8F]">80 meters</div>
+            </div>
+          ) : (
+            /* Expanded Full Sidebar */
+            <div className="flex flex-col h-full p-4 overflow-y-auto">
+              {/* Header: Title, Reset and Collapse Toggle */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2A9D8F] text-white shadow-sm">
+                    <Navigation size={16} />
+                  </div>
+                  <div>
+                    <h1 className="text-sm font-semibold text-slate-900 leading-tight">Campus Navigator</h1>
+                    <p className="text-[10px] text-slate-500 truncate max-w-[190px]">MNMJEC Campus Model</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="flex h-8 items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    title="Reset route to default"
+                  >
+                    <RotateCcw size={12} />
+                    <span>Reset</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsSidebarCollapsed(true)}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    title="Collapse sidebar"
+                    aria-label="Collapse sidebar"
+                  >
+                    <PanelLeftClose size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Sidebar Body */}
+              <div className="mt-3 flex-1 overflow-y-auto pr-1">
+                {renderPlanningControls(false)}
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Right Column: Large Dedicated 3D Campus Viewport (Sibling in Flexbox) */}
+        <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
+          <Campus3D
+            routePoints={routePoints}
+            activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
+            simulatedPosition={navMode === 'simulation' ? simProgress.position : null}
+            completedPoints={navMode === 'simulation' ? simProgress.completedPoints : undefined}
+            remainingPoints={navMode === 'simulation' ? simProgress.remainingPoints : undefined}
+            isSimulating={navMode === 'simulation'}
+            selectedBuildingId={toId}
+            viewTarget="route"
+            showHud={false}
+            showInstructionBadge={false}
+            className="absolute inset-0 h-full w-full"
+            onBuildingSelect={handleBuildingSelect}
+          />
+          {/* Subtle bottom-left hint */}
+          <div className="pointer-events-none absolute bottom-4 left-4 z-10">
+            <div className="pointer-events-auto rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-medium text-slate-600 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl">
+              Click any building to set destination • Drag to orbit • Scroll to zoom
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* ============================================================== */}
+      {/* MOBILE LAYOUT (< md): Large Viewport + Collapsible Bottom Sheet */}
+      {/* ============================================================== */}
+      <div className="flex md:hidden flex-col h-[calc(100dvh-10.5rem)] min-h-[460px] w-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
+        {/* Full 3D Campus Viewport */}
+        <div className="absolute inset-0 h-full w-full">
+          <Campus3D
+            routePoints={routePoints}
+            activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
+            simulatedPosition={navMode === 'simulation' ? simProgress.position : null}
+            completedPoints={navMode === 'simulation' ? simProgress.completedPoints : undefined}
+            remainingPoints={navMode === 'simulation' ? simProgress.remainingPoints : undefined}
+            isSimulating={navMode === 'simulation'}
+            selectedBuildingId={toId}
+            viewTarget="route"
+            showHud={false}
+            showInstructionBadge={false}
+            className="h-full w-full"
+            onBuildingSelect={handleBuildingSelect}
+          />
+        </div>
+
+        {/* Floating Mobile Bottom Sheet with 3 States: collapsed, half, expanded */}
+        <div
+          className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-white/95 shadow-2xl ring-1 ring-slate-200/80 backdrop-blur-xl transition-all duration-300 ${
+            mobileSheetState === 'collapsed'
+              ? 'h-14'
+              : mobileSheetState === 'half'
+                ? 'h-[52%] max-h-[350px]'
+                : 'h-[85%]'
+          }`}
+        >
+          {/* Grab Handle & Sheet Header */}
+          <div
+            onClick={(e) => {
+              if ((e.target as HTMLElement).tagName !== 'BUTTON' && !(e.target as HTMLElement).closest('button')) {
+                setMobileSheetState((s) => (s === 'collapsed' ? 'half' : 'collapsed'))
+              }
+            }}
+            className="flex flex-col items-center px-4 pt-2 pb-2 border-b border-slate-100 flex-shrink-0 cursor-pointer select-none"
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setMobileSheetState((s) => (s === 'collapsed' ? 'half' : s === 'half' ? 'expanded' : 'collapsed'))
+              }}
+              className="h-1.5 w-12 rounded-full bg-slate-300 hover:bg-slate-400 transition-colors mb-2"
+              aria-label="Toggle sheet height"
+            />
+            <div className="flex w-full items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2A9D8F] text-white">
+                  <Navigation size={14} />
+                </div>
+                <div className="text-left">
+                  <h2 className="text-xs font-semibold text-slate-900 leading-tight">Campus Navigator</h2>
+                  <p className="text-[10px] text-slate-500">
+                    {mobileSheetState === 'collapsed'
+                      ? routeCalculation.status === 'ok'
+                        ? 'Route calculated • Tap to view'
+                        : 'Route unavailable • Tap'
+                      : 'Misrimal Navajee Munoth Jain'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-600"
+                  title="Reset"
+                >
+                  <RotateCcw size={12} />
+                </button>
+                {mobileSheetState === 'collapsed' ? (
+                  <button
+                    type="button"
+                    onClick={() => setMobileSheetState('half')}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                    title="Expand sheet"
+                    aria-label="Expand sheet"
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                ) : mobileSheetState === 'half' ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setMobileSheetState('collapsed')}
+                      className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                      title="Collapse sheet"
+                      aria-label="Collapse sheet"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMobileSheetState('expanded')}
+                      className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                      title="Maximize sheet"
+                      aria-label="Maximize sheet"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setMobileSheetState('half')}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                    title="Minimize sheet"
+                    aria-label="Minimize sheet"
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
-          {expanded && summary && (
-            <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-white p-4">
-              <div className="text-sm font-semibold text-slate-900">Detailed Waypoints</div>
-              <div className="space-y-2 text-sm text-slate-600">
-                <div className="rounded-xl bg-slate-50 p-3">Main Entrance (Gate 1) — 0 m</div>
-                <div className="rounded-xl bg-slate-50 p-3">Turn right before Civil Block — 110 m</div>
-                <div className="rounded-xl bg-slate-50 p-3">Proceed past L-Shape Block — 90 m</div>
-                <div className="rounded-xl bg-slate-50 p-3">Arrive at IT Block Main Entrance — 40 m</div>
-              </div>
-              <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{summary.note}</p>
+          {/* Sheet Body (Hidden when collapsed) */}
+          {mobileSheetState !== 'collapsed' && (
+            <div className="flex-1 overflow-y-auto p-4">
+              {renderPlanningControls(true)}
             </div>
           )}
         </div>
       </div>
 
-      <SurfaceCard title="Landmarks Along Route" subtitle="Verified examples from Stitch direction flow">
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200">First Year Block</div>
-          <div className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200">Civil Block</div>
-        </div>
-      </SurfaceCard>
+      {/* Supporting Information Cards below main workspace */}
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <SurfaceCard title="Campus Pathway Policy" subtitle="Accurate spatial guidance">
+          <div className="flex items-start gap-2.5 text-xs text-slate-600">
+            <Info size={16} className="text-[#2A9D8F] flex-shrink-0 mt-0.5" />
+            <p>
+              Navigation routes follow geometry extracted directly from the Blender campus GLB. If pathway connectivity is uncertain or pending survey, routes are honestly marked provisional.
+            </p>
+          </div>
+        </SurfaceCard>
+
+        <SurfaceCard title="Real-Time 3D Interaction" subtitle="Responsive controls">
+          <div className="flex items-start gap-2.5 text-xs text-slate-600">
+            <Compass size={16} className="text-[#2A9D8F] flex-shrink-0 mt-0.5" />
+            <p>
+              Use the top-right camera controls to toggle between 3D Isometric, 2D Top-down, Fit Route, and Campus Reset perspectives. Tap or click directly on any academic block in the 3D model to refocus your route.
+            </p>
+          </div>
+        </SurfaceCard>
+      </div>
     </div>
   )
 }

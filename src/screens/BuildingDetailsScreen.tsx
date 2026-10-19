@@ -62,7 +62,7 @@ export function BuildingDetailsScreen() {
           <div className="space-y-4 p-4 md:p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[#2A9D8F]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#2A9D8F]">Registry Verified</span>
+                <span className="rounded-full bg-[#2A9D8F]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#2A9D8F]">Campus model available</span>
                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">{building.floorInfo.label}</span>
               </div>
               <span className="text-xs text-slate-400">ID: {building.id.toUpperCase()}</span>
@@ -77,7 +77,7 @@ export function BuildingDetailsScreen() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-400">Entrance</div>
-                  <div className="mt-1 font-medium text-slate-800">Pending verification</div>
+                  <div className="mt-1 font-medium text-slate-800">Entrance pending verification</div>
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-400">Vertical Span</div>
@@ -85,7 +85,7 @@ export function BuildingDetailsScreen() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-400">Accessibility</div>
-                  <div className="mt-1 font-medium text-slate-800">Pending route validation</div>
+                  <div className="mt-1 font-medium text-slate-800">Accessibility data not verified</div>
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-400">Connectivity</div>
@@ -97,13 +97,30 @@ export function BuildingDetailsScreen() {
             {building.notes && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{building.notes}</div>}
 
             <div className="flex gap-2">
-              <button type="button" className="flex-1 rounded-xl bg-[#2A9D8F] px-4 py-3 text-sm font-semibold text-white shadow-sm">
+              <Link
+                to="/navigation"
+                className="flex flex-1 items-center justify-center rounded-xl bg-[#2A9D8F] px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#238276] transition-colors"
+              >
                 Navigate Here
-              </button>
-              <button type="button" className="rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+              </Link>
+              <Link
+                to="/explore"
+                className="flex items-center justify-center rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition-colors"
+              >
                 3D Plan
-              </button>
-              <button type="button" className="rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: building.name, url: window.location.href }).catch(() => {})
+                  } else {
+                    navigator.clipboard.writeText(window.location.href)
+                    alert('Building link copied to clipboard!')
+                  }
+                }}
+                className="rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-200 transition-colors"
+              >
                 Share
               </button>
             </div>
@@ -111,7 +128,7 @@ export function BuildingDetailsScreen() {
             <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
               <div className="mb-3 flex items-center justify-between">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">Floor Directory</div>
-                <div className="text-xs text-slate-500">Strict campus floor system</div>
+                <div className="text-xs text-slate-500">Floor count provided</div>
               </div>
               <FloorSelector floors={floors} selectedFloor={selectedFloor} onSelectFloor={setSelectedFloor} />
             </div>
@@ -120,12 +137,12 @@ export function BuildingDetailsScreen() {
 
         <section className="space-y-4">
           <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200 md:p-5">
-            <div className="text-sm font-semibold text-slate-900">Verified Floor Directory</div>
+            <div className="text-sm font-semibold text-slate-900">Floor Directory</div>
             <div className="mt-3 grid gap-2">
               {floors.map((floor) => (
                 <div key={floor} className={`rounded-2xl p-3 ${floor === selectedFloor ? 'bg-[#2A9D8F] text-white' : 'bg-slate-50 text-slate-700'}`}>
                   <div className="text-sm font-medium">{floor}</div>
-                  <div className={`text-xs ${floor === selectedFloor ? 'text-white/80' : 'text-slate-500'}`}>No fabricated room map data</div>
+                  <div className={`text-xs ${floor === selectedFloor ? 'text-white/80' : 'text-slate-500'}`}>Indoor map not mapped yet</div>
                 </div>
               ))}
             </div>
@@ -137,7 +154,7 @@ export function BuildingDetailsScreen() {
               {['Civil Block', 'First Year Block', 'Main Block', 'L Shape Block'].map((block) => (
                 <div key={block} className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200">
                   <div className="text-sm font-medium text-slate-800">{block}</div>
-                  <div className="text-xs text-[#2A9D8F]">Floor data verified</div>
+                  <div className="text-xs text-[#2A9D8F]">Floor count provided</div>
                 </div>
               ))}
             </div>
@@ -146,10 +163,10 @@ export function BuildingDetailsScreen() {
           <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200 md:p-5">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2A9D8F]/10 text-[#2A9D8F]">
-                <span className="material-symbols-outlined text-[20px]">shield</span>
+                <span className="material-symbols-outlined text-[20px]">info</span>
               </div>
               <p className="text-sm text-slate-600">
-                Verified by MNMJEC Academic Registry &amp; Estate Management. Floor count follows official campus blueprints.
+                Floor counts and vertical spans provided based on campus 3D model. Detailed room maps remain pending until mapped.
               </p>
             </div>
           </div>
@@ -158,7 +175,7 @@ export function BuildingDetailsScreen() {
 
       <SurfaceCard title="Selected Floor" subtitle={`Current selection: ${selectedFloor}`}>
         <p className="text-sm text-slate-600">
-          This is a layout scaffold only; indoor room numbers and anchor points will remain pending until verified against the future Blender GLB.
+          This is a layout scaffold only; indoor room numbers and anchor points will remain pending until verified against future GLB updates.
         </p>
       </SurfaceCard>
     </div>

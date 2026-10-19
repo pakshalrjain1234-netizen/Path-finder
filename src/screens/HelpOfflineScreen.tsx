@@ -35,7 +35,7 @@ export function HelpOfflineScreen() {
           <SurfaceCard title="PWA Status" subtitle="Offline readiness">
             <div className="space-y-2 text-sm text-slate-600">
               <p>App shell and static assets are cached for offline startup.</p>
-              <p>3D campus rendering offline support depends on verified GLB and route data availability.</p>
+              <p>3D campus rendering offline support depends on GLB and route data availability.</p>
               <p>Use desktop sidebar or mobile floating controls to access all modules.</p>
             </div>
           </SurfaceCard>
@@ -54,9 +54,9 @@ export function HelpOfflineScreen() {
             <div className="mt-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
               <div className="text-sm font-semibold text-slate-900">Offline Navigation Guide</div>
               <div className="mt-3 space-y-2 text-sm text-slate-600">
-                <p>1. Verified campus geometry can be cached once model and route data are available.</p>
-                <p>2. Compass and accelerometer support can assist even without mobile network.</p>
-                <p>3. Indoor room codes will follow verified campus prefixes after data validation.</p>
+                <p>1. Campus model geometry can be cached once data is available.</p>
+                <p>2. Compass and device orientation can assist navigation orientation.</p>
+                <p>3. Indoor room codes will follow campus prefixes once mapped.</p>
               </div>
             </div>
           </SurfaceCard>

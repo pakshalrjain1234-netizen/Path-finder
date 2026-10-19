@@ -1,0 +1,272 @@
+{
+  "buildingBoxes": [
+    {
+      "name": "BOYS_HOSTEL_FOOTPRINT",
+      "minX": 9,
+      "maxX": 50.4,
+      "minZ": -199.6,
+      "maxZ": -183.8
+    },
+    {
+      "name": "CANTEEN_FLOOR_G",
+      "minX": 11.2,
+      "maxX": 63.4,
+      "minZ": -15.8,
+      "maxZ": -3.8
+    },
+    {
+      "name": "CIVIL_BLOCK_FLOOR_G",
+      "minX": 137,
+      "maxX": 152,
+      "minZ": -83,
+      "maxZ": -54.8
+    },
+    {
+      "name": "ENGLISH_DEPARTMENT_FLOOR_ELEVATED",
+      "minX": 59.6,
+      "maxX": 81.8,
+      "minZ": -40.2,
+      "maxZ": -23.8
+    },
+    {
+      "name": "FIRST_YEAR_BLOCK_FLOOR_G",
+      "minX": 157.8,
+      "maxX": 175.8,
+      "minZ": -82.8,
+      "maxZ": -64.8
+    },
+    {
+      "name": "IT_BLOCK_FOOTPRINT",
+      "minX": 82.4,
+      "maxX": 111.4,
+      "minZ": -56,
+      "maxZ": -46.4
+    },
+    {
+      "name": "JAIN_MESS_FLOOR_G",
+      "minX": 30,
+      "maxX": 50.6,
+      "minZ": -40.2,
+      "maxZ": -23.8
+    },
+    {
+      "name": "L_SHAPE_BLOCK_FLOOR_G",
+      "minX": 137.4,
+      "maxX": 263.4,
+      "minZ": -95,
+      "maxZ": -39.2
+    },
+    {
+      "name": "MAIN_BLOCK_FLOOR_G",
+      "minX": 181,
+      "maxX": 206,
+      "minZ": -75.8,
+      "maxZ": -57.2
+    },
+    {
+      "name": "MATHS_DEPARTMENT_FLOOR_G",
+      "minX": 85.2,
+      "maxX": 108.2,
+      "minZ": -40.2,
+      "maxZ": -23.8
+    },
+    {
+      "name": "MECHANICAL_BLOCK_FOOTPRINT",
+      "minX": 27.4,
+      "maxX": 86.4,
+      "minZ": -86.4,
+      "maxZ": -66.2
+    },
+    {
+      "name": "MNM_SCHOOL_OF_ARCHITECTURE_FOOTPRINT",
+      "minX": 6.2,
+      "maxX": 30.4,
+      "minZ": -145.4,
+      "maxZ": -102.2
+    },
+    {
+      "name": "NON_JAIN_MESS_FLOOR_G",
+      "minX": 2.6,
+      "maxX": 24.2,
+      "minZ": -40.2,
+      "maxZ": -23.8
+    },
+    {
+      "name": "OAT_FOOTPRINT",
+      "minX": 216.6,
+      "maxX": 238.4,
+      "minZ": -75.8,
+      "maxZ": -57.2
+    },
+    {
+      "name": "PHYSICS_DEPARTMENT_FLOOR_ELEVATED",
+      "minX": 1.6,
+      "maxX": 27.2,
+      "minZ": -61,
+      "maxZ": -47.8
+    }
+  ],
+  "walkableBoxes": [
+    {
+      "name": "ROAD_CENTRAL_AND_MAIN_ENTRANCE",
+      "minX": 107.6,
+      "maxX": 238,
+      "minZ": -135.4,
+      "maxZ": 12
+    },
+    {
+      "name": "ROAD_HOSTEL_TO_GROUND",
+      "minX": 11,
+      "maxX": 107.6,
+      "minZ": -182.6,
+      "maxZ": -122.2
+    },
+    {
+      "name": "ROAD_MECHANICAL_EAST",
+      "minX": 96.8,
+      "maxX": 103,
+      "minZ": -89,
+      "maxZ": -56.2
+    },
+    {
+      "name": "ROAD_MECHANICAL_SOUTH",
+      "minX": 9.4,
+      "maxX": 96.8,
+      "minZ": -63,
+      "maxZ": -49.4
+    },
+    {
+      "name": "ROAD_MECHANICAL_WEST",
+      "minX": 9.4,
+      "maxX": 15.2,
+      "minZ": -89,
+      "maxZ": -63
+    },
+    {
+      "name": "ROAD_NORTH_SOUTH_LINK",
+      "minX": 72.6,
+      "maxX": 77.2,
+      "minZ": -122.2,
+      "maxZ": -97
+    },
+    {
+      "name": "ROAD_WEST_CROSS_CAMPUS",
+      "minX": 9.4,
+      "maxX": 107.6,
+      "minZ": -97,
+      "maxZ": -89
+    },
+    {
+      "name": "WALK_ACADEMIC_FRONT",
+      "minX": 133.4,
+      "maxX": 245,
+      "minZ": -46,
+      "maxZ": -42.8
+    },
+    {
+      "name": "WALK_ACADEMIC_REAR",
+      "minX": 152.2,
+      "maxX": 245.6,
+      "minZ": -85.4,
+      "maxZ": -46
+    },
+    {
+      "name": "WALK_ARCHITECTURE_EAST",
+      "minX": 30.4,
+      "maxX": 46.8,
+      "minZ": -114,
+      "maxZ": -97
+    },
+    {
+      "name": "WALK_ARCHITECTURE_SOUTH",
+      "minX": 17.8,
+      "maxX": 26.8,
+      "minZ": -102.2,
+      "maxZ": -97
+    },
+    {
+      "name": "WALK_CANTEEN_APPROACH",
+      "minX": 31,
+      "maxX": 44,
+      "minZ": -3.8,
+      "maxZ": 1
+    },
+    {
+      "name": "WALK_CANTEEN_NORTH",
+      "minX": 2.8,
+      "maxX": 100.8,
+      "minZ": -21.8,
+      "maxZ": -16.2
+    },
+    {
+      "name": "WALK_CIVIL",
+      "minX": 141.4,
+      "maxX": 149,
+      "minZ": -54.8,
+      "maxZ": -46
+    },
+    {
+      "name": "WALK_ENGLISH_APPROACH",
+      "minX": 67,
+      "maxX": 74.4,
+      "minZ": -23.8,
+      "maxZ": 0
+    },
+    {
+      "name": "WALK_FIRST_YEAR",
+      "minX": 163,
+      "maxX": 170,
+      "minZ": -64.8,
+      "maxZ": -46
+    },
+    {
+      "name": "WALK_IT",
+      "minX": 93,
+      "maxX": 100.2,
+      "minZ": -46.4,
+      "maxZ": -45.6
+    },
+    {
+      "name": "WALK_JAIN_MESS",
+      "minX": 36.8,
+      "maxX": 43.6,
+      "minZ": -23.8,
+      "maxZ": -21.8
+    },
+    {
+      "name": "WALK_L_SHAPE_ENTRANCE",
+      "minX": 162,
+      "maxX": 169.6,
+      "minZ": -85.6,
+      "maxZ": -82.8
+    },
+    {
+      "name": "WALK_MAIN",
+      "minX": 189.4,
+      "maxX": 198,
+      "minZ": -57.2,
+      "maxZ": -46
+    },
+    {
+      "name": "WALK_MESS_DEPARTMENTS",
+      "minX": 1.6,
+      "maxX": 113,
+      "minZ": -45.6,
+      "maxZ": -40.2
+    },
+    {
+      "name": "WALK_NON_JAIN_MESS",
+      "minX": 9.8,
+      "maxX": 17.4,
+      "minZ": -23.8,
+      "maxZ": -21.8
+    },
+    {
+      "name": "WALK_OAT",
+      "minX": 224,
+      "maxX": 231.4,
+      "minZ": -57.2,
+      "maxZ": -46
+    }
+  ]
+}

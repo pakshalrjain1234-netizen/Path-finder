@@ -75,8 +75,8 @@ export function SearchScreen() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1 rounded-full bg-[#2A9D8F]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#2A9D8F]">
-                    <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: `'FILL' 1` }}>verified</span>
-                    Verified
+                    <span className="material-symbols-outlined text-[13px]">location_on</span>
+                    Campus model available
                   </span>
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">{building.floorInfo.label}</span>
                 </div>

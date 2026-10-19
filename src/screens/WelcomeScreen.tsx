@@ -56,9 +56,9 @@ export function WelcomeScreen() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <SurfaceCard title="Campus Features" subtitle="Converted from Stitch UI">
           <ul className="space-y-2 text-sm text-slate-600">
-            <li>Mobile-first 3D campus explorer with separate viewer scaffold.</li>
-            <li>Destination search with verified result cards.</li>
-            <li>Route guidance drawer with accessibility support.</li>
+            <li>Mobile-first 3D campus explorer with interactive 3D model viewer.</li>
+            <li>Destination search with campus location details.</li>
+            <li>Route guidance with turn-by-turn waypoints.</li>
           </ul>
         </SurfaceCard>
 

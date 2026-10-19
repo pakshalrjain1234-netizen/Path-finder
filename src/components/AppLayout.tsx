@@ -83,7 +83,7 @@ export function AppLayout() {
         <div className="border-t border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-slate-800">Main Campus Gate 1</span>
-            <span className="text-slate-500">GPS Locked</span>
+            <span className="text-slate-500 text-xs">Location permission not requested</span>
           </div>
         </div>
       </aside>
