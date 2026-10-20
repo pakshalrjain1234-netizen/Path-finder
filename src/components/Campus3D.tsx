@@ -26,6 +26,7 @@ export interface Campus3DProps {
   routePoints?: Point3[]
   activeStepPoint?: Point3 | null
   simulatedPosition?: Point3 | null
+  simulatedAccuracyRadius?: number | null
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
@@ -258,6 +259,7 @@ function RouteOverlay({
   points,
   activeStepPoint,
   simulatedPosition,
+  simulatedAccuracyRadius,
   completedPoints,
   remainingPoints,
   isSimulating,
@@ -265,6 +267,7 @@ function RouteOverlay({
   points: Point3[]
   activeStepPoint?: Point3 | null
   simulatedPosition?: Point3 | null
+  simulatedAccuracyRadius?: number | null
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
@@ -324,9 +327,15 @@ function RouteOverlay({
         </mesh>
       )}
 
-      {/* Blue location dot for simulation mode */}
+      {/* Blue location dot for simulation / live navigation mode */}
       {isSimulating && simulatedPosition && (
         <group position={[simulatedPosition[0], simulatedPosition[1] + 0.55, simulatedPosition[2]]}>
+          {simulatedAccuracyRadius && simulatedAccuracyRadius > 0 && (
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.45, 0]}>
+              <ringGeometry args={[0, Math.max(simulatedAccuracyRadius, 1.2), 32]} />
+              <meshBasicMaterial color="#3B82F6" opacity={0.15} transparent side={2} depthWrite={false} />
+            </mesh>
+          )}
           <mesh>
             <sphereGeometry args={[0.75, 20, 20]} />
             <meshStandardMaterial color="#2563EB" emissive="#60A5FA" emissiveIntensity={0.9} />
@@ -404,6 +413,7 @@ function CampusScene({
   routePoints,
   activeStepPoint,
   simulatedPosition,
+  simulatedAccuracyRadius,
   completedPoints,
   remainingPoints,
   isSimulating,
@@ -419,6 +429,7 @@ function CampusScene({
   routePoints?: Point3[]
   activeStepPoint?: Point3 | null
   simulatedPosition?: Point3 | null
+  simulatedAccuracyRadius?: number | null
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
@@ -512,6 +523,7 @@ function CampusScene({
           points={routePoints}
           activeStepPoint={activeStepPoint}
           simulatedPosition={simulatedPosition}
+          simulatedAccuracyRadius={simulatedAccuracyRadius}
           completedPoints={completedPoints}
           remainingPoints={remainingPoints}
           isSimulating={isSimulating}
@@ -672,6 +684,7 @@ function CampusCanvas({
   routePoints,
   activeStepPoint,
   simulatedPosition,
+  simulatedAccuracyRadius,
   completedPoints,
   remainingPoints,
   isSimulating,
@@ -691,6 +704,7 @@ function CampusCanvas({
   routePoints?: Point3[]
   activeStepPoint?: Point3 | null
   simulatedPosition?: Point3 | null
+  simulatedAccuracyRadius?: number | null
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
@@ -762,6 +776,7 @@ function CampusCanvas({
               routePoints={routePoints}
               activeStepPoint={activeStepPoint}
               simulatedPosition={simulatedPosition}
+              simulatedAccuracyRadius={simulatedAccuracyRadius}
               completedPoints={completedPoints}
               remainingPoints={remainingPoints}
               isSimulating={isSimulating}
@@ -827,6 +842,7 @@ export function Campus3D({
   routePoints,
   activeStepPoint,
   simulatedPosition,
+  simulatedAccuracyRadius,
   completedPoints,
   remainingPoints,
   isSimulating,
@@ -854,6 +870,7 @@ export function Campus3D({
             routePoints={routePoints}
             activeStepPoint={activeStepPoint}
             simulatedPosition={simulatedPosition}
+            simulatedAccuracyRadius={simulatedAccuracyRadius}
             completedPoints={completedPoints}
             remainingPoints={remainingPoints}
             isSimulating={isSimulating}

@@ -2,9 +2,15 @@ import {
   AlertTriangle,
   ArrowLeftRight,
   ArrowUp,
+  CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Compass,
+  CornerUpLeft,
+  CornerUpRight,
+  Crosshair,
   Footprints,
   Info,
   Layers,
@@ -14,6 +20,7 @@ import {
   PanelLeftOpen,
   Pause,
   Play,
+  Radio,
   RotateCcw,
   Sparkles,
   StopCircle,
@@ -31,6 +38,10 @@ import {
 } from '../data/navigationGraph'
 import { createRoutePlan } from '../lib/routePlanner'
 import { computeCumulativeDistances, interpolatePolylineAtDistance } from '../lib/routeSimulation'
+import { useGpsLocation } from '../hooks/useGpsLocation.ts'
+import { useLiveNavigation } from '../hooks/useLiveNavigation.ts'
+import { NAVIGATION_SCENARIOS } from '../data/navigationScenarios.ts'
+import type { ScenarioId } from '../types/liveNavigation.ts'
 import type { Point3, RoutePlan } from '../types/navigation'
 
 interface LocationOption {
@@ -41,7 +52,7 @@ interface LocationOption {
 }
 
 type MobileSheetState = 'collapsed' | 'half' | 'expanded'
-type NavMode = 'manual' | 'simulation'
+type NavMode = 'manual' | 'simulation' | 'live'
 
 export function NavigationScreen() {
   const [searchParams] = useSearchParams()
@@ -51,8 +62,10 @@ export function NavigationScreen() {
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0)
   const [showAllSteps, setShowAllSteps] = useState<boolean>(false)
 
-  // Simulation state
+  // Navigation mode & Live GPS state
   const [navMode, setNavMode] = useState<NavMode>(() => (searchParams.get('mode') as NavMode) || 'manual')
+  const [selectedScenarioId, setSelectedScenarioId] = useState<ScenarioId>('walk_main_gate_to_it')
+  const [cameraRevision, setCameraRevision] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [simulatedDistance, setSimulatedDistance] = useState<number>(0)
   const [simSpeed, setSimSpeed] = useState<number>(3.0) // 3.0 m/s walking simulation
@@ -168,6 +181,46 @@ export function NavigationScreen() {
       .filter((pos): pos is Point3 => Boolean(pos))
   }, [route])
 
+  // GPS Location & Live Navigation Tracking Hooks
+  const {
+    coords: gpsCoords,
+    calibrationModel,
+    isTestMode,
+  } = useGpsLocation()
+
+  const {
+    navState,
+    activeScenario,
+    scenarioStepIndex,
+    isScenarioPlaying,
+    startNavigation: startLiveNav,
+    pauseNavigation: pauseLiveNav,
+    resumeNavigation: resumeLiveNav,
+    stopNavigation: stopLiveNav,
+    runScenario,
+    stepScenario,
+  } = useLiveNavigation({
+    route,
+    routePoints,
+    calibration: calibrationModel,
+    liveCoordinates: gpsCoords,
+    isSimulated: isTestMode || Boolean(selectedScenarioId) || navMode === 'simulation' || navMode === 'live',
+  })
+
+  const handleRunScenario = (scenarioId: ScenarioId) => {
+    const scenario = NAVIGATION_SCENARIOS.find((s) => s.id === scenarioId)
+    if (scenario) {
+      setSelectedScenarioId(scenarioId)
+      if (scenario.fromId !== fromId) setFromId(scenario.fromId)
+      if (scenario.toId !== toId) setToId(scenario.toId)
+      runScenario(scenarioId)
+    }
+  }
+
+  const handleRecenterCamera = () => {
+    setCameraRevision((r) => r + 1)
+  }
+
   // Polyline cumulative distances
   const cumulativeDistances = useMemo(() => computeCumulativeDistances(routePoints), [routePoints])
   const totalRouteDistance = useMemo(() => {
@@ -200,7 +253,12 @@ export function NavigationScreen() {
     return Math.min(route.steps.length - 1, currentIdx)
   }, [route, stepCumulativeDistances, simulatedDistance])
 
-  const effectiveStepIndex = navMode === 'simulation' ? simulatedStepIndex : activeStepIndex
+  const effectiveStepIndex =
+    navMode === 'live'
+      ? navState.currentStepIndex
+      : navMode === 'simulation'
+        ? simulatedStepIndex
+        : activeStepIndex
 
   // Animation frame loop for continuous simulation
   useEffect(() => {
@@ -426,7 +484,7 @@ export function NavigationScreen() {
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                Manual Guidance
+                Manual
               </button>
               <button
                 type="button"
@@ -440,12 +498,318 @@ export function NavigationScreen() {
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                Simulate Walk (Virtual)
+                Virtual Walk
+              </button>
+              <button
+                id="tab-gps-navigation"
+                type="button"
+                onClick={() => {
+                  setNavMode('live')
+                  setIsNavigating(true)
+                  startLiveNav()
+                }}
+                className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
+                  navMode === 'live'
+                    ? 'bg-[#2A9D8F] text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                GPS Navigation
               </button>
             </div>
 
-            {/* SIMULATION MODE */}
-            {navMode === 'simulation' ? (
+            {/* LIVE GPS / SCENARIO NAVIGATION MODE */}
+            {navMode === 'live' ? (
+              <div className="space-y-3 rounded-2xl border border-[#2A9D8F]/40 bg-emerald-50/50 p-3 shadow-xs">
+                {/* Mode Indicator & Safety Status */}
+                <div
+                  className={`rounded-xl border p-2.5 text-[11px] ${
+                    activeScenario
+                      ? 'border-blue-200 bg-blue-50/80 text-blue-900'
+                      : isTestMode
+                        ? 'border-amber-200 bg-amber-50/80 text-amber-900'
+                        : navState.rawModelPosition === null
+                          ? 'border-slate-200 bg-slate-50 text-slate-800'
+                          : 'border-emerald-200 bg-emerald-50/80 text-emerald-900'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                      <span
+                        className={`h-2 w-2 rounded-full animate-pulse ${
+                          activeScenario
+                            ? 'bg-blue-600'
+                            : isTestMode
+                              ? 'bg-amber-600'
+                              : navState.rawModelPosition === null
+                                ? 'bg-slate-400'
+                                : 'bg-emerald-600'
+                        }`}
+                      />
+                      <span>
+                        {activeScenario
+                          ? 'SIMULATION MODE • TEST SCENARIO'
+                          : isTestMode
+                            ? 'GPS TEST MODE (SIMULATED)'
+                            : navState.rawModelPosition === null
+                              ? 'CALIBRATION PENDING (LOCKED)'
+                              : 'LIVE GPS TRACKING'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] font-semibold">
+                      <span className="rounded-full bg-white/90 px-2 py-0.5 shadow-xs">
+                        ±{navState.accuracyRadiusMeters.toFixed(1)}m
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 uppercase ${
+                          navState.confidence === 'high'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : navState.confidence === 'medium'
+                              ? 'bg-blue-100 text-blue-800'
+                              : navState.confidence === 'off_route'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {navState.confidence}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-1 text-[10px] opacity-90 leading-tight">
+                    {activeScenario
+                      ? activeScenario.description
+                      : isTestMode
+                        ? 'Simulating GPS observations using development benchmarks with 0m residual error.'
+                        : navState.userMessage}
+                  </div>
+                </div>
+
+                {/* Turn-by-Turn Guidance Hero Card (Google Maps Style) */}
+                <div className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200/90 space-y-3">
+                  {/* Turn Maneuver Header */}
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm text-white ${
+                        navState.status === 'arrived'
+                          ? 'bg-emerald-600'
+                          : navState.isOffRoute
+                            ? 'bg-amber-500'
+                            : navState.isApproachingTurn
+                              ? 'bg-[#E76F51] animate-pulse'
+                              : 'bg-[#2A9D8F]'
+                      }`}
+                    >
+                      {navState.status === 'arrived' ? (
+                        <CheckCircle2 size={24} />
+                      ) : navState.isOffRoute ? (
+                        <AlertTriangle size={24} />
+                      ) : navState.currentStep?.title.toLowerCase().includes('right') ||
+                        (navState.isApproachingTurn &&
+                          navState.nextStep?.title.toLowerCase().includes('right')) ? (
+                        <CornerUpRight size={24} />
+                      ) : navState.currentStep?.title.toLowerCase().includes('left') ||
+                        (navState.isApproachingTurn &&
+                          navState.nextStep?.title.toLowerCase().includes('left')) ? (
+                        <CornerUpLeft size={24} />
+                      ) : (
+                        <ArrowUp size={24} />
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-base text-slate-900 tracking-tight">
+                          {navState.status === 'arrived'
+                            ? 'Destination Arrived'
+                            : navState.isApproachingTurn
+                              ? `In ${navState.distanceToNextTurn.toFixed(0)} m`
+                              : `In ${navState.distanceToNextTurn.toFixed(0)} m`}
+                        </span>
+                        {navState.isApproachingTurn && (
+                          <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800 uppercase animate-pulse">
+                            Upcoming Turn
+                          </span>
+                        )}
+                        {navState.isOffRoute && (
+                          <span className="rounded-full bg-red-100 px-1.5 py-0.2 text-[9px] font-bold text-red-800 uppercase">
+                            Off-Route
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-xs font-semibold text-slate-800 mt-0.5 leading-snug">
+                        {navState.status === 'arrived'
+                          ? 'You have safely reached your destination!'
+                          : navState.isApproachingTurn && navState.nextStep
+                            ? navState.nextStep.title
+                            : navState.currentStep?.title ?? 'Proceed along path'}
+                      </h3>
+
+                      {navState.currentStep?.notes && (
+                        <p className="mt-0.5 text-[11px] text-slate-500">
+                          {navState.currentStep.notes}
+                        </p>
+                      )}
+
+                      {/* Next Turn Preview */}
+                      {navState.nextStep && !navState.isApproachingTurn && (
+                        <div className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-400">
+                          <span>Then:</span>
+                          <span className="font-medium text-slate-600 truncate">
+                            {navState.nextStep.title}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Bar & Distance / ETA */}
+                  <div className="border-t border-slate-100 pt-2.5 space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-bold text-slate-900">
+                        {navState.remainingDistance.toFixed(0)} m remaining
+                      </span>
+                      <span className="font-medium text-slate-500">
+                        ~{Math.ceil(navState.estimatedTimeRemainingSec / 60)} min •{' '}
+                        {(navState.progressRatio * 100).toFixed(0)}%
+                      </span>
+                    </div>
+
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#2A9D8F] to-[#E76F51] transition-all duration-300"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, navState.progressRatio * 100))}%`,
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span>Start: {locationOptions.find((o) => o.id === fromId)?.label}</span>
+                      <span>End: {locationOptions.find((o) => o.id === toId)?.label}</span>
+                    </div>
+                  </div>
+
+                  {/* Primary Navigation Controls */}
+                  <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        id="btn-live-pause-resume"
+                        type="button"
+                        onClick={() => {
+                          if (navState.isPaused) {
+                            resumeLiveNav()
+                          } else {
+                            pauseLiveNav()
+                          }
+                        }}
+                        className="flex items-center gap-1 rounded-xl bg-[#2A9D8F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-[#238276] transition"
+                      >
+                        {navState.isPaused ? <Play size={13} /> : <Pause size={13} />}
+                        <span>{navState.isPaused ? 'Resume' : 'Pause'}</span>
+                      </button>
+
+                      <button
+                        id="btn-live-stop"
+                        type="button"
+                        onClick={stopLiveNav}
+                        className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-xs transition"
+                      >
+                        <StopCircle size={13} className="text-red-500" />
+                        <span>Stop</span>
+                      </button>
+                    </div>
+
+                    <button
+                      id="btn-live-recenter"
+                      type="button"
+                      onClick={handleRecenterCamera}
+                      className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:border-[#2A9D8F] hover:text-[#2A9D8F] shadow-xs transition"
+                      title="Recenter camera on route"
+                    >
+                      <Crosshair size={13} className="text-[#2A9D8F]" />
+                      <span>Recenter</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Repeatable Test Scenarios Suite */}
+                <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200/90 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                      <Radio size={14} className="text-[#2A9D8F]" />
+                      <span>GPS Test Scenarios (10 Tests)</span>
+                    </span>
+                    {activeScenario && (
+                      <span className="text-[10px] font-semibold text-blue-600">
+                        Obs {scenarioStepIndex + 1}/{activeScenario.observations.length}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <select
+                      id="nav-scenario-select"
+                      value={selectedScenarioId}
+                      onChange={(e) => {
+                        const scId = e.target.value as ScenarioId
+                        setSelectedScenarioId(scId)
+                        handleRunScenario(scId)
+                      }}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-800 outline-none focus:border-[#2A9D8F]"
+                    >
+                      {NAVIGATION_SCENARIOS.map((sc) => (
+                        <option key={sc.id} value={sc.id}>
+                          {sc.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Scenario Action Controls */}
+                    <div className="flex items-center justify-between gap-1.5 pt-1">
+                      <button
+                        id="btn-run-scenario"
+                        type="button"
+                        onClick={() => handleRunScenario(selectedScenarioId)}
+                        className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-slate-900 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition shadow-xs"
+                      >
+                        <Play size={12} />
+                        <span>
+                          {activeScenario?.id === selectedScenarioId && isScenarioPlaying
+                            ? 'Restart Scenario'
+                            : 'Run Scenario'}
+                        </span>
+                      </button>
+
+                      {activeScenario && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            id="btn-scenario-prev"
+                            type="button"
+                            disabled={scenarioStepIndex === 0}
+                            onClick={() => stepScenario('prev')}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                            title="Previous observation"
+                          >
+                            <ChevronLeft size={14} />
+                          </button>
+                          <button
+                            id="btn-scenario-next"
+                            type="button"
+                            disabled={scenarioStepIndex >= activeScenario.observations.length - 1}
+                            onClick={() => stepScenario('next')}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                            title="Next observation"
+                          >
+                            <ChevronRight size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : navMode === 'simulation' ? (
               <div className="space-y-2.5 rounded-2xl border border-[#2A9D8F]/30 bg-emerald-50/40 p-3">
                 {/* Clear Label & Disclaimer */}
                 <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-2.5 text-[11px] text-blue-900">
@@ -829,12 +1193,36 @@ export function NavigationScreen() {
         {/* Right Column: Large Dedicated 3D Campus Viewport (Sibling in Flexbox) */}
         <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
           <Campus3D
+            key={`campus-3d-desktop-${cameraRevision}`}
             routePoints={routePoints}
             activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
-            simulatedPosition={navMode === 'simulation' ? simProgress.position : null}
-            completedPoints={navMode === 'simulation' ? simProgress.completedPoints : undefined}
-            remainingPoints={navMode === 'simulation' ? simProgress.remainingPoints : undefined}
-            isSimulating={navMode === 'simulation'}
+            simulatedPosition={
+              navMode === 'live'
+                ? navState.displayPosition
+                : navMode === 'simulation'
+                  ? simProgress.position
+                  : null
+            }
+            simulatedAccuracyRadius={
+              navMode === 'live'
+                ? navState.accuracyRadiusModel
+                : null
+            }
+            completedPoints={
+              navMode === 'live'
+                ? navState.completedPoints
+                : navMode === 'simulation'
+                  ? simProgress.completedPoints
+                  : undefined
+            }
+            remainingPoints={
+              navMode === 'live'
+                ? navState.remainingPoints
+                : navMode === 'simulation'
+                  ? simProgress.remainingPoints
+                  : undefined
+            }
+            isSimulating={navMode === 'live' || navMode === 'simulation'}
             selectedBuildingId={toId}
             viewTarget="route"
             showHud={false}
@@ -858,12 +1246,36 @@ export function NavigationScreen() {
         {/* Full 3D Campus Viewport */}
         <div className="absolute inset-0 h-full w-full">
           <Campus3D
+            key={`campus-3d-mobile-${cameraRevision}`}
             routePoints={routePoints}
             activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
-            simulatedPosition={navMode === 'simulation' ? simProgress.position : null}
-            completedPoints={navMode === 'simulation' ? simProgress.completedPoints : undefined}
-            remainingPoints={navMode === 'simulation' ? simProgress.remainingPoints : undefined}
-            isSimulating={navMode === 'simulation'}
+            simulatedPosition={
+              navMode === 'live'
+                ? navState.displayPosition
+                : navMode === 'simulation'
+                  ? simProgress.position
+                  : null
+            }
+            simulatedAccuracyRadius={
+              navMode === 'live'
+                ? navState.accuracyRadiusModel
+                : null
+            }
+            completedPoints={
+              navMode === 'live'
+                ? navState.completedPoints
+                : navMode === 'simulation'
+                  ? simProgress.completedPoints
+                  : undefined
+            }
+            remainingPoints={
+              navMode === 'live'
+                ? navState.remainingPoints
+                : navMode === 'simulation'
+                  ? simProgress.remainingPoints
+                  : undefined
+            }
+            isSimulating={navMode === 'live' || navMode === 'simulation'}
             selectedBuildingId={toId}
             viewTarget="route"
             showHud={false}
