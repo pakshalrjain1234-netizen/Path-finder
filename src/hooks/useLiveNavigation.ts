@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { Point3, RoutePlan } from '../types/navigation'
+import type { NavigationGraph, Point3, RoutePlan } from '../types/navigation'
 import type { CalibrationModel } from '../types/gps'
 import { LiveNavigationEngine } from '../lib/liveNavigationEngine.ts'
 import type {
@@ -15,6 +15,9 @@ interface UseLiveNavigationProps {
   calibration: CalibrationModel
   liveCoordinates: { latitude: number; longitude: number; accuracy: number } | null
   isSimulated: boolean
+  graph?: NavigationGraph | null
+  destinationNodeId?: string | null
+  onRouteRerouted?: (newRoute: RoutePlan, newPoints: Point3[]) => void
 }
 
 export function useLiveNavigation({
@@ -23,6 +26,9 @@ export function useLiveNavigation({
   calibration,
   liveCoordinates,
   isSimulated,
+  graph,
+  destinationNodeId,
+  onRouteRerouted,
 }: UseLiveNavigationProps) {
   const engine = useMemo(() => new LiveNavigationEngine(), [])
 
@@ -31,7 +37,12 @@ export function useLiveNavigation({
   const [scenarioStepIndex, setScenarioStepIndex] = useState<number>(0)
   const [isScenarioPlaying, setIsScenarioPlaying] = useState<boolean>(false)
 
-  // Initialize route in engine
+  // Configure campus graph & destination for automatic rerouting
+  useEffect(() => {
+    engine.setGraph(graph ?? null, destinationNodeId ?? null)
+  }, [graph, destinationNodeId, engine])
+
+  // Initialize or update route in engine
   useEffect(() => {
     engine.setRoute(route, routePoints)
   }, [route, routePoints, engine])
@@ -49,6 +60,15 @@ export function useLiveNavigation({
       isSimulated
     )
   })
+
+  // Notify parent component when an automatic reroute completes
+  useEffect(() => {
+    if (navState.status === 'rerouted' && navState.activeRoutePlan) {
+      if (onRouteRerouted) {
+        onRouteRerouted(navState.activeRoutePlan, navState.remainingPoints)
+      }
+    }
+  }, [navState.status, navState.activeRoutePlan, navState.remainingPoints, onRouteRerouted])
 
   // Feed Live GPS Coordinates when in live/tracking mode
   useEffect(() => {

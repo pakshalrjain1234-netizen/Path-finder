@@ -1,4 +1,4 @@
-import type { Point3, RoutePlan } from '../types/navigation'
+import type { NavigationGraph, Point3, RoutePlan } from '../types/navigation'
 import type { CalibrationModel } from '../types/gps'
 import { geoToModelCoordinates } from './campusCalibration.ts'
 import { computeCumulativeDistances, interpolatePolylineAtDistance, pointDistance3D } from './routeSimulation.ts'
@@ -7,9 +7,12 @@ import type {
   LiveNavigationState,
   LocationObservation,
   NavigationStatus,
+  OffRouteStatus,
   RouteMatchingConfidence,
   RouteProjection,
 } from '../types/liveNavigation.ts'
+import { OffRouteDetector } from './offRouteDetector.ts'
+import { findValidReroute } from './routeRerouter.ts'
 
 export const DEFAULT_NAVIGATION_CONFIG: LiveNavigationConfig = {
   maxAcceptableAccuracyMeters: 30,
@@ -20,6 +23,14 @@ export const DEFAULT_NAVIGATION_CONFIG: LiveNavigationConfig = {
   arrivalThresholdMeters: 7,
   jitterBackwardToleranceMeters: 4,
   signalLossTimeoutMs: 8000,
+
+  // Phase 4C Intelligent Rerouting Defaults
+  consecutiveOffRouteThreshold: 3,
+  recoveryConsecutiveThreshold: 2,
+  minDeviationDurationMs: 2500,
+  rerouteSearchRadiusMeters: 40,
+  stationarySpeedThresholdMps: 0.4,
+  enableAutoReroute: true,
 }
 
 /**
@@ -127,7 +138,8 @@ export function projectPointOntoRoute(
 
 /**
  * Pure, stateful Live Navigation Engine.
- * Manages tracking lifecycle, filtering, progression, and guidance.
+ * Manages tracking lifecycle, filtering, progression, guidance,
+ * and automatic intelligent rerouting upon confirmed pathway deviation.
  */
 export class LiveNavigationEngine {
   private config: LiveNavigationConfig
@@ -136,6 +148,10 @@ export class LiveNavigationEngine {
   private cumulativeDistances: number[] = []
   private stepCumulativeDistances: number[] = []
   private totalDistance: number = 0
+
+  // Campus Graph & Destination for Automatic Rerouting
+  private graph: NavigationGraph | null = null
+  private destinationNodeId: string | null = null
 
   // Tracking state
   private isNavigating: boolean = false
@@ -146,14 +162,30 @@ export class LiveNavigationEngine {
   private currentProgressDistance: number = 0
   private lastObservationTime: number = 0
 
+  // Phase 4C Rerouting & Off-Route State Machine
+  private offRouteDetector: OffRouteDetector = new OffRouteDetector()
+  private rerouteCount: number = 0
+  private lastReroutedNodeId: string | null = null
+  private rerouteFailureReason: string | null = null
+  private previousCompletedPoints: Point3[] = []
+
   constructor(config: Partial<LiveNavigationConfig> = {}) {
     this.config = { ...DEFAULT_NAVIGATION_CONFIG, ...config }
   }
 
   /**
-   * Initializes or updates the active route plan
+   * Sets the campus graph and destination for automatic rerouting
    */
-  public setRoute(route: RoutePlan | null, routePoints: Point3[]): void {
+  public setGraph(graph: NavigationGraph | null, destinationNodeId: string | null): void {
+    this.graph = graph
+    this.destinationNodeId = destinationNodeId
+  }
+
+  /**
+   * Initializes or updates the active route plan
+   * @param preserveHistory If true, preserves traversed history and reroute count (used during rerouting)
+   */
+  public setRoute(route: RoutePlan | null, routePoints: Point3[], preserveHistory: boolean = false): void {
     this.route = route
     this.routePoints = routePoints
     this.cumulativeDistances = computeCumulativeDistances(routePoints)
@@ -173,7 +205,13 @@ export class LiveNavigationEngine {
       this.stepCumulativeDistances = []
     }
 
-    this.reset()
+    if (!preserveHistory) {
+      this.previousCompletedPoints = []
+      this.rerouteCount = 0
+      this.lastReroutedNodeId = null
+      this.rerouteFailureReason = null
+      this.reset()
+    }
   }
 
   /**
@@ -206,6 +244,11 @@ export class LiveNavigationEngine {
     this.isNavigating = false
     this.isPaused = false
     this.isArrived = false
+    this.previousCompletedPoints = []
+    this.rerouteCount = 0
+    this.lastReroutedNodeId = null
+    this.rerouteFailureReason = null
+    this.offRouteDetector.reset()
     this.reset()
   }
 
@@ -218,6 +261,7 @@ export class LiveNavigationEngine {
     this.currentProgressDistance = 0
     this.lastObservationTime = 0
     this.isArrived = false
+    this.offRouteDetector.reset()
   }
 
   /**
@@ -225,6 +269,13 @@ export class LiveNavigationEngine {
    */
   public setProgressDistance(distance: number): void {
     this.currentProgressDistance = Math.max(0, Math.min(this.totalDistance, distance))
+  }
+
+  /**
+   * Returns total reroutes executed in this navigation session
+   */
+  public getRerouteCount(): number {
+    return this.rerouteCount
   }
 
   /**
@@ -302,7 +353,7 @@ export class LiveNavigationEngine {
     this.lastValidObservation = obs
     this.lastValidModelPoint = currentModelPoint
 
-    // Project onto route
+    // Project onto active route
     const projection = projectPointOntoRoute(
       currentModelPoint,
       this.routePoints,
@@ -310,22 +361,182 @@ export class LiveNavigationEngine {
       this.currentProgressDistance
     )
 
-    // Route matching confidence classification
+    // Evaluate Phase 4C Off-Route State Machine
+    const offRouteEval = this.offRouteDetector.evaluateObservation(
+      obs,
+      currentModelPoint,
+      projection,
+      this.config
+    )
+
+    // -------------------------------------------------------------
+    // PHASE 4C: AUTOMATIC REROUTING LOGIC
+    // -------------------------------------------------------------
+    if (
+      offRouteEval.status === 'confirmed_off_route' &&
+      this.config.enableAutoReroute &&
+      this.graph &&
+      this.destinationNodeId &&
+      !this.isArrived &&
+      this.isNavigating
+    ) {
+      const rerouteResult = findValidReroute({
+        userModelPoint: currentModelPoint,
+        destinationNodeId: this.destinationNodeId,
+        graph: this.graph,
+        searchRadiusMeters: this.config.rerouteSearchRadiusMeters,
+      })
+
+      if (rerouteResult.success) {
+        // Archive current traversed progress into previousCompletedPoints
+        if (this.currentProgressDistance > 0 && this.routePoints.length >= 2) {
+          const prevSlice = interpolatePolylineAtDistance(
+            this.routePoints,
+            this.cumulativeDistances,
+            this.currentProgressDistance
+          )
+          this.previousCompletedPoints = [
+            ...this.previousCompletedPoints,
+            ...prevSlice.completedPoints,
+          ]
+        }
+
+        // Install new route plan
+        this.route = rerouteResult.routePlan
+        this.routePoints = rerouteResult.routePoints
+        this.cumulativeDistances = computeCumulativeDistances(this.routePoints)
+        this.totalDistance =
+          this.cumulativeDistances.length > 0
+            ? this.cumulativeDistances[this.cumulativeDistances.length - 1]
+            : 0
+
+        this.stepCumulativeDistances = this.route.steps.map((step) => {
+          const idx = this.route!.nodeIds.indexOf(step.nodeId)
+          return idx >= 0 && idx < this.cumulativeDistances.length
+            ? this.cumulativeDistances[idx]
+            : 0
+        })
+
+        this.currentProgressDistance = 0
+        this.rerouteCount++
+        this.lastReroutedNodeId = rerouteResult.entryNode.id
+        this.rerouteFailureReason = null
+        this.offRouteDetector.reset()
+
+        // Re-project user position onto the newly installed route
+        const newProjection = projectPointOntoRoute(
+          currentModelPoint,
+          this.routePoints,
+          this.cumulativeDistances,
+          0
+        )
+
+        return this.buildStateWithProjection(
+          isSimulated,
+          'rerouted',
+          newProjection,
+          'high',
+          `Route recalculated via ${rerouteResult.entryNode.label}.`,
+          'on_route',
+          0
+        )
+      } else {
+        // Rerouting failed (e.g. building obstacle block or no path)
+        this.rerouteFailureReason = rerouteResult.reason
+        return this.buildStateWithProjection(
+          isSimulated,
+          'off_route',
+          projection,
+          'off_route',
+          `Off-route: ${rerouteResult.message}`,
+          'confirmed_off_route',
+          offRouteEval.consecutiveOffRouteCount
+        )
+      }
+    }
+
+    // If confirmed off-route but auto rerouting disabled or unconfigured
+    if (offRouteEval.status === 'confirmed_off_route') {
+      return this.buildStateWithProjection(
+        isSimulated,
+        'off_route',
+        projection,
+        'off_route',
+        `You are ${projection.crossTrackDistance.toFixed(0)}m away from the planned walkway.`,
+        'confirmed_off_route',
+        offRouteEval.consecutiveOffRouteCount
+      )
+    }
+
+    // If diverging (single or unconfirmed reading)
+    if (offRouteEval.status === 'diverging') {
+      // Rule 4: Monotonic Progress Clamp continues
+      this.applyProgressClamping(projection)
+      const divergingConfidence: RouteMatchingConfidence =
+        projection.crossTrackDistance > this.config.offRouteThresholdMeters ? 'off_route' : 'low'
+
+      return this.buildStateWithProjection(
+        isSimulated,
+        divergingConfidence === 'off_route' ? 'off_route' : (this.isNavigating ? 'navigating' : 'idle'),
+        projection,
+        divergingConfidence,
+        `Leaving walkway corridor (${projection.crossTrackDistance.toFixed(0)}m). Monitoring path...`,
+        'diverging',
+        offRouteEval.consecutiveOffRouteCount
+      )
+    }
+
+    // If on-route or recovering
     let confidence: RouteMatchingConfidence = 'high'
-    if (projection.crossTrackDistance > this.config.offRouteThresholdMeters) {
-      confidence = 'off_route'
-    } else if (projection.crossTrackDistance > this.config.snapToRouteThresholdMeters || obs.accuracy > 15) {
+    if (projection.crossTrackDistance > this.config.snapToRouteThresholdMeters || obs.accuracy > 15) {
       confidence = 'medium'
     }
 
-    // Rule 4: Monotonic Progress Clamp & Jitter Tolerance
+    // Monotonic Progress Clamp & Jitter Tolerance
+    this.applyProgressClamping(projection)
+
+    // Check Destination Arrival
+    const remainingDist = Math.max(0, this.totalDistance - this.currentProgressDistance)
+    if (this.isNavigating && remainingDist <= this.config.arrivalThresholdMeters) {
+      this.isArrived = true
+      this.currentProgressDistance = this.totalDistance
+    }
+
+    const status: NavigationStatus = this.isArrived
+      ? 'arrived'
+      : this.isNavigating
+        ? 'navigating'
+        : 'idle'
+
+    let userMessage = 'Navigation active.'
+    if (status === 'arrived') {
+      userMessage = 'You have arrived at your destination.'
+    } else if (offRouteEval.status === 'recovering') {
+      userMessage = 'Returned to planned walkway.'
+    }
+
+    return this.buildStateWithProjection(
+      isSimulated,
+      status,
+      projection,
+      confidence,
+      userMessage,
+      offRouteEval.status,
+      offRouteEval.consecutiveOffRouteCount
+    )
+  }
+
+  /**
+   * Applies monotonic progress clamping so normal GPS jitter cannot pull the user backward
+   */
+  private applyProgressClamping(projection: RouteProjection): void {
     const proposedProgress = projection.progressDistance
     if (proposedProgress < this.currentProgressDistance) {
       const backwardDelta = this.currentProgressDistance - proposedProgress
       if (backwardDelta <= this.config.jitterBackwardToleranceMeters) {
         // Clamp: normal jitter cannot pull user backward
         // Keep this.currentProgressDistance unchanged
-      } else if (backwardDelta > 15 && confidence !== 'off_route') {
+      } else if (backwardDelta > 15) {
         // Sustained reverse walking: allow controlled recalculation
         this.currentProgressDistance = proposedProgress
       }
@@ -333,30 +544,6 @@ export class LiveNavigationEngine {
       // Forward progress
       this.currentProgressDistance = proposedProgress
     }
-
-    // Check Destination Arrival
-    const remainingDist = Math.max(0, this.totalDistance - this.currentProgressDistance)
-    if (this.isNavigating && remainingDist <= this.config.arrivalThresholdMeters && confidence !== 'off_route') {
-      this.isArrived = true
-      this.currentProgressDistance = this.totalDistance
-    }
-
-    const status: NavigationStatus = this.isArrived
-      ? 'arrived'
-      : confidence === 'off_route'
-        ? 'off_route'
-        : this.isNavigating
-          ? 'navigating'
-          : 'idle'
-
-    let userMessage = 'Navigation active.'
-    if (status === 'arrived') {
-      userMessage = 'You have arrived at your destination.'
-    } else if (status === 'off_route') {
-      userMessage = `You are ${projection.crossTrackDistance.toFixed(0)}m away from the planned walkway.`
-    }
-
-    return this.buildStateWithProjection(isSimulated, status, projection, confidence, userMessage)
   }
 
   /**
@@ -387,13 +574,14 @@ export class LiveNavigationEngine {
     status: NavigationStatus,
     projection: RouteProjection,
     confidence: RouteMatchingConfidence,
-    userMessage: string
+    userMessage: string,
+    offRouteStatus: OffRouteStatus = 'on_route',
+    offRouteConsecutiveCount: number = 0
   ): LiveNavigationState {
     const totalDist = this.totalDistance
     const curDist = Math.max(0, Math.min(totalDist, this.currentProgressDistance))
     const progressRatio = totalDist > 0 ? curDist / totalDist : 1
     const remainingDist = Math.max(0, totalDist - curDist)
-    // Assume average walking speed ~1.3 m/s for ETA
     const estimatedTimeSec = Math.round(remainingDist / 1.3)
 
     // Slice polyline for visual completion & remaining highlight
@@ -423,13 +611,16 @@ export class LiveNavigationEngine {
     const distanceToNextTurn = Math.max(0, nextStepDist - curDist)
     const isApproachingTurn = distanceToNextTurn <= this.config.turnProximityThresholdMeters && nextStep !== null
 
-    // Display Position Strategy:
-    // If confidence is high/medium, softly snap to route centerline for clean walkway traversal.
-    // If off-route, display raw location — NEVER falsely snap an off-route user onto an incorrect walkway!
-    const displayPosition: Point3 =
-      confidence === 'off_route'
-        ? projection.rawModelPoint
-        : projection.projectedPoint
+    // Distinct raw vs snapped display position:
+    // If confidence is off_route, NEVER falsely snap onto an incorrect walkway!
+    const isOffRoute =
+      confidence === 'off_route' ||
+      projection.crossTrackDistance > this.config.offRouteThresholdMeters ||
+      offRouteStatus === 'confirmed_off_route'
+
+    const displayPosition: Point3 = isOffRoute
+      ? projection.rawModelPoint
+      : projection.projectedPoint
 
     return {
       status,
@@ -437,7 +628,7 @@ export class LiveNavigationEngine {
       isNavigating: this.isNavigating,
       isPaused: this.isPaused,
       isArrived: this.isArrived,
-      isOffRoute: confidence === 'off_route',
+      isOffRoute,
       signalStatus: 'healthy',
       totalDistance: totalDist,
       currentDistance: curDist,
@@ -456,8 +647,16 @@ export class LiveNavigationEngine {
       nextStep,
       distanceToNextTurn,
       isApproachingTurn,
-      completedPoints: polylineProgress.completedPoints,
+      completedPoints: [...this.previousCompletedPoints, ...polylineProgress.completedPoints],
       remainingPoints: polylineProgress.remainingPoints,
+      previousCompletedPoints: this.previousCompletedPoints,
+      offRouteStatus,
+      offRouteConsecutiveCount,
+      isRerouting: status === 'recalculating',
+      rerouteCount: this.rerouteCount,
+      lastReroutedNodeId: this.lastReroutedNodeId,
+      rerouteFailureReason: this.rerouteFailureReason,
+      activeRoutePlan: this.route,
       userMessage,
       details: `${curDist.toFixed(1)}m of ${totalDist.toFixed(1)}m • ${(progressRatio * 100).toFixed(0)}% complete`,
     }
@@ -528,8 +727,16 @@ export class LiveNavigationEngine {
       nextStep,
       distanceToNextTurn,
       isApproachingTurn,
-      completedPoints: polylineProgress.completedPoints,
+      completedPoints: [...this.previousCompletedPoints, ...polylineProgress.completedPoints],
       remainingPoints: polylineProgress.remainingPoints,
+      previousCompletedPoints: this.previousCompletedPoints,
+      offRouteStatus: this.offRouteDetector.getStatus(),
+      offRouteConsecutiveCount: this.offRouteDetector.getConsecutiveCount(),
+      isRerouting: status === 'recalculating',
+      rerouteCount: this.rerouteCount,
+      lastReroutedNodeId: this.lastReroutedNodeId,
+      rerouteFailureReason: this.rerouteFailureReason,
+      activeRoutePlan: this.route,
       userMessage,
       details: `${curDist.toFixed(1)}m of ${totalDist.toFixed(1)}m • ${(progressRatio * 100).toFixed(0)}% complete`,
     }
@@ -572,6 +779,14 @@ export class LiveNavigationEngine {
       isApproachingTurn: false,
       completedPoints: [],
       remainingPoints: polylineProgress.remainingPoints,
+      previousCompletedPoints: [],
+      offRouteStatus: 'on_route',
+      offRouteConsecutiveCount: 0,
+      isRerouting: false,
+      rerouteCount: 0,
+      lastReroutedNodeId: null,
+      rerouteFailureReason: null,
+      activeRoutePlan: this.route,
       userMessage: 'Campus map calibration pending. Real outdoor GPS navigation is locked.',
       details: 'On-site RTK-GNSS surveyed benchmarks are required before live outdoor blue-dot navigation.',
     }

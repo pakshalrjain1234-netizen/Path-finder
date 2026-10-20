@@ -1,4 +1,4 @@
-import type { Point3, RouteStep } from './navigation'
+import type { Point3, RoutePlan, RouteStep } from './navigation'
 
 /**
  * Raw timestamped location observation in WGS-84 coordinates
@@ -27,8 +27,15 @@ export type NavigationStatus =
   | 'paused'
   | 'arrived'
   | 'off_route'
+  | 'recalculating'
+  | 'rerouted'
   | 'signal_lost'
   | 'accuracy_insufficient'
+
+/**
+ * Off-route state machine status
+ */
+export type OffRouteStatus = 'on_route' | 'diverging' | 'confirmed_off_route' | 'recovering'
 
 /**
  * Detailed orthogonal projection onto a route polyline
@@ -79,6 +86,16 @@ export interface LiveNavigationState {
   // Polyline sliced for 3D visualization
   completedPoints: Point3[]
   remainingPoints: Point3[]
+  previousCompletedPoints: Point3[] // Historical points from prior traversed segments before rerouting
+
+  // Automatic rerouting state
+  offRouteStatus: OffRouteStatus
+  offRouteConsecutiveCount: number
+  isRerouting: boolean
+  rerouteCount: number
+  lastReroutedNodeId: string | null
+  rerouteFailureReason: string | null
+  activeRoutePlan: RoutePlan | null
 
   // Status message for user
   userMessage: string
@@ -97,10 +114,18 @@ export interface LiveNavigationConfig {
   arrivalThresholdMeters: number // default: 7m
   jitterBackwardToleranceMeters: number // default: 4m
   signalLossTimeoutMs: number // default: 8000ms
+
+  // Phase 4C Intelligent Rerouting thresholds
+  consecutiveOffRouteThreshold: number // default: 3 observations
+  recoveryConsecutiveThreshold: number // default: 2 observations
+  minDeviationDurationMs: number // default: 2500ms
+  rerouteSearchRadiusMeters: number // default: 40m
+  stationarySpeedThresholdMps: number // default: 0.4 m/s
+  enableAutoReroute: boolean // default: true
 }
 
 /**
- * Deterministic test scenario identifier
+ * Deterministic test scenario identifier (Phase 4B & Phase 4C)
  */
 export type ScenarioId =
   | 'walk_main_gate_to_it'
@@ -113,6 +138,17 @@ export type ScenarioId =
   | 'approaching_turn'
   | 'destination_arrival'
   | 'off_route_deviation'
+  // Phase 4C Rerouting Scenarios
+  | 'reroute_wrong_turn'
+  | 'reroute_valid_walkway'
+  | 'reroute_walking_away'
+  | 'reroute_return_to_route'
+  | 'reroute_stationary_jitter'
+  | 'reroute_single_inaccurate_obs'
+  | 'reroute_signal_loss_during_dev'
+  | 'reroute_no_valid_path'
+  | 'reroute_repeated_attempts'
+  | 'reroute_then_arrive'
 
 export interface NavigationScenario {
   id: ScenarioId

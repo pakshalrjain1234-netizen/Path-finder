@@ -205,7 +205,19 @@ export function NavigationScreen() {
     calibration: calibrationModel,
     liveCoordinates: gpsCoords,
     isSimulated: isTestMode || Boolean(selectedScenarioId) || navMode === 'simulation' || navMode === 'live',
+    graph: campusNavigationGraph,
+    destinationNodeId: destinationNodeId,
   })
+
+  // Dynamic route points for active display (switches seamlessly upon automatic rerouting)
+  const liveRoutePoints = useMemo<Point3[]>(() => {
+    if (navMode === 'live' && navState.activeRoutePlan) {
+      return navState.activeRoutePlan.nodeIds
+        .map((id) => campusNavigationNodesById.get(id)?.position)
+        .filter((pos): pos is Point3 => Boolean(pos))
+    }
+    return routePoints
+  }, [navMode, navState.activeRoutePlan, routePoints])
 
   const handleRunScenario = (scenarioId: ScenarioId) => {
     const scenario = NAVIGATION_SCENARIOS.find((s) => s.id === scenarioId)
@@ -617,17 +629,27 @@ export function NavigationScreen() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-extrabold text-base text-slate-900 tracking-tight">
                           {navState.status === 'arrived'
                             ? 'Destination Arrived'
-                            : navState.isApproachingTurn
-                              ? `In ${navState.distanceToNextTurn.toFixed(0)} m`
+                            : navState.status === 'rerouted'
+                              ? 'Route Recalculated'
                               : `In ${navState.distanceToNextTurn.toFixed(0)} m`}
                         </span>
                         {navState.isApproachingTurn && (
                           <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800 uppercase animate-pulse">
                             Upcoming Turn
+                          </span>
+                        )}
+                        {navState.status === 'rerouted' && (
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-800 uppercase flex items-center gap-1">
+                            <Sparkles size={10} /> Recalculated ({navState.rerouteCount})
+                          </span>
+                        )}
+                        {navState.offRouteStatus === 'diverging' && !navState.isOffRoute && (
+                          <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800 uppercase">
+                            Diverging
                           </span>
                         )}
                         {navState.isOffRoute && (
@@ -640,12 +662,28 @@ export function NavigationScreen() {
                       <h3 className="text-xs font-semibold text-slate-800 mt-0.5 leading-snug">
                         {navState.status === 'arrived'
                           ? 'You have safely reached your destination!'
-                          : navState.isApproachingTurn && navState.nextStep
-                            ? navState.nextStep.title
-                            : navState.currentStep?.title ?? 'Proceed along path'}
+                          : navState.status === 'rerouted'
+                            ? navState.userMessage
+                            : navState.isApproachingTurn && navState.nextStep
+                              ? navState.nextStep.title
+                              : navState.currentStep?.title ?? 'Proceed along path'}
                       </h3>
 
-                      {navState.currentStep?.notes && (
+                      {navState.status === 'rerouted' && (
+                        <div className="mt-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-1 text-[11px] font-medium text-emerald-800 flex items-center gap-1.5">
+                          <Sparkles size={12} className="text-emerald-600 flex-shrink-0" />
+                          <span>{navState.userMessage}</span>
+                        </div>
+                      )}
+
+                      {navState.isOffRoute && navState.rerouteFailureReason && (
+                        <div className="mt-1.5 rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-[11px] font-medium text-amber-900 flex items-center gap-1.5">
+                          <AlertTriangle size={12} className="text-amber-600 flex-shrink-0" />
+                          <span>{navState.userMessage}</span>
+                        </div>
+                      )}
+
+                      {navState.currentStep?.notes && navState.status !== 'rerouted' && (
                         <p className="mt-0.5 text-[11px] text-slate-500">
                           {navState.currentStep.notes}
                         </p>
@@ -1194,7 +1232,7 @@ export function NavigationScreen() {
         <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
           <Campus3D
             key={`campus-3d-desktop-${cameraRevision}`}
-            routePoints={routePoints}
+            routePoints={liveRoutePoints}
             activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
             simulatedPosition={
               navMode === 'live'
@@ -1247,7 +1285,7 @@ export function NavigationScreen() {
         <div className="absolute inset-0 h-full w-full">
           <Campus3D
             key={`campus-3d-mobile-${cameraRevision}`}
-            routePoints={routePoints}
+            routePoints={liveRoutePoints}
             activeStepPoint={navMode === 'manual' && isNavigating ? activeStepPoint : null}
             simulatedPosition={
               navMode === 'live'
