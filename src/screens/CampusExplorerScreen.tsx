@@ -21,6 +21,7 @@ export function CampusExplorerScreen() {
     serviceStatus,
     classification,
     calibrationModel,
+    geofence,
     isTestMode,
     startLocation,
     stopLocation,
@@ -102,6 +103,7 @@ export function CampusExplorerScreen() {
           {classification.status !== 'idle' && (
             <GpsStatusBanner
               classification={classification}
+              geofence={geofence}
               onStop={stopLocation}
               onOpenCalibration={() => setIsCalibrationOpen(true)}
             />
@@ -178,6 +180,7 @@ export function CampusExplorerScreen() {
         isOpen={isCalibrationOpen}
         onClose={() => setIsCalibrationOpen(false)}
         calibrationModel={calibrationModel}
+        geofence={geofence}
         onUpdateControlPoints={updateControlPoints}
         onResetCalibration={resetToDefaultCalibration}
         isTestMode={isTestMode}

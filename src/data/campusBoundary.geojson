@@ -1,0 +1,50 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "source": "OpenStreetMap",
+    "osmWayId": 35457616,
+    "osmType": "way",
+    "retrievedAt": "2026-10-20T07:15:00Z",
+    "tags": {
+      "amenity": "college",
+      "landuse": "education",
+      "name": "MNM Jain Engineering College",
+      "operator": "Misrimal Navajee Munoth Jain Engineering College",
+      "website": "https://mnmjec.ac.in/"
+    },
+    "status": "provisional_unverified",
+    "note": "Provisional community-contributed educational boundary polygon from OpenStreetMap Way 35457616. Not an official legal property boundary or verified cadastral survey."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "way/35457616",
+      "properties": {
+        "name": "MNM Jain Engineering College",
+        "amenity": "college",
+        "landuse": "education",
+        "isApprovedForLiveNavigation": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [80.2461435, 12.9428555],
+            [80.2433293, 12.9434546],
+            [80.2433547, 12.9450586],
+            [80.2435305, 12.9459492],
+            [80.2428648, 12.9460769],
+            [80.2404579, 12.9465384],
+            [80.2406591, 12.9472154],
+            [80.2413189, 12.9470586],
+            [80.2441353, 12.9466194],
+            [80.2470937, 12.9461779],
+            [80.2468964, 12.9451293],
+            [80.2466032, 12.9451884],
+            [80.2461435, 12.9428555]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import {
   MockGeolocationProvider,
   createBrowserGeolocationProvider,
 } from '../services/gpsService'
+import { evaluateCampusGeofence } from '../lib/campusGeofence'
 import type {
   CalibrationModel,
   GpsCoordinates,
@@ -17,6 +18,7 @@ import type {
   GroundControlPoint,
   PositionClassification,
 } from '../types/gps'
+import type { GeofenceEvaluation } from '../types/geofence'
 
 export interface UseGpsLocationResult {
   isTracking: boolean
@@ -24,6 +26,7 @@ export interface UseGpsLocationResult {
   coords: GpsCoordinates | null
   classification: PositionClassification
   calibrationModel: CalibrationModel
+  geofence: GeofenceEvaluation | null
   isTestMode: boolean
   startLocation: () => void
   stopLocation: () => void
@@ -50,6 +53,14 @@ export function useGpsLocation(): UseGpsLocationResult {
   const classification = useMemo<PositionClassification>(() => {
     return classifyGpsPosition(coords, serviceStatus, calibrationModel, isTestMode)
   }, [coords, serviceStatus, calibrationModel, isTestMode])
+
+  // Evaluate campus geofence polygon boundary
+  const geofence = useMemo<GeofenceEvaluation | null>(() => {
+    if (!coords) return null
+    return evaluateCampusGeofence(coords.latitude, coords.longitude, coords.accuracy, {
+      isSimulated: isTestMode,
+    })
+  }, [coords, isTestMode])
 
   // Subscribe to GPS service
   useEffect(() => {
@@ -139,6 +150,7 @@ export function useGpsLocation(): UseGpsLocationResult {
     coords,
     classification,
     calibrationModel,
+    geofence,
     isTestMode,
     startLocation,
     stopLocation,

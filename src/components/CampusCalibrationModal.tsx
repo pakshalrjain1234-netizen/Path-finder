@@ -3,8 +3,10 @@ import {
   AlertTriangle,
   Compass,
   FlaskConical,
+  Layers,
   Plus,
   RotateCcw,
+  Shield,
   ShieldAlert,
   Sparkles,
   Trash2,
@@ -16,12 +18,18 @@ import {
   SYNTHETIC_GPS_PRESETS,
   TEST_MODE_CONTROL_POINTS,
 } from '../data/campusCalibrationData.ts'
+import {
+  GEOFENCE_PRESETS,
+  PROVISIONAL_CAMPUS_BOUNDARY,
+} from '../data/campusGeofenceData.ts'
 import type { CalibrationModel, GroundControlPoint } from '../types/gps'
+import type { GeofenceEvaluation } from '../types/geofence'
 
 interface CampusCalibrationModalProps {
   isOpen: boolean
   onClose: () => void
   calibrationModel: CalibrationModel
+  geofence?: GeofenceEvaluation | null
   onUpdateControlPoints: (points: GroundControlPoint[]) => void
   onResetCalibration: () => void
   isTestMode: boolean
@@ -33,13 +41,14 @@ export function CampusCalibrationModal({
   isOpen,
   onClose,
   calibrationModel,
+  geofence,
   onUpdateControlPoints,
   onResetCalibration,
   isTestMode,
   onToggleTestMode,
   onInjectTestPosition,
 }: CampusCalibrationModalProps) {
-  const [activeTab, setActiveTab] = useState<'benchmarks' | 'test-mode'>('benchmarks')
+  const [activeTab, setActiveTab] = useState<'benchmarks' | 'geofence' | 'test-mode'>('benchmarks')
 
   // Benchmark form state
   const [name, setName] = useState('')
@@ -134,6 +143,22 @@ export function CampusCalibrationModal({
             }`}
           >
             Ground Control Points ({controlPoints.length})
+          </button>
+          <button
+            id="calibration-tab-geofence"
+            type="button"
+            onClick={() => setActiveTab('geofence')}
+            className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-semibold transition ${
+              activeTab === 'geofence'
+                ? 'border-[#2A9D8F] text-[#2A9D8F]'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Layers size={14} />
+            <span>Campus Geofence</span>
+            <span className="rounded-full bg-slate-200 px-1.5 py-0.2 text-[9px] font-bold uppercase text-slate-700">
+              OSM 12 Nodes
+            </span>
           </button>
           <button
             id="calibration-tab-test-mode"
@@ -542,6 +567,199 @@ export function CampusCalibrationModal({
                     <Sparkles size={14} />
                     <span>Inject Simulated Position</span>
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Campus Geofence Tab */}
+          {activeTab === 'geofence' && (
+            <div className="space-y-4">
+              {/* Safety & Overview Card */}
+              <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-blue-950">
+                <div className="flex items-start gap-2.5">
+                  <ShieldAlert size={18} className="text-blue-700 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-blue-900">
+                        Provisional Campus Geofence Boundary
+                      </h3>
+                      <span className="rounded-full bg-blue-200/80 px-2 py-0.5 text-[10px] font-bold text-blue-800">
+                        OSM Way 35457616
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-blue-800 leading-relaxed">
+                      Community-contributed educational polygon from OpenStreetMap. It is not an official government cadastral or RTK-GNSS surveyed property boundary.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-semibold text-blue-700">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-white/80 px-2 py-1 ring-1 ring-blue-200">
+                        <Shield size={11} className="text-[#2A9D8F]" />
+                        Live Navigation Guardrail: Pending Survey
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-md bg-white/80 px-2 py-1 ring-1 ring-blue-200">
+                        Max Accuracy Threshold: 30m
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-md bg-white/80 px-2 py-1 ring-1 ring-blue-200">
+                        Perimeter Overlap Rule: Active
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Real-time Geofence Status */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <Compass size={15} className="text-[#2A9D8F]" />
+                    <h3 className="font-bold text-xs text-slate-800">Active Geofence Evaluation</h3>
+                  </div>
+                  {geofence && (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                        geofence.status === 'inside'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : geofence.status === 'outside'
+                            ? 'bg-amber-100 text-amber-800'
+                            : geofence.status === 'uncertain'
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {geofence.status.replace('_', ' ')}
+                    </span>
+                  )}
+                </div>
+
+                {geofence ? (
+                  <div className="space-y-2">
+                    <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200/80">
+                      <p className="font-bold text-slate-900 text-sm">
+                        "{geofence.userMessage}"
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {geofence.details}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
+                      <div className="rounded-xl border border-slate-200 bg-white p-2">
+                        <span className="block text-[9px] uppercase font-bold text-slate-400">Boundary Distance</span>
+                        <span className="font-semibold text-slate-800">
+                          {geofence.distanceToBoundaryMeters.toFixed(1)} m
+                        </span>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-white p-2">
+                        <span className="block text-[9px] uppercase font-bold text-slate-400">Accuracy Radius</span>
+                        <span className="font-semibold text-slate-800">
+                          ±{geofence.accuracyMeters.toFixed(1)} m
+                        </span>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-white p-2">
+                        <span className="block text-[9px] uppercase font-bold text-slate-400">Confidence</span>
+                        <span className="font-semibold uppercase text-slate-800">
+                          {geofence.confidence}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-4 text-center text-slate-500 text-xs">
+                    No active GPS position. Inject one of the test presets below or start GPS tracking on the main screen to evaluate the geofence.
+                  </div>
+                )}
+              </div>
+
+              {/* Geofence Simulation Presets */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-xs text-slate-800">
+                    Deterministic Geofence Test Presets
+                  </h3>
+                  <span className="text-[10px] text-slate-500">
+                    Validates Inside / Outside / Uncertain edge behaviors
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {GEOFENCE_PRESETS.map((preset) => (
+                    <div
+                      key={preset.id}
+                      className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs hover:border-[#2A9D8F]/60 transition space-y-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-xs text-slate-800">{preset.label}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            preset.expectedStatus === 'inside'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : preset.expectedStatus === 'outside'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-purple-100 text-purple-800'
+                          }`}
+                        >
+                          Expected: {preset.expectedStatus}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-500 leading-normal">
+                        {preset.description}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                        <span className="font-mono text-[10px] text-slate-400">
+                          {preset.latitude.toFixed(5)}°, {preset.longitude.toFixed(5)}° (±{preset.accuracy}m)
+                        </span>
+                        <button
+                          id={`btn-preset-${preset.id}`}
+                          type="button"
+                          onClick={() => {
+                            if (!isTestMode) {
+                              onToggleTestMode(true)
+                            }
+                            onInjectTestPosition(preset.latitude, preset.longitude, preset.accuracy)
+                          }}
+                          className="flex items-center gap-1 rounded-lg bg-[#2A9D8F] px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-[#238276] transition shadow-xs"
+                        >
+                          <Sparkles size={11} />
+                          <span>Simulate</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Boundary Vertices Table */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-xs text-slate-800">
+                    Provisional Polygon Coordinates ({PROVISIONAL_CAMPUS_BOUNDARY.coordinates.length - 1} Edges)
+                  </h3>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    WGS-84 Ring
+                  </span>
+                </div>
+
+                <div className="max-h-36 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-2 font-mono text-[10px] text-slate-600">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-slate-400 text-[9px] uppercase font-bold">
+                        <th className="py-1">Node</th>
+                        <th className="py-1">Latitude (°N)</th>
+                        <th className="py-1">Longitude (°E)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {PROVISIONAL_CAMPUS_BOUNDARY.coordinates.map((coord, idx) => (
+                        <tr key={idx} className="hover:bg-white/80">
+                          <td className="py-1 text-slate-400">#{idx + 1}</td>
+                          <td className="py-1 font-semibold text-slate-800">{coord[1].toFixed(7)}°</td>
+                          <td className="py-1 font-semibold text-slate-800">{coord[0].toFixed(7)}°</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

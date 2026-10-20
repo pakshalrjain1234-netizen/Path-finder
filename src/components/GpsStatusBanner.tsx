@@ -4,6 +4,7 @@ import {
   Clock,
   Compass,
   Info,
+  Layers,
   MapPin,
   Shield,
   ShieldAlert,
@@ -11,9 +12,11 @@ import {
   StopCircle,
 } from 'lucide-react'
 import type { PositionClassification } from '../types/gps'
+import type { GeofenceEvaluation } from '../types/geofence'
 
 interface GpsStatusBannerProps {
   classification: PositionClassification
+  geofence?: GeofenceEvaluation | null
   onStop: () => void
   onOpenCalibration?: () => void
   className?: string
@@ -21,6 +24,7 @@ interface GpsStatusBannerProps {
 
 export function GpsStatusBanner({
   classification,
+  geofence,
   onStop,
   onOpenCalibration,
   className = '',
@@ -86,6 +90,79 @@ export function GpsStatusBanner({
       badgeColor = 'bg-slate-200 text-slate-700'
       badgeLabel = 'GPS Timeout'
       break
+  }
+
+  // Geofence visual elements
+  const renderGeofenceCard = () => {
+    if (!geofence) return null
+
+    let geofenceBadgeColor = 'bg-slate-100 text-slate-700 border-slate-200'
+    let geofenceBadgeText = 'Geofence Checking'
+
+    switch (geofence.status) {
+      case 'inside':
+        geofenceBadgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-300'
+        geofenceBadgeText = geofence.isSimulated ? 'Simulated Inside' : 'Inside MNMJEC'
+        break
+      case 'outside':
+        geofenceBadgeColor = 'bg-amber-100 text-amber-800 border-amber-300'
+        geofenceBadgeText = geofence.isSimulated ? 'Simulated Outside' : 'Outside MNMJEC'
+        break
+      case 'uncertain':
+        geofenceBadgeColor = 'bg-purple-100 text-purple-800 border-purple-300'
+        geofenceBadgeText = 'Location Uncertain'
+        break
+      case 'boundary_unapproved':
+        geofenceBadgeColor = 'bg-blue-100 text-blue-800 border-blue-300'
+        geofenceBadgeText = 'Boundary Calibration Pending'
+        break
+    }
+
+    return (
+      <div id="geofence-status-card" className="mt-2.5 rounded-xl border border-slate-200/90 bg-white/90 p-2.5 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <div className="flex items-center gap-1.5">
+            <Layers size={13} className="text-[#2A9D8F]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              Campus Geofence (OSM Way 35457616)
+            </span>
+          </div>
+          <span className={`inline-flex rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${geofenceBadgeColor}`}>
+            {geofenceBadgeText}
+          </span>
+        </div>
+
+        {/* Prominent Required User Copy */}
+        <p className="font-semibold text-slate-900 text-[12px] leading-snug">
+          "{geofence.userMessage}"
+        </p>
+
+        {/* Technical Perimeter Metrics */}
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+          <span>
+            Perimeter distance:{' '}
+            <strong className="text-slate-700">
+              {geofence.distanceToBoundaryMeters.toFixed(1)} m
+            </strong>{' '}
+            ({geofence.isInsidePolygon ? 'inside' : 'outside'})
+          </span>
+          <span>
+            Accuracy radius:{' '}
+            <strong className="text-slate-700">±{geofence.accuracyMeters.toFixed(1)} m</strong>
+          </span>
+          <span>
+            Confidence:{' '}
+            <strong className="uppercase text-slate-700">{geofence.confidence}</strong>
+          </span>
+        </div>
+
+        {geofence.details && (
+          <p className="mt-1 text-[10px] text-slate-400 leading-normal">
+            {geofence.details}
+          </p>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -168,6 +245,9 @@ export function GpsStatusBanner({
             )}
           </div>
         )}
+
+        {/* Campus Geofence Verdict Card */}
+        {renderGeofenceCard()}
       </div>
 
       {/* Privacy note */}
