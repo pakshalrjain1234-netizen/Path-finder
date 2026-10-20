@@ -1,5 +1,8 @@
 import { Compass, HelpCircle, Layers3, Menu, Route, Search, Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { defaultGpsService } from '../services/gpsService.ts'
+import type { GpsServiceStatus } from '../types/gps.ts'
 
 const navigationItems = [
   { to: '/welcome', label: 'Welcome', icon: Compass },
@@ -11,6 +14,39 @@ const navigationItems = [
 ]
 
 export function AppLayout() {
+  const [gpsStatus, setGpsStatus] = useState<GpsServiceStatus>(defaultGpsService.getStatus())
+
+  useEffect(() => {
+    const unsubscribe = defaultGpsService.addListener({
+      onPosition: () => {
+        setGpsStatus('active')
+      },
+      onError: (status) => {
+        setGpsStatus(status)
+      },
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const gpsStatusText = (() => {
+    switch (gpsStatus) {
+      case 'active':
+        return 'GPS active'
+      case 'requesting':
+        return 'Acquiring GPS fix...'
+      case 'permission_denied':
+        return 'Location permission denied'
+      case 'position_unavailable':
+        return 'GPS signal unavailable'
+      case 'timeout':
+        return 'GPS timed out'
+      case 'unsupported':
+        return 'Geolocation unsupported'
+      case 'idle':
+      default:
+        return 'Location permission not requested'
+    }
+  })()
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] md:grid md:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl md:hidden">
@@ -83,7 +119,22 @@ export function AppLayout() {
         <div className="border-t border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-slate-800">Main Campus Gate 1</span>
-            <span className="text-slate-500 text-xs">Location permission not requested</span>
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  gpsStatus === 'active'
+                    ? 'bg-emerald-500 animate-pulse'
+                    : gpsStatus === 'requesting'
+                      ? 'bg-amber-500 animate-pulse'
+                      : gpsStatus === 'permission_denied'
+                        ? 'bg-red-500'
+                        : 'bg-slate-300'
+                }`}
+              />
+              <span id="app-sidebar-gps-status" className="text-slate-500 text-xs">
+                {gpsStatusText}
+              </span>
+            </div>
           </div>
         </div>
       </aside>

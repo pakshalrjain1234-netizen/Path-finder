@@ -29,6 +29,8 @@ export interface Campus3DProps {
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
+  userLocationPoint?: Point3 | null
+  userLocationAccuracyRadius?: number | null
   viewTarget?: 'campus' | 'route'
   showHud?: boolean
   showInstructionBadge?: boolean
@@ -353,6 +355,49 @@ function RouteOverlay({
   )
 }
 
+function UserLocationMarker({
+  position,
+  accuracyRadius,
+}: {
+  position: Point3
+  accuracyRadius?: number | null
+}) {
+  const [x, y, z] = position
+  const safeRadius = Math.max(accuracyRadius || 5, 2)
+
+  return (
+    <group position={[x, y + 0.5, z]} name="user-location-marker">
+      {/* Accuracy disc on the ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.45, 0]}>
+        <ringGeometry args={[0, safeRadius, 32]} />
+        <meshBasicMaterial color="#3B82F6" opacity={0.15} transparent side={2} depthWrite={false} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.44, 0]}>
+        <ringGeometry args={[Math.max(0, safeRadius - 0.3), safeRadius, 32]} />
+        <meshBasicMaterial color="#2563EB" opacity={0.45} transparent side={2} depthWrite={false} />
+      </mesh>
+
+      {/* Blue location glowing sphere */}
+      <mesh position={[0, 0.4, 0]}>
+        <sphereGeometry args={[0.85, 24, 24]} />
+        <meshStandardMaterial color="#1D4ED8" emissive="#3B82F6" emissiveIntensity={0.9} />
+      </mesh>
+
+      {/* Inner white core */}
+      <mesh position={[0, 0.4, 0]}>
+        <sphereGeometry args={[0.35, 16, 16]} />
+        <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1} />
+      </mesh>
+
+      {/* Pulsating ground wave ring */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.2, 0]}>
+        <ringGeometry args={[1.0, 1.6, 32]} />
+        <meshBasicMaterial color="#60A5FA" opacity={0.7} transparent side={2} />
+      </mesh>
+    </group>
+  )
+}
+
 function CampusScene({
   selectedBuildingId,
   selectedFloor,
@@ -362,6 +407,8 @@ function CampusScene({
   completedPoints,
   remainingPoints,
   isSimulating,
+  userLocationPoint,
+  userLocationAccuracyRadius,
   onBuildingSelect,
   onSelectionChange,
   onModelReady,
@@ -375,6 +422,8 @@ function CampusScene({
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
+  userLocationPoint?: Point3 | null
+  userLocationAccuracyRadius?: number | null
   onBuildingSelect?: (buildingId: string) => void
   onSelectionChange?: (buildingId: string | null) => void
   onModelReady?: (availableBuildings: CampusBuildingId[]) => void
@@ -466,6 +515,12 @@ function CampusScene({
           completedPoints={completedPoints}
           remainingPoints={remainingPoints}
           isSimulating={isSimulating}
+        />
+      )}
+      {userLocationPoint && (
+        <UserLocationMarker
+          position={userLocationPoint}
+          accuracyRadius={userLocationAccuracyRadius}
         />
       )}
     </group>
@@ -620,6 +675,8 @@ function CampusCanvas({
   completedPoints,
   remainingPoints,
   isSimulating,
+  userLocationPoint,
+  userLocationAccuracyRadius,
   viewTarget,
   showHud = true,
   showInstructionBadge = true,
@@ -637,6 +694,8 @@ function CampusCanvas({
   completedPoints?: Point3[]
   remainingPoints?: Point3[]
   isSimulating?: boolean
+  userLocationPoint?: Point3 | null
+  userLocationAccuracyRadius?: number | null
   viewTarget?: 'campus' | 'route'
   showHud?: boolean
   showInstructionBadge?: boolean
@@ -706,6 +765,8 @@ function CampusCanvas({
               completedPoints={completedPoints}
               remainingPoints={remainingPoints}
               isSimulating={isSimulating}
+              userLocationPoint={userLocationPoint}
+              userLocationAccuracyRadius={userLocationAccuracyRadius}
               onBuildingSelect={onBuildingSelect}
               onSelectionChange={onSelectionChange}
               onModelReady={onModelReady}
@@ -769,6 +830,8 @@ export function Campus3D({
   completedPoints,
   remainingPoints,
   isSimulating,
+  userLocationPoint,
+  userLocationAccuracyRadius,
   viewTarget = 'campus',
   showHud = true,
   showInstructionBadge = true,
@@ -794,6 +857,8 @@ export function Campus3D({
             completedPoints={completedPoints}
             remainingPoints={remainingPoints}
             isSimulating={isSimulating}
+            userLocationPoint={userLocationPoint}
+            userLocationAccuracyRadius={userLocationAccuracyRadius}
             viewTarget={viewTarget}
             showHud={showHud}
             showInstructionBadge={showInstructionBadge}
