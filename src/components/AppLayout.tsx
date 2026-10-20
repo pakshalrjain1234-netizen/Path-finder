@@ -1,4 +1,4 @@
-import { Compass, HelpCircle, Layers3, Menu, Route, Search, Star } from 'lucide-react'
+import { Compass, HelpCircle, Layers3, Route, Search, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { defaultGpsService } from '../services/gpsService.ts'
@@ -47,91 +47,120 @@ export function AppLayout() {
         return 'Location permission not requested'
     }
   })()
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] md:grid md:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[320px_minmax(0,1fr)]">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl md:hidden">
-        <div className="flex h-16 items-center justify-between px-4">
-          <button type="button" className="rounded-full p-2 text-slate-600">
-            <Menu size={20} />
-          </button>
-          <div className="text-center">
-            <div className="text-sm font-semibold tracking-tight">PATH FINDER</div>
-            <div className="text-[11px] text-slate-500">MNMJEC Campus • PWA Ready</div>
+    <div className="min-h-screen bg-[#061018] text-[#F8FAFC] md:grid md:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+      {/* Mobile Top Header */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0B1220]/90 backdrop-blur-xl md:hidden">
+        <div className="flex h-15 items-center justify-between px-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-sm shadow-blue-600/30">
+              <Compass size={18} />
+            </div>
+            <div>
+              <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                PATH FINDER
+                <span className="rounded-full bg-blue-900/60 px-1.5 py-0.2 text-[9px] font-bold text-blue-300 border border-blue-500/30">3D</span>
+              </div>
+              <div className="text-[10px] font-medium text-slate-400">MNMJEC Chennai</div>
+            </div>
           </div>
-          <button type="button" className="rounded-full p-2 text-slate-600">
-            <HelpCircle size={20} />
-          </button>
+          <NavLink
+            to="/help"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition"
+            aria-label="Help & Information"
+          >
+            <HelpCircle size={18} />
+          </NavLink>
         </div>
       </header>
 
-      <aside className="hidden border-r border-slate-200 bg-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-[280px] md:flex-col md:overflow-hidden xl:w-[320px]">
-        <div className="border-b border-slate-200 bg-white/90 px-5 py-4 backdrop-blur-xl">
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden border-r border-white/10 bg-[#0B1220]/95 backdrop-blur-2xl md:fixed md:inset-y-0 md:left-0 md:flex md:w-[280px] md:flex-col md:overflow-hidden xl:w-[300px]">
+        {/* Brand Header */}
+        <div className="border-b border-white/10 bg-gradient-to-b from-[#0B1220] to-[#0D1728] p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2A9D8F] text-white shadow-md shadow-emerald-900/10">
-              <Compass size={20} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white shadow-lg shadow-blue-600/30">
+              <Compass size={22} />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold tracking-tight">PATH FINDER</div>
-              <div className="text-xs text-slate-500">Misrimal Navajee Munoth Jain Engineering College</div>
+              <div className="text-base font-extrabold tracking-tight text-white flex items-center gap-1.5">
+                PATH FINDER
+                <span className="rounded-full bg-blue-900/60 px-1.5 py-0.5 text-[9px] font-bold text-blue-300 border border-blue-500/30">3D</span>
+              </div>
+              <div className="text-[11px] font-medium text-slate-400 truncate">
+                MNM Jain Engineering College
+              </div>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between rounded-2xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#2A9D8F]" />
-              Live Campus Map
+
+          <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-[#162033]/80 px-3 py-2 text-xs shadow-inner">
+            <span className="inline-flex items-center gap-2 font-medium text-slate-300">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              Campus Interactive
             </span>
-            <span className="rounded-full bg-[#2A9D8F]/10 px-2 py-0.5 text-[#2A9D8F]">PWA Ready</span>
+            <span className="rounded-md bg-blue-950/80 px-2 py-0.5 text-[10px] font-bold tracking-wider text-cyan-300 uppercase border border-cyan-500/30">
+              Chennai
+            </span>
           </div>
         </div>
 
-        <nav className="grid grid-cols-3 gap-1 border-b border-slate-200 bg-slate-100 p-2">
+        {/* Navigation Links */}
+        <nav className="flex-1 overflow-y-auto p-3.5 space-y-1">
+          <div className="px-2 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-500">
+            Navigation Modules
+          </div>
           {navigationItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-xs font-medium transition ${
-                  isActive ? 'bg-[#2A9D8F] text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
                 }`
               }
             >
-              <item.icon size={14} />
+              <item.icon size={16} />
               <span className="truncate">{item.label}</span>
             </NavLink>
           ))}
+
+          <div className="pt-4 px-2 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-500">
+            Platform Overview
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-[#111827]/70 p-3.5 shadow-sm">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+              <Layers3 size={15} className="text-cyan-400" />
+              Walkway Precision
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-slate-400">
+              Explore 3D buildings, pedestrian corridors, turn-by-turn guidance, and real-time rerouting on campus.
+            </p>
+          </div>
         </nav>
 
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-3 rounded-2xl bg-slate-50 p-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              <Layers3 size={14} className="text-[#2A9D8F]" />
-              Active Module View
-            </div>
-            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-              <div className="text-sm font-semibold">Interactive Workspace</div>
-              <p className="mt-1 text-sm text-slate-500">
-                Switch between the 3D campus explorer, route guidance, building details, saved locations, and offline help.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-200 bg-white px-4 py-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-slate-800">Main Campus Gate 1</span>
+        {/* Footer Status */}
+        <div className="border-t border-white/10 bg-[#061018]/90 p-3.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-300">Gate 1 • Main Campus</span>
             <div className="flex items-center gap-1.5">
               <span
-                className={`h-1.5 w-1.5 rounded-full ${
+                className={`h-2 w-2 rounded-full ${
                   gpsStatus === 'active'
-                    ? 'bg-emerald-500 animate-pulse'
+                    ? 'bg-emerald-400 animate-pulse'
                     : gpsStatus === 'requesting'
-                      ? 'bg-amber-500 animate-pulse'
+                      ? 'bg-amber-400 animate-pulse'
                       : gpsStatus === 'permission_denied'
-                        ? 'bg-red-500'
-                        : 'bg-slate-300'
+                        ? 'bg-red-400'
+                        : 'bg-slate-500'
                 }`}
               />
-              <span id="app-sidebar-gps-status" className="text-slate-500 text-xs">
+              <span id="app-sidebar-gps-status" className="text-slate-400 text-[11px] font-medium truncate max-w-[120px]">
                 {gpsStatusText}
               </span>
             </div>
@@ -139,23 +168,27 @@ export function AppLayout() {
         </div>
       </aside>
 
-      <main className="min-w-0 pb-24 pt-16 md:col-start-2 md:pb-0 md:pt-0">
+      {/* Main Content Area */}
+      <main className="min-w-0 pb-24 pt-16 md:col-start-2 md:pb-0 md:pt-0 bg-[#061018]">
         <Outlet />
       </main>
 
-      <nav className="fixed inset-x-4 bottom-4 z-40 flex justify-between rounded-2xl bg-white p-2 shadow-lg md:hidden">
+      {/* Mobile Floating Bottom Navigation */}
+      <nav className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-2xl border border-white/10 bg-[#0B1220]/95 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-2xl md:hidden">
         {navigationItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex min-w-0 flex-1 flex-col items-center rounded-xl px-1 py-2 text-[11px] ${
-                isActive ? 'bg-[#2A9D8F] text-white' : 'text-slate-600'
+              `flex min-w-0 flex-1 flex-col items-center justify-center rounded-xl py-1.5 text-[10px] font-semibold transition-all ${
+                isActive
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
+                  : 'text-slate-400 hover:text-white'
               }`
             }
           >
-            <item.icon size={14} />
-            <span className="mt-1 truncate">{item.label}</span>
+            <item.icon size={16} />
+            <span className="mt-0.5 truncate tracking-tight">{item.label}</span>
           </NavLink>
         ))}
       </nav>

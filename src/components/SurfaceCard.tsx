@@ -9,11 +9,11 @@ interface SurfaceCardProps {
 
 export function SurfaceCard({ title, subtitle, action, children }: SurfaceCardProps) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <header className="mb-3 flex items-start justify-between gap-3">
+    <section className="rounded-2xl border border-white/10 bg-[#111827]/80 p-5 shadow-xl shadow-black/30 backdrop-blur-xl transition-all hover:border-white/20">
+      <header className="mb-3.5 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-[#1E293B]">{title}</h2>
-          {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+          <h2 className="text-base font-bold text-white tracking-tight">{title}</h2>
+          {subtitle && <p className="text-xs font-medium text-slate-400 mt-0.5">{subtitle}</p>}
         </div>
         {action}
       </header>

@@ -1,10 +1,10 @@
-import { Line, OrbitControls, useGLTF } from '@react-three/drei'
+import { Html, Line, OrbitControls, useGLTF } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
 import type { ThreeEvent } from '@react-three/fiber'
-import { AlertCircle, Box, Loader2, Maximize2, RefreshCcw, Target, ZoomIn, ZoomOut } from 'lucide-react'
+import { AlertCircle, Box, Compass as CompassIcon, Loader2, Maximize2, RefreshCcw, Target, ZoomIn, ZoomOut } from 'lucide-react'
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Mesh, Object3D } from 'three'
-import { Box3, Color, Matrix4, PerspectiveCamera, Vector3 } from 'three'
+import { ACESFilmicToneMapping, Box3, Color, Matrix4, PCFSoftShadowMap, PerspectiveCamera, Vector3 } from 'three'
 import { buildings } from '../data/buildings'
 import {
   campusModelMapById,
@@ -152,11 +152,11 @@ class ModelErrorBoundary extends Component<ErrorBoundaryProps, { error: Error | 
 
 function LoadingState() {
   return (
-    <div className="flex h-full min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 text-center">
+    <div className="flex h-full min-h-[420px] items-center justify-center rounded-2xl border border-white/10 bg-[#0B1220]/90 px-6 text-center backdrop-blur-xl">
       <div>
-        <Loader2 className="mx-auto animate-spin text-[#2A9D8F]" size={28} />
-        <h3 className="mt-3 text-base font-semibold text-slate-900">Loading MNMJEC 3D campus</h3>
-        <p className="mt-1 text-sm text-slate-500">Preparing the GLB scene and interactive controls.</p>
+        <Loader2 className="mx-auto animate-spin text-cyan-400" size={28} />
+        <h3 className="mt-3 text-base font-semibold text-white">Loading MNMJEC 3D Campus</h3>
+        <p className="mt-1 text-sm text-slate-400">Preparing architectural geometry and interactive controls...</p>
       </div>
     </div>
   )
@@ -164,11 +164,11 @@ function LoadingState() {
 
 function ErrorState({ error }: { error: Error | null }) {
   return (
-    <div className="flex h-full min-h-[420px] items-center justify-center rounded-2xl border border-red-200 bg-white px-6 text-center">
+    <div className="flex h-full min-h-[420px] items-center justify-center rounded-2xl border border-rose-500/30 bg-[#0B1220]/90 px-6 text-center backdrop-blur-xl">
       <div>
-        <AlertCircle className="mx-auto text-[#E76F51]" size={28} />
-        <h3 className="mt-3 text-base font-semibold text-slate-900">Unable to load the 3D campus model</h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <AlertCircle className="mx-auto text-rose-400" size={28} />
+        <h3 className="mt-3 text-base font-semibold text-white">Unable to load the 3D campus model</h3>
+        <p className="mt-1 text-sm text-slate-400">
           {error ? error.message : 'The GLB file could not be parsed. Verify the Blender export and try again.'}
         </p>
       </div>
@@ -197,22 +197,23 @@ function Hud({
   const floorLabel = entry && key && entry.floorObjects[key] ? ` • Floor ${selectedFloor}` : ''
 
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[calc(100%-7rem)] rounded-2xl bg-white/90 px-4 py-3 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl md:left-4 md:top-4">
+    <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[calc(100%-8rem)] rounded-2xl border border-white/10 bg-[#0B1220]/90 p-3.5 shadow-2xl backdrop-blur-xl md:left-4 md:top-4">
       <div className="flex items-center gap-2">
-        <span className="inline-flex rounded-full bg-[#2A9D8F]/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#2A9D8F]">
-          3D campus
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase text-cyan-300 border border-cyan-500/30">
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          3D Interactive
         </span>
-        <span className="text-xs text-slate-500">
-          {routePoints && routePoints.length > 0 ? `Route active (${routePoints.length} waypoints)` : 'GLB loaded'}
+        <span className="text-[11px] font-medium text-slate-400">
+          {routePoints && routePoints.length > 0 ? `Route active (${routePoints.length} waypoints)` : 'MNMJEC Campus'}
         </span>
       </div>
-      <div className="mt-2 text-sm font-semibold text-slate-900">{buildingLabel}</div>
-      <div className="mt-1 text-xs text-slate-500">
+      <div className="mt-1.5 text-sm font-bold text-white tracking-tight">{buildingLabel}</div>
+      <div className="mt-0.5 text-[11px] font-medium text-slate-400">
         {floorCount > 0
           ? `${floorCount} known floor(s)`
-          : entry?.knownFloorLabel ?? (routePoints && routePoints.length > 0 ? 'Outdoor Route Navigation' : 'No selected building')}
+          : entry?.knownFloorLabel ?? (routePoints && routePoints.length > 0 ? 'Outdoor Walkway Navigation' : 'Tap any building to inspect details')}
         {floorLabel}
-        {indoorAvailable ? '' : ' • Indoor map not mapped yet'}
+        {indoorAvailable ? '' : ' • Ground access'}
       </div>
     </div>
   )
@@ -296,34 +297,34 @@ function RouteOverlay({
 
   return (
     <group name="route-overlay">
-      {/* If simulating: render completed path in subdued color, remaining in vivid teal */}
+      {/* If simulating: render completed path in subdued slate, remaining in radiant electric cyan */}
       {isSimulating && elevatedCompleted && (
-        <Line points={elevatedCompleted} color="#94A3B8" lineWidth={3.5} opacity={0.65} transparent />
+        <Line points={elevatedCompleted} color="#475569" lineWidth={4} opacity={0.4} transparent />
       )}
       {isSimulating && elevatedRemaining ? (
-        <Line points={elevatedRemaining} color="#2A9D8F" lineWidth={5} />
+        <Line points={elevatedRemaining} color="#22D3EE" lineWidth={6} />
       ) : (
-        <Line points={elevatedAllPoints} color="#2A9D8F" lineWidth={5} />
+        <Line points={elevatedAllPoints} color="#22D3EE" lineWidth={6} />
       )}
 
       {start && (
         <mesh position={[start[0], start[1] + 0.5, start[2]]}>
-          <sphereGeometry args={[0.9, 16, 16]} />
-          <meshStandardMaterial color="#2A9D8F" emissive="#2A9D8F" emissiveIntensity={0.6} />
+          <sphereGeometry args={[0.9, 20, 20]} />
+          <meshStandardMaterial color="#0284C7" emissive="#38BDF8" emissiveIntensity={1} />
         </mesh>
       )}
 
       {points.slice(1, -1).map(([x, y, z], index) => (
         <mesh key={`waypoint-${index}`} position={[x, y + 0.35, z]}>
-          <sphereGeometry args={[0.35, 12, 12]} />
-          <meshStandardMaterial color="#2A9D8F" opacity={0.85} transparent />
+          <sphereGeometry args={[0.3, 12, 12]} />
+          <meshStandardMaterial color="#22D3EE" emissive="#38BDF8" emissiveIntensity={0.6} opacity={0.9} transparent />
         </mesh>
       ))}
 
       {destination && (
         <mesh position={[destination[0], destination[1] + 0.6, destination[2]]}>
-          <sphereGeometry args={[1.1, 16, 16]} />
-          <meshStandardMaterial color="#E76F51" emissive="#E76F51" emissiveIntensity={0.8} />
+          <sphereGeometry args={[1.1, 20, 20]} />
+          <meshStandardMaterial color="#E11D48" emissive="#FB7185" emissiveIntensity={1} />
         </mesh>
       )}
 
@@ -333,16 +334,16 @@ function RouteOverlay({
           {simulatedAccuracyRadius && simulatedAccuracyRadius > 0 && (
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.45, 0]}>
               <ringGeometry args={[0, Math.max(simulatedAccuracyRadius, 1.2), 32]} />
-              <meshBasicMaterial color="#3B82F6" opacity={0.15} transparent side={2} depthWrite={false} />
+              <meshBasicMaterial color="#38BDF8" opacity={0.18} transparent side={2} depthWrite={false} />
             </mesh>
           )}
           <mesh>
             <sphereGeometry args={[0.75, 20, 20]} />
-            <meshStandardMaterial color="#2563EB" emissive="#60A5FA" emissiveIntensity={0.9} />
+            <meshStandardMaterial color="#2563EB" emissive="#60A5FA" emissiveIntensity={1} />
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.15, 0]}>
             <ringGeometry args={[0.9, 1.4, 32]} />
-            <meshBasicMaterial color="#38BDF8" opacity={0.8} transparent side={2} />
+            <meshBasicMaterial color="#22D3EE" opacity={0.85} transparent side={2} />
           </mesh>
         </group>
       )}
@@ -407,6 +408,15 @@ function UserLocationMarker({
   )
 }
 
+const CAMPUS_LANDMARKS: Array<{ id: string; label: string; position: Point3; type: 'entrance' | 'academic' | 'facility' }> = [
+  { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', position: [181.0, 1.8, -6.2], type: 'entrance' },
+  { id: 'main-block', label: 'Main Block', position: [180.2, 8.5, -38.6], type: 'academic' },
+  { id: 'first-year-block', label: 'First Year Block', position: [166.5, 12.0, -38.6], type: 'academic' },
+  { id: 'civil-block', label: 'Civil Block', position: [145.2, 10.0, -38.6], type: 'academic' },
+  { id: 'it-block', label: 'IT Block', position: [96.8, 8.5, -45.8], type: 'academic' },
+  { id: 'canteen', label: 'Canteen & Mess', position: [37.4, 5.0, 2.0], type: 'facility' },
+]
+
 function CampusScene({
   selectedBuildingId,
   selectedFloor,
@@ -446,7 +456,38 @@ function CampusScene({
     instance.traverse((object) => {
       if (!('isMesh' in object) || !object.isMesh) return
       const mesh = object as Mesh
-      // Geometry and transforms remain shared/intact; highlight materials are per mesh.
+      mesh.castShadow = true
+      mesh.receiveShadow = true
+
+      const nameLower = mesh.name.toLowerCase()
+      const isRoadOrWalkway =
+        nameLower.includes('road') ||
+        nameLower.includes('walkway') ||
+        nameLower.includes('path') ||
+        nameLower.includes('lane') ||
+        nameLower.includes('driveway') ||
+        nameLower.includes('paver')
+      const isGround =
+        nameLower.includes('ground') ||
+        nameLower.includes('lawn') ||
+        nameLower.includes('terrain')
+
+      // Architectural materials calibration
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      materials.forEach((m) => {
+        if ('roughness' in m && typeof m.roughness === 'number') {
+          if (isRoadOrWalkway) {
+            m.roughness = 0.86
+            if ('metalness' in m) (m as any).metalness = 0.02
+          } else if (isGround) {
+            m.roughness = 0.92
+            if ('metalness' in m) (m as any).metalness = 0.01
+          } else {
+            m.roughness = 0.58
+            if ('metalness' in m) (m as any).metalness = 0.05
+          }
+        }
+      })
       mesh.material = Array.isArray(mesh.material) ? mesh.material.map((m) => m.clone()) : mesh.material.clone()
     })
     return instance
@@ -455,6 +496,7 @@ function CampusScene({
   const selectedFloorKey = useMemo(() => toFloorKey(selectedFloor), [selectedFloor])
   const { capture, restore } = useMaterialDefaults(scene)
   const [localSelectedId, setLocalSelectedId] = useState<string | null>(selectedBuildingId ?? null)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   useEffect(() => {
     onFrameReady(frame)
@@ -469,9 +511,11 @@ function CampusScene({
   useEffect(() => {
     restore()
     const activeBuildingId = (selectedBuildingId !== undefined ? selectedBuildingId : localSelectedId) as CampusBuildingId | null
-    if (!activeBuildingId) return
+    const targetBuildingId = activeBuildingId || hoveredId
+    const isHoverOnly = !activeBuildingId && Boolean(hoveredId)
+    if (!targetBuildingId) return
 
-    const entry = campusModelMapById[activeBuildingId]
+    const entry = campusModelMapById[targetBuildingId as CampusBuildingId]
     if (!entry) return
     const activeNames = new Set<string>([...entry.objectNames, ...(entry.interactionObjects ?? [])])
     const activeFloorNames = selectedFloorKey ? new Set(entry.floorObjects[selectedFloorKey] ?? []) : null
@@ -480,7 +524,7 @@ function CampusScene({
       if (!('isMesh' in object) || !object.isMesh) return
       const mesh = object as Mesh
       const mapped = resolveBuildingIdFromObject(mesh)
-      if (mapped !== activeBuildingId && !activeNames.has(mesh.name)) return
+      if (mapped !== targetBuildingId && !activeNames.has(mesh.name)) return
 
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
       materials.forEach((material) => {
@@ -489,14 +533,16 @@ function CampusScene({
         for (let current: Object3D | null = mesh; current && activeFloorNames; current = current.parent) {
           if (activeFloorNames.has(current.name)) { isFloor = true; break }
         }
-        if ('color' in material) (material as any).color.set(isFloor ? '#E76F51' : '#2A9D8F')
+        // Palette: Electric Blue (#3B82F6) for building, Violet (#8B5CF6) for floor, Cyan (#22D3EE) for hover
+        // Preserve base texture & colors (no solid paint override) to keep architectural identity intact
+        const highlightColor = isFloor ? '#8B5CF6' : isHoverOnly ? '#22D3EE' : '#3B82F6'
         if ('emissive' in material) {
-          ;(material as any).emissive = new Color(isFloor ? '#E76F51' : '#2A9D8F')
-          ;(material as any).emissiveIntensity = 0.25
+          ;(material as any).emissive = new Color(highlightColor)
+          ;(material as any).emissiveIntensity = isHoverOnly ? 0.32 : isFloor ? 0.72 : 0.48
         }
       })
     })
-  }, [capture, localSelectedId, restore, scene, selectedBuildingId, selectedFloorKey])
+  }, [capture, hoveredId, localSelectedId, restore, scene, selectedBuildingId, selectedFloorKey])
 
   return (
     <group>
@@ -517,7 +563,48 @@ function CampusScene({
           onBuildingSelect?.(mapped)
           onSelectionChange?.(mapped)
         }}
+        onPointerOver={(event: ThreeEvent<PointerEvent>) => {
+          const mapped = resolveBuildingIdFromObject(event.object)
+          if (mapped) {
+            document.body.style.cursor = 'pointer'
+            setHoveredId(mapped)
+          }
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'default'
+          setHoveredId(null)
+        }}
       />
+      {/* 3D Floating Landmark Badges for Quick Orientation when not navigating */}
+      {(!routePoints || routePoints.length === 0) &&
+        CAMPUS_LANDMARKS.map((landmark) => (
+          <Html
+            key={landmark.id}
+            position={[landmark.position[0], landmark.position[1], landmark.position[2]]}
+            center
+            distanceFactor={140}
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (landmark.type !== 'entrance') {
+                  setLocalSelectedId(landmark.id)
+                  onBuildingSelect?.(landmark.id)
+                  onSelectionChange?.(landmark.id)
+                }
+              }}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold shadow-lg backdrop-blur-xl transition-all hover:scale-105 cursor-pointer select-none whitespace-nowrap ${
+                (selectedBuildingId ?? localSelectedId) === landmark.id
+                  ? 'bg-blue-600/95 text-white border-blue-400 ring-2 ring-cyan-400/60 shadow-blue-500/50 scale-105'
+                  : 'bg-[#0B1220]/90 text-slate-200 border-white/20 hover:border-cyan-400 hover:text-white'
+              }`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${landmark.type === 'entrance' ? 'bg-emerald-400' : 'bg-cyan-400'}`} />
+              <span>{landmark.label}</span>
+            </button>
+          </Html>
+        ))}
       {routePoints && routePoints.length >= 2 && (
         <RouteOverlay
           points={routePoints}
@@ -596,83 +683,100 @@ function ControlsLayer({
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20">
+      {/* Top-Right Camera Modes & Tools */}
       <div className="pointer-events-none absolute right-3 top-3 z-20 flex flex-col items-end gap-2 md:right-4 md:top-4">
-        <button
-          type="button"
-          onClick={() => {
-            setPreset('framed')
-            onResetView?.()
-          }}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl hover:bg-white hover:text-slate-900 transition"
-          aria-label="Reset camera"
-          title="Reset camera to entire campus"
-        >
-          <RefreshCcw size={16} />
-        </button>
-
-        {hasRoute && (
+        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1.5 shadow-2xl backdrop-blur-xl">
           <button
             type="button"
-            onClick={onFitRoute}
-            className="pointer-events-auto flex h-10 items-center gap-1.5 rounded-full bg-white/95 px-3 text-xs font-semibold text-slate-700 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl hover:bg-white hover:text-[#2A9D8F] transition"
-            aria-label="Fit entire route"
-            title="Fit entire route within view"
+            onClick={() => {
+              setPreset('framed')
+              onResetView?.()
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
+            aria-label="Reset camera"
+            title="Reset camera to entire campus"
           >
-            <Maximize2 size={14} className="text-[#2A9D8F]" />
-            <span>Fit Route</span>
+            <RefreshCcw size={15} />
           </button>
-        )}
 
-        <button
-          type="button"
-          onClick={() => {
-            setPreset('isometric')
-          }}
-          className={`pointer-events-auto flex h-10 items-center gap-1.5 rounded-full px-3 text-xs font-semibold shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl transition ${
-            preset === 'isometric' ? 'bg-[#2A9D8F] text-white' : 'bg-white/95 text-slate-700 hover:bg-white'
-          }`}
-          aria-label="Isometric view"
-          title="3D Isometric perspective"
-        >
-          <Box size={14} />
-          <span>3D</span>
-        </button>
+          {hasRoute && (
+            <button
+              type="button"
+              onClick={onFitRoute}
+              className="flex h-9 items-center gap-1.5 rounded-xl bg-cyan-950/70 px-2.5 text-[11px] font-bold text-cyan-300 hover:bg-cyan-900/80 transition border border-cyan-500/40"
+              aria-label="Fit entire route"
+              title="Fit entire route within view"
+            >
+              <Maximize2 size={13} className="text-cyan-400" />
+              <span>Fit Route</span>
+            </button>
+          )}
 
-        <button
-          type="button"
-          onClick={() => {
-            setPreset('top-down')
-          }}
-          className={`pointer-events-auto flex h-10 items-center gap-1.5 rounded-full px-3 text-xs font-semibold shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl transition ${
-            preset === 'top-down' ? 'bg-[#E76F51] text-white' : 'bg-white/95 text-slate-700 hover:bg-white'
-          }`}
-          aria-label="Top-down view"
-          title="Top-down 2D perspective"
-        >
-          <Target size={14} />
-          <span>Top</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPreset('isometric')
+            }}
+            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition ${
+              preset === 'isometric'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            }`}
+            aria-label="Isometric view"
+            title="3D Isometric perspective"
+          >
+            <Box size={14} />
+            <span>3D</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setPreset('top-down')
+            }}
+            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition ${
+              preset === 'top-down'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/40 border border-indigo-400/40'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            }`}
+            aria-label="Top-down view"
+            title="Top-down 2D perspective"
+          >
+            <Target size={14} />
+            <span>Top</span>
+          </button>
+        </div>
+
+        {/* North Compass Indicator */}
+        <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/10 bg-[#0B1220]/90 px-2.5 py-1 text-[10px] font-bold text-slate-300 shadow-xl backdrop-blur-md">
+          <CompassIcon size={12} className="text-rose-400" />
+          <span>NORTH</span>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-4 right-3 z-20 flex flex-col gap-2 md:right-4">
-        <button
-          type="button"
-          onClick={() => zoom(0.85)}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl hover:bg-white hover:text-slate-900 transition"
-          aria-label="Zoom in"
-          title="Zoom in"
-        >
-          <ZoomIn size={16} />
-        </button>
-        <button
-          type="button"
-          onClick={() => zoom(1.18)}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl hover:bg-white hover:text-slate-900 transition"
-          aria-label="Zoom out"
-          title="Zoom out"
-        >
-          <ZoomOut size={16} />
-        </button>
+      {/* Bottom-Right Zoom Controls */}
+      <div className="pointer-events-none absolute bottom-4 right-3 z-20 flex flex-col gap-1.5 md:right-4">
+        <div className="pointer-events-auto flex flex-col rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1 shadow-2xl backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => zoom(0.82)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
+            aria-label="Zoom in"
+            title="Zoom in"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <div className="mx-1.5 h-px bg-white/10" />
+          <button
+            type="button"
+            onClick={() => zoom(1.22)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
+            aria-label="Zoom out"
+            title="Zoom out"
+          >
+            <ZoomOut size={16} />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -741,7 +845,7 @@ function CampusCanvas({
   }, [viewTarget, routeFrame])
 
   const activeFrame = frameMode === 'route' && routeFrame ? routeFrame : campusFrame
-  const containerClasses = className ?? 'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-260px)] md:min-h-[460px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100'
+  const containerClasses = className ?? 'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-200px)] md:min-h-[480px] overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-100 to-slate-200 shadow-sm'
 
   const handleFitRoute = useCallback(() => {
     if (routeFrame) {
@@ -759,15 +863,48 @@ function CampusCanvas({
   return (
     <div className={containerClasses}>
       <Canvas
-        dpr={[1, 1.75]}
-        camera={{ position: activeFrame.framedPosition, fov: 45, near: 0.1, far: 5000 }}
+        shadows
+        dpr={[1, 2]}
+        camera={{ position: activeFrame.framedPosition, fov: 42, near: 0.2, far: 4000 }}
         onCreated={({ gl }) => {
-          gl.setClearColor('#f8fafc', 1)
+          gl.setClearColor('#0B1220', 1)
+          gl.toneMapping = ACESFilmicToneMapping
+          gl.toneMappingExposure = 1.14
+          gl.shadowMap.enabled = true
+          gl.shadowMap.type = PCFSoftShadowMap
         }}
       >
-        <ambientLight intensity={0.85} />
-        <directionalLight position={[8, 16, 8]} intensity={1.2} />
-        <directionalLight position={[-10, 8, -10]} intensity={0.35} />
+        <fog attach="fog" args={['#0B1220', 160, 500]} />
+        <ambientLight intensity={0.5} color="#1E293B" />
+        <hemisphereLight args={['#38BDF8', '#061018', 0.85]} />
+        <directionalLight
+          position={[50, 90, 45]}
+          intensity={1.85}
+          color="#FFFDF5"
+          castShadow
+          shadow-mapSize={[1024, 1024]}
+          shadow-camera-near={10}
+          shadow-camera-far={380}
+          shadow-camera-left={-130}
+          shadow-camera-right={130}
+          shadow-camera-top={130}
+          shadow-camera-bottom={-130}
+          shadow-bias={-0.0003}
+        />
+        <directionalLight position={[-45, 30, -50]} intensity={0.45} color="#818CF8" />
+
+        {/* Sleek architectural dark ground base */}
+        <mesh position={[activeFrame.center.x, -0.08, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[800, 800]} />
+          <meshStandardMaterial color="#080F1D" roughness={0.92} metalness={0.05} />
+        </mesh>
+
+        {/* Soft shadow-receiving ground plane */}
+        <mesh position={[activeFrame.center.x, -0.06, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[800, 800]} />
+          <shadowMaterial opacity={0.35} />
+        </mesh>
+
         <Suspense fallback={null}>
           <ModelErrorBoundary onError={onSceneError}>
             <CampusScene
@@ -793,17 +930,17 @@ function CampusCanvas({
           ref={controlsRef}
           makeDefault
           enableDamping
-          dampingFactor={0.08}
+          dampingFactor={0.06}
           enablePan
           enableZoom
           enableRotate
-          rotateSpeed={0.6}
+          rotateSpeed={0.65}
           zoomSpeed={0.9}
           panSpeed={0.7}
-          maxPolarAngle={Math.PI / 2 - 0.03}
-          minPolarAngle={0}
-          minDistance={activeFrame.radius * 0.05}
-          maxDistance={activeFrame.radius * 12}
+          maxPolarAngle={Math.PI / 2 - 0.05}
+          minPolarAngle={0.05}
+          minDistance={10}
+          maxDistance={320}
           touches={{ ONE: 0, TWO: 2 }}
         />
         <CameraRig frame={activeFrame} preset={preset} controlsRef={controlsRef} revision={revision} />
@@ -817,9 +954,9 @@ function CampusCanvas({
         onResetView={handleResetCamera}
       />
       {showInstructionBadge && (
-        <div className="pointer-events-none absolute bottom-4 left-3 z-20 max-w-[calc(100%-6.5rem)] rounded-2xl bg-white/90 px-3 py-2 shadow-lg ring-1 ring-slate-200 backdrop-blur-xl md:left-4">
-          <div className="flex items-center gap-2 text-xs text-slate-600">
-            <span className="h-2 w-2 rounded-full bg-[#2A9D8F]" />
+        <div className="pointer-events-none absolute bottom-4 left-3 z-20 max-w-[calc(100%-6.5rem)] rounded-xl border border-white/10 bg-[#0B1220]/90 px-3 py-1.5 shadow-lg backdrop-blur-xl md:left-4">
+          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-sm shadow-cyan-400/50" />
             Drag to orbit • Right-drag to pan • Pinch/scroll to zoom
           </div>
         </div>

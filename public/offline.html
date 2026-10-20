@@ -8,28 +8,41 @@
       body {
         margin: 0;
         font-family: Inter, system-ui, -apple-system, sans-serif;
-        background: #f8fafc;
-        color: #1e293b;
+        background: #061018;
+        color: #f8fafc;
         display: grid;
         min-height: 100vh;
         place-items: center;
       }
       main {
         width: min(560px, 90vw);
-        border: 1px solid #cbd5e1;
-        border-radius: 16px;
-        padding: 24px;
-        background: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 28px;
+        background: #0b1220;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       }
-      h1 { color: #2a9d8f; margin: 0 0 12px; }
-      p { margin: 8px 0; line-height: 1.5; }
+      h1 { color: #22d3ee; margin: 0 0 12px; font-size: 1.5rem; font-weight: 800; }
+      p { margin: 8px 0; line-height: 1.6; color: #94a3b8; font-size: 0.95rem; }
+      .retry-btn {
+        display: inline-block;
+        margin-top: 16px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 12px;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
     <main>
-      <h1>PATH FINDER</h1>
-      <p>You are offline. Core app shell is available.</p>
-      <p>3D model rendering and verified route navigation may require an active connection until full offline datasets are validated.</p>
+      <h1>PATH FINDER 3D</h1>
+      <p>You are currently offline. Core app shell is ready.</p>
+      <p>3D model rendering and verified route navigation may require an active network connection until cached assets finish initializing.</p>
+      <a href="/welcome" class="retry-btn" onclick="window.location.reload()">Reload Application</a>
     </main>
   </body>
 </html>

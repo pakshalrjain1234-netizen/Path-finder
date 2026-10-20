@@ -365,10 +365,10 @@ export function NavigationScreen() {
       <div className="space-y-2">
         <div className="grid gap-2">
           {/* From Input */}
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 focus-within:border-[#2A9D8F] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#2A9D8F]/20 transition-all">
-            <span className="h-2.5 w-2.5 rounded-full border border-white bg-[#2A9D8F] shadow-sm flex-shrink-0" />
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#111827]/80 px-3 py-1.5 focus-within:border-cyan-400 focus-within:bg-[#162033] focus-within:ring-2 focus-within:ring-cyan-400/20 transition-all">
+            <span className="h-2.5 w-2.5 rounded-full border border-white/20 bg-cyan-400 shadow-sm flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <label htmlFor={isMobile ? 'mobile-route-from-select' : 'route-from-select'} className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <label htmlFor={isMobile ? 'mobile-route-from-select' : 'route-from-select'} className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 From (Origin)
               </label>
               <select
@@ -379,7 +379,7 @@ export function NavigationScreen() {
                   setActiveStepIndex(0)
                   setIsNavigating(false)
                 }}
-                className="w-full bg-transparent text-xs font-semibold text-slate-800 outline-none"
+                className="w-full bg-[#111827] text-xs font-semibold text-white outline-none"
               >
                 <optgroup label="Campus Entrances & Gates">
                   {locationOptions
@@ -405,11 +405,11 @@ export function NavigationScreen() {
 
           {/* Swap Button Divider */}
           <div className="relative flex items-center justify-center">
-            <div className="absolute inset-x-0 h-px bg-slate-200" />
+            <div className="absolute inset-x-0 h-px bg-white/10" />
             <button
               type="button"
               onClick={handleSwap}
-              className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm hover:border-[#2A9D8F] hover:text-[#2A9D8F] transition-colors"
+              className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-[#162033] text-slate-300 shadow-sm hover:border-cyan-400 hover:text-cyan-400 transition-colors"
               title="Swap origin and destination"
               aria-label="Swap origin and destination"
             >
@@ -418,10 +418,10 @@ export function NavigationScreen() {
           </div>
 
           {/* To Input */}
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 focus-within:border-[#2A9D8F] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#2A9D8F]/20 transition-all">
-            <span className="h-2.5 w-2.5 rounded-full border border-white bg-[#E76F51] shadow-sm flex-shrink-0" />
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#111827]/80 px-3 py-1.5 focus-within:border-cyan-400 focus-within:bg-[#162033] focus-within:ring-2 focus-within:ring-cyan-400/20 transition-all">
+            <span className="h-2.5 w-2.5 rounded-full border border-white/20 bg-rose-500 shadow-sm flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <label htmlFor={isMobile ? 'mobile-route-to-select' : 'route-to-select'} className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              <label htmlFor={isMobile ? 'mobile-route-to-select' : 'route-to-select'} className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 To (Destination)
               </label>
               <select
@@ -432,7 +432,7 @@ export function NavigationScreen() {
                   setActiveStepIndex(0)
                   setIsNavigating(false)
                 }}
-                className="w-full bg-transparent text-xs font-semibold text-slate-800 outline-none"
+                className="w-full bg-[#111827] text-xs font-semibold text-white outline-none"
               >
                 <optgroup label="Campus Buildings & Facilities">
                   {locationOptions
@@ -459,19 +459,19 @@ export function NavigationScreen() {
 
         {/* Status Badge & Metrics (Accurate: distance pending survey) */}
         {routeCalculation.status === 'ok' && route && (
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 p-2.5 text-xs text-slate-600 ring-1 ring-slate-100">
+          <div className="flex items-center justify-between rounded-xl bg-[#111827]/70 border border-white/10 p-2.5 text-xs text-slate-300">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2A9D8F]/10 text-[#2A9D8F]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-950/80 text-cyan-400 border border-cyan-500/30">
                 <Footprints size={15} />
               </div>
               <div>
-                <div className="font-semibold text-slate-900">
+                <div className="font-semibold text-white">
                   Distance pending campus survey
                 </div>
-                <div className="text-[10px] text-slate-500">Scale uncalibrated • Provisional route</div>
+                <div className="text-[10px] text-slate-400">Scale uncalibrated • Provisional route</div>
               </div>
             </div>
-            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+            <span className="rounded-full bg-amber-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300 border border-amber-500/30">
               Route provisional
             </span>
           </div>
@@ -483,7 +483,7 @@ export function NavigationScreen() {
         {routeCalculation.status === 'ok' && route && currentStep && (
           <div className="space-y-3">
             {/* Mode Switcher Tabs */}
-            <div className="flex rounded-xl bg-slate-100 p-1 text-xs">
+            <div className="flex rounded-xl bg-[#111827]/80 border border-white/10 p-1 text-xs">
               <button
                 type="button"
                 onClick={() => {
@@ -492,8 +492,8 @@ export function NavigationScreen() {
                 }}
                 className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
                   navMode === 'manual'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-400/30'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Manual
@@ -504,10 +504,10 @@ export function NavigationScreen() {
                   setNavMode('simulation')
                   setIsNavigating(true)
                 }}
-                className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
+                className={`flex-1 rounded-lg py-1.5 font-bold transition-all ${
                   navMode === 'simulation'
-                    ? 'bg-[#2A9D8F] text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 border border-blue-400/30'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Virtual Walk
@@ -520,10 +520,10 @@ export function NavigationScreen() {
                   setIsNavigating(true)
                   startLiveNav()
                 }}
-                className={`flex-1 rounded-lg py-1.5 font-semibold transition-all ${
+                className={`flex-1 rounded-lg py-1.5 font-bold transition-all ${
                   navMode === 'live'
-                    ? 'bg-[#2A9D8F] text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 border border-blue-400/30'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 GPS Navigation
@@ -532,17 +532,17 @@ export function NavigationScreen() {
 
             {/* LIVE GPS / SCENARIO NAVIGATION MODE */}
             {navMode === 'live' ? (
-              <div className="space-y-3 rounded-2xl border border-[#2A9D8F]/40 bg-emerald-50/50 p-3 shadow-xs">
+              <div className="space-y-3 rounded-2xl border border-white/10 bg-[#0B1220]/95 p-3.5 shadow-2xl backdrop-blur-2xl">
                 {/* Mode Indicator & Safety Status */}
                 <div
                   className={`rounded-xl border p-2.5 text-[11px] ${
                     activeScenario
-                      ? 'border-blue-200 bg-blue-50/80 text-blue-900'
+                      ? 'border-blue-500/30 bg-blue-950/60 text-blue-200'
                       : isTestMode
-                        ? 'border-amber-200 bg-amber-50/80 text-amber-900'
+                        ? 'border-amber-500/30 bg-amber-950/60 text-amber-200'
                         : navState.rawModelPosition === null
-                          ? 'border-slate-200 bg-slate-50 text-slate-800'
-                          : 'border-emerald-200 bg-emerald-50/80 text-emerald-900'
+                          ? 'border-white/10 bg-[#162033]/80 text-slate-300'
+                          : 'border-emerald-500/30 bg-emerald-950/60 text-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-1">
@@ -550,12 +550,12 @@ export function NavigationScreen() {
                       <span
                         className={`h-2 w-2 rounded-full animate-pulse ${
                           activeScenario
-                            ? 'bg-blue-600'
+                            ? 'bg-cyan-400'
                             : isTestMode
-                              ? 'bg-amber-600'
+                              ? 'bg-amber-400'
                               : navState.rawModelPosition === null
-                                ? 'bg-slate-400'
-                                : 'bg-emerald-600'
+                                ? 'bg-slate-500'
+                                : 'bg-emerald-400'
                         }`}
                       />
                       <span>
@@ -569,18 +569,18 @@ export function NavigationScreen() {
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-[10px] font-semibold">
-                      <span className="rounded-full bg-white/90 px-2 py-0.5 shadow-xs">
+                      <span className="rounded-full bg-[#111827] px-2 py-0.5 border border-white/10 text-slate-300">
                         ±{navState.accuracyRadiusMeters.toFixed(1)}m
                       </span>
                       <span
                         className={`rounded-full px-2 py-0.5 uppercase ${
                           navState.confidence === 'high'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30'
                             : navState.confidence === 'medium'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-blue-950/80 text-cyan-300 border border-blue-500/30'
                               : navState.confidence === 'off_route'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-amber-100 text-amber-800'
+                                ? 'bg-rose-950/80 text-rose-300 border border-rose-500/30'
+                                : 'bg-amber-950/80 text-amber-300 border border-amber-500/30'
                         }`}
                       >
                         {navState.confidence}
@@ -597,18 +597,18 @@ export function NavigationScreen() {
                 </div>
 
                 {/* Turn-by-Turn Guidance Hero Card (Google Maps Style) */}
-                <div className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-200/90 space-y-3">
+                <div className="rounded-2xl bg-[#111827]/90 p-3.5 shadow-xl border border-white/10 space-y-3">
                   {/* Turn Maneuver Header */}
                   <div className="flex items-start gap-3">
                     <div
-                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm text-white ${
+                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-lg text-white ${
                         navState.status === 'arrived'
-                          ? 'bg-emerald-600'
+                          ? 'bg-emerald-600 shadow-emerald-500/30'
                           : navState.isOffRoute
-                            ? 'bg-amber-500'
+                            ? 'bg-amber-600 shadow-amber-500/30'
                             : navState.isApproachingTurn
-                              ? 'bg-[#E76F51] animate-pulse'
-                              : 'bg-[#2A9D8F]'
+                              ? 'bg-rose-600 shadow-rose-500/30 animate-pulse'
+                              : 'bg-gradient-to-tr from-blue-600 to-cyan-600 shadow-blue-500/30'
                       }`}
                     >
                       {navState.status === 'arrived' ? (
@@ -630,7 +630,7 @@ export function NavigationScreen() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-extrabold text-base text-slate-900 tracking-tight">
+                        <span className="font-extrabold text-base text-white tracking-tight">
                           {navState.status === 'arrived'
                             ? 'Destination Arrived'
                             : navState.status === 'rerouted'
@@ -638,28 +638,28 @@ export function NavigationScreen() {
                               : `In ${navState.distanceToNextTurn.toFixed(0)} m`}
                         </span>
                         {navState.isApproachingTurn && (
-                          <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800 uppercase animate-pulse">
+                          <span className="rounded-full bg-amber-950/80 px-2 py-0.5 text-[9px] font-bold text-amber-300 uppercase border border-amber-500/30 animate-pulse">
                             Upcoming Turn
                           </span>
                         )}
                         {navState.status === 'rerouted' && (
-                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-800 uppercase flex items-center gap-1">
+                          <span className="rounded-full bg-emerald-950/80 px-2 py-0.5 text-[9px] font-bold text-emerald-300 uppercase border border-emerald-500/30 flex items-center gap-1">
                             <Sparkles size={10} /> Recalculated ({navState.rerouteCount})
                           </span>
                         )}
                         {navState.offRouteStatus === 'diverging' && !navState.isOffRoute && (
-                          <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-bold text-amber-800 uppercase">
+                          <span className="rounded-full bg-amber-950/80 px-2 py-0.5 text-[9px] font-bold text-amber-300 uppercase border border-amber-500/30">
                             Diverging
                           </span>
                         )}
                         {navState.isOffRoute && (
-                          <span className="rounded-full bg-red-100 px-1.5 py-0.2 text-[9px] font-bold text-red-800 uppercase">
+                          <span className="rounded-full bg-rose-950/80 px-2 py-0.5 text-[9px] font-bold text-rose-300 uppercase border border-rose-500/30 animate-pulse">
                             Off-Route
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-xs font-semibold text-slate-800 mt-0.5 leading-snug">
+                      <h3 className="text-xs font-semibold text-slate-200 mt-0.5 leading-snug">
                         {navState.status === 'arrived'
                           ? 'You have safely reached your destination!'
                           : navState.status === 'rerouted'
@@ -670,21 +670,21 @@ export function NavigationScreen() {
                       </h3>
 
                       {navState.status === 'rerouted' && (
-                        <div className="mt-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-1 text-[11px] font-medium text-emerald-800 flex items-center gap-1.5">
-                          <Sparkles size={12} className="text-emerald-600 flex-shrink-0" />
+                        <div className="mt-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30 px-2 py-1 text-[11px] font-medium text-emerald-200 flex items-center gap-1.5">
+                          <Sparkles size={12} className="text-emerald-400 flex-shrink-0" />
                           <span>{navState.userMessage}</span>
                         </div>
                       )}
 
                       {navState.isOffRoute && navState.rerouteFailureReason && (
-                        <div className="mt-1.5 rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-[11px] font-medium text-amber-900 flex items-center gap-1.5">
-                          <AlertTriangle size={12} className="text-amber-600 flex-shrink-0" />
+                        <div className="mt-1.5 rounded-lg bg-amber-950/60 border border-amber-500/30 px-2 py-1 text-[11px] font-medium text-amber-200 flex items-center gap-1.5">
+                          <AlertTriangle size={12} className="text-amber-400 flex-shrink-0" />
                           <span>{navState.userMessage}</span>
                         </div>
                       )}
 
                       {navState.currentStep?.notes && navState.status !== 'rerouted' && (
-                        <p className="mt-0.5 text-[11px] text-slate-500">
+                        <p className="mt-0.5 text-[11px] text-slate-400">
                           {navState.currentStep.notes}
                         </p>
                       )}
@@ -693,7 +693,7 @@ export function NavigationScreen() {
                       {navState.nextStep && !navState.isApproachingTurn && (
                         <div className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-400">
                           <span>Then:</span>
-                          <span className="font-medium text-slate-600 truncate">
+                          <span className="font-medium text-slate-300 truncate">
                             {navState.nextStep.title}
                           </span>
                         </div>
@@ -702,20 +702,20 @@ export function NavigationScreen() {
                   </div>
 
                   {/* Progress Bar & Distance / ETA */}
-                  <div className="border-t border-slate-100 pt-2.5 space-y-1.5">
+                  <div className="border-t border-white/10 pt-2.5 space-y-1.5">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-white">
                         {navState.remainingDistance.toFixed(0)} m remaining
                       </span>
-                      <span className="font-medium text-slate-500">
+                      <span className="font-medium text-slate-400">
                         ~{Math.ceil(navState.estimatedTimeRemainingSec / 60)} min •{' '}
                         {(navState.progressRatio * 100).toFixed(0)}%
                       </span>
                     </div>
 
-                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#2A9D8F] to-[#E76F51] transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 transition-all duration-300"
                         style={{
                           width: `${Math.min(100, Math.max(0, navState.progressRatio * 100))}%`,
                         }}
@@ -729,7 +729,7 @@ export function NavigationScreen() {
                   </div>
 
                   {/* Primary Navigation Controls */}
-                  <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-2.5">
+                  <div className="flex items-center justify-between gap-2 border-t border-white/10 pt-2.5">
                     <div className="flex items-center gap-1.5">
                       <button
                         id="btn-live-pause-resume"
@@ -741,7 +741,7 @@ export function NavigationScreen() {
                             pauseLiveNav()
                           }
                         }}
-                        className="flex items-center gap-1 rounded-xl bg-[#2A9D8F] px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-[#238276] transition"
+                        className="flex items-center gap-1 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-blue-500/30 hover:from-blue-500 hover:to-cyan-500 transition"
                       >
                         {navState.isPaused ? <Play size={13} /> : <Pause size={13} />}
                         <span>{navState.isPaused ? 'Resume' : 'Pause'}</span>
@@ -751,9 +751,9 @@ export function NavigationScreen() {
                         id="btn-live-stop"
                         type="button"
                         onClick={stopLiveNav}
-                        className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-xs transition"
+                        className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#162033] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-[#1B2540] hover:text-white transition"
                       >
-                        <StopCircle size={13} className="text-red-500" />
+                        <StopCircle size={13} className="text-rose-400" />
                         <span>Stop</span>
                       </button>
                     </div>
@@ -762,24 +762,24 @@ export function NavigationScreen() {
                       id="btn-live-recenter"
                       type="button"
                       onClick={handleRecenterCamera}
-                      className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:border-[#2A9D8F] hover:text-[#2A9D8F] shadow-xs transition"
+                      className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#162033] px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:border-cyan-400 hover:text-cyan-400 transition"
                       title="Recenter camera on route"
                     >
-                      <Crosshair size={13} className="text-[#2A9D8F]" />
+                      <Crosshair size={13} className="text-cyan-400" />
                       <span>Recenter</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Repeatable Test Scenarios Suite */}
-                <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200/90 space-y-2">
+                <div className="rounded-2xl bg-[#111827]/90 p-3 shadow-xl border border-white/10 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                      <Radio size={14} className="text-[#2A9D8F]" />
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
+                      <Radio size={14} className="text-cyan-400" />
                       <span>GPS Test Scenarios (10 Tests)</span>
                     </span>
                     {activeScenario && (
-                      <span className="text-[10px] font-semibold text-blue-600">
+                      <span className="text-[10px] font-semibold text-cyan-300">
                         Obs {scenarioStepIndex + 1}/{activeScenario.observations.length}
                       </span>
                     )}
@@ -794,7 +794,7 @@ export function NavigationScreen() {
                         setSelectedScenarioId(scId)
                         handleRunScenario(scId)
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-800 outline-none focus:border-[#2A9D8F]"
+                      className="w-full rounded-xl border border-white/10 bg-[#162033] px-2.5 py-1.5 text-xs font-medium text-white outline-none focus:border-cyan-400"
                     >
                       {NAVIGATION_SCENARIOS.map((sc) => (
                         <option key={sc.id} value={sc.id}>
@@ -809,7 +809,7 @@ export function NavigationScreen() {
                         id="btn-run-scenario"
                         type="button"
                         onClick={() => handleRunScenario(selectedScenarioId)}
-                        className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-slate-900 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition shadow-xs"
+                        className="flex-1 flex items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-1.5 text-xs font-semibold text-white hover:from-blue-500 hover:to-indigo-500 transition shadow-md shadow-blue-500/25"
                       >
                         <Play size={12} />
                         <span>
@@ -826,7 +826,7 @@ export function NavigationScreen() {
                             type="button"
                             disabled={scenarioStepIndex === 0}
                             onClick={() => stepScenario('prev')}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white disabled:opacity-40"
                             title="Previous observation"
                           >
                             <ChevronLeft size={14} />
@@ -836,7 +836,7 @@ export function NavigationScreen() {
                             type="button"
                             disabled={scenarioStepIndex >= activeScenario.observations.length - 1}
                             onClick={() => stepScenario('next')}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white disabled:opacity-40"
                             title="Next observation"
                           >
                             <ChevronRight size={14} />
@@ -848,20 +848,20 @@ export function NavigationScreen() {
                 </div>
               </div>
             ) : navMode === 'simulation' ? (
-              <div className="space-y-2.5 rounded-2xl border border-[#2A9D8F]/30 bg-emerald-50/40 p-3">
+              <div className="space-y-2.5 rounded-2xl border border-cyan-500/30 bg-[#0B1220]/90 p-3.5 shadow-glass backdrop-blur-xl">
                 {/* Clear Label & Disclaimer */}
-                <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-2.5 text-[11px] text-blue-900">
-                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-blue-800">
-                    <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+                <div className="rounded-xl border border-cyan-500/25 bg-cyan-950/40 p-2.5 text-[11px] text-cyan-200">
+                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-cyan-300">
+                    <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                     Simulation Mode — Virtual Demo
                   </div>
-                  <div className="mt-0.5 text-[10px] text-blue-700 leading-normal">
+                  <div className="mt-0.5 text-[10px] text-cyan-300/80 leading-normal">
                     Demonstrates continuous route progress along verified road centerlines. Virtual animation only — not live GPS positioning.
                   </div>
                 </div>
 
                 {/* Simulation Controls: Play/Pause, Reset, Speed */}
-                <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200 space-y-2.5">
+                <div className="rounded-xl bg-[#111827]/80 p-3 ring-1 ring-white/10 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <button
@@ -874,7 +874,7 @@ export function NavigationScreen() {
                             setIsPlaying((p) => !p)
                           }
                         }}
-                        className="flex items-center gap-1.5 rounded-xl bg-[#2A9D8F] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#238276] transition-all"
+                        className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:from-blue-500 hover:to-cyan-400 transition-all"
                       >
                         {isPlaying ? <Pause size={14} /> : <Play size={14} />}
                         <span>{isPlaying ? 'Pause' : simProgress.isFinished ? 'Replay' : 'Play'}</span>
@@ -885,7 +885,7 @@ export function NavigationScreen() {
                           setIsPlaying(false)
                           setSimulatedDistance(0)
                         }}
-                        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-all"
+                        className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/10 transition-all"
                         title="Reset simulation"
                       >
                         <RotateCcw size={13} />
@@ -894,14 +894,14 @@ export function NavigationScreen() {
                     </div>
 
                     {/* Speed selector */}
-                    <div className="flex items-center gap-0.5 rounded-lg bg-slate-100 p-0.5 text-[10px]">
+                    <div className="flex items-center gap-0.5 rounded-lg bg-black/40 border border-white/10 p-0.5 text-[10px]">
                       {[1.5, 3.0, 6.0].map((speed) => (
                         <button
                           key={speed}
                           type="button"
                           onClick={() => setSimSpeed(speed)}
                           className={`rounded-md px-1.5 py-0.5 font-semibold transition ${
-                            simSpeed === speed ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                            simSpeed === speed ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40' : 'text-slate-400 hover:text-slate-200'
                           }`}
                         >
                           {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}
@@ -912,9 +912,9 @@ export function NavigationScreen() {
 
                   {/* Scrubber / Progress slider */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="flex items-center justify-between text-[11px] text-slate-400">
                       <span>Progress along route</span>
-                      <span className="font-semibold text-slate-800">
+                      <span className="font-semibold text-slate-200">
                         {simulatedDistance.toFixed(1)} m / {totalRouteDistance.toFixed(1)} m ({Math.round(simProgress.progressRatio * 100)}%)
                       </span>
                     </div>
@@ -927,19 +927,19 @@ export function NavigationScreen() {
                       onChange={(e) => {
                         setSimulatedDistance(parseFloat(e.target.value))
                       }}
-                      className="w-full accent-[#2A9D8F] cursor-pointer"
+                      className="w-full accent-cyan-400 cursor-pointer bg-slate-800"
                     />
                   </div>
                 </div>
 
                 {/* Auto-advancing step card */}
-                <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+                <div className="rounded-xl bg-[#111827]/80 p-3 ring-1 ring-white/10">
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
                     <span>STEP {simulatedStepIndex + 1} OF {route.steps.length} (AUTO)</span>
-                    <span className="font-medium text-[#2A9D8F]">{currentStep.verificationStatus}</span>
+                    <span className="font-medium text-cyan-400">{currentStep.verificationStatus}</span>
                   </div>
                   <div className="mt-2 flex items-start gap-2.5">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-sm shadow-cyan-500/20">
                       {simulatedStepIndex === 0 ? (
                         <Compass size={18} />
                       ) : simulatedStepIndex === route.steps.length - 1 ? (
@@ -949,9 +949,9 @@ export function NavigationScreen() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h2 className="text-xs font-semibold text-slate-900 leading-snug">{currentStep.title}</h2>
+                      <h2 className="text-xs font-semibold text-slate-100 leading-snug">{currentStep.title}</h2>
                       {currentStep.notes && (
-                        <p className="mt-0.5 text-[11px] text-slate-500 leading-normal">{currentStep.notes}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-400 leading-normal">{currentStep.notes}</p>
                       )}
                     </div>
                   </div>
@@ -967,36 +967,36 @@ export function NavigationScreen() {
                       setIsNavigating(true)
                       setActiveStepIndex(0)
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2A9D8F] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-emerald-900/10 hover:bg-[#238276] transition-all"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-4 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-cyan-400 transition-all"
                   >
                     <Sparkles size={15} />
                     <span>Start Turn-by-Turn Navigation</span>
                   </button>
                 ) : (
-                  <div className="space-y-2.5 rounded-2xl border border-[#2A9D8F]/30 bg-emerald-50/40 p-3">
+                  <div className="space-y-2.5 rounded-2xl border border-blue-500/30 bg-[#0B1220]/90 p-3.5 shadow-glass backdrop-blur-xl">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2A9D8F]">
-                        <span className="h-2 w-2 rounded-full bg-[#2A9D8F] animate-pulse" />
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-cyan-300">
+                        <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                         Live Guidance Active
                       </span>
                       <button
                         type="button"
                         onClick={() => setIsNavigating(false)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-white/10"
                       >
-                        <StopCircle size={12} className="text-red-500" />
+                        <StopCircle size={12} className="text-rose-400" />
                         Exit Guidance
                       </button>
                     </div>
 
                     {/* Direction step highlight */}
-                    <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
+                    <div className="rounded-xl bg-[#111827]/80 p-3 ring-1 ring-white/10">
                       <div className="flex items-center justify-between text-[11px] text-slate-400">
                         <span>STEP {activeStepIndex + 1} OF {route.steps.length}</span>
-                        <span className="font-medium text-[#2A9D8F]">{currentStep.verificationStatus}</span>
+                        <span className="font-medium text-cyan-400">{currentStep.verificationStatus}</span>
                       </div>
                       <div className="mt-2 flex items-start gap-2.5">
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#2A9D8F] text-white">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-sm shadow-cyan-500/20">
                           {activeStepIndex === 0 ? (
                             <Compass size={18} />
                           ) : activeStepIndex === route.steps.length - 1 ? (
@@ -1006,20 +1006,20 @@ export function NavigationScreen() {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h2 className="text-xs font-semibold text-slate-900 leading-snug">{currentStep.title}</h2>
+                          <h2 className="text-xs font-semibold text-slate-100 leading-snug">{currentStep.title}</h2>
                           {currentStep.notes && (
-                            <p className="mt-0.5 text-[11px] text-slate-500 leading-normal">{currentStep.notes}</p>
+                            <p className="mt-0.5 text-[11px] text-slate-400 leading-normal">{currentStep.notes}</p>
                           )}
                         </div>
                       </div>
 
                       {/* Step controls */}
-                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
+                      <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 text-xs">
                         <button
                           type="button"
                           disabled={activeStepIndex === 0}
                           onClick={() => setActiveStepIndex((idx) => Math.max(0, idx - 1))}
-                          className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none"
+                          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 font-medium text-slate-300 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none"
                         >
                           Previous Step
                         </button>
@@ -1027,7 +1027,7 @@ export function NavigationScreen() {
                           type="button"
                           disabled={activeStepIndex === route.steps.length - 1}
                           onClick={() => setActiveStepIndex((idx) => Math.min(route.steps.length - 1, idx + 1))}
-                          className="rounded-lg bg-[#2A9D8F] px-3 py-1 font-semibold text-white hover:bg-[#238276] disabled:opacity-40 disabled:pointer-events-none"
+                          className="rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-1 font-semibold text-white hover:from-blue-500 hover:to-cyan-400 disabled:opacity-30 disabled:pointer-events-none"
                         >
                           Next Step
                         </button>
@@ -1042,20 +1042,20 @@ export function NavigationScreen() {
             <button
               type="button"
               onClick={() => setShowAllSteps((v) => !v)}
-              className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-[#111827]/80 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition-colors"
             >
               <span className="flex items-center gap-1.5">
-                <Layers size={14} className="text-[#2A9D8F]" />
+                <Layers size={14} className="text-cyan-400" />
                 Full Waypoints List ({route.steps.length} nodes)
               </span>
-              <span className="text-[11px] text-[#2A9D8F] font-semibold">
+              <span className="text-[11px] text-cyan-400 font-semibold">
                 {showAllSteps ? 'Hide' : 'View'}
               </span>
             </button>
 
             {/* Expanded Waypoint List */}
             {showAllSteps && (
-              <div className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 text-xs">
+              <div className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-white/10 bg-[#0B1220]/95 p-2 text-xs">
                 {route.steps.map((step, idx) => (
                   <div
                     key={`step-${step.nodeId}-${idx}`}
@@ -1070,15 +1070,15 @@ export function NavigationScreen() {
                     }}
                     className={`flex cursor-pointer items-start justify-between rounded-lg p-2 transition-colors ${
                       idx === effectiveStepIndex
-                        ? 'bg-[#2A9D8F]/10 ring-1 ring-[#2A9D8F]/30 font-semibold text-slate-900'
-                        : 'hover:bg-slate-50 text-slate-700'
+                        ? 'bg-cyan-500/15 ring-1 ring-cyan-500/30 font-semibold text-cyan-200'
+                        : 'hover:bg-white/5 text-slate-300'
                     }`}
                   >
                     <div className="truncate pr-2">
-                      <span className="text-slate-400 mr-1.5">{idx + 1}.</span>
+                      <span className="text-slate-500 mr-1.5">{idx + 1}.</span>
                       <span>{step.title}</span>
                     </div>
-                    <span className="text-[10px] text-amber-600 uppercase flex-shrink-0">
+                    <span className="text-[10px] text-amber-400 uppercase flex-shrink-0">
                       {step.verificationStatus}
                     </span>
                   </div>
@@ -1090,21 +1090,21 @@ export function NavigationScreen() {
 
         {/* Disconnected or Unverified Destination Message */}
         {routeCalculation.status !== 'ok' && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-900">
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-950/40 p-3.5 text-xs text-amber-200">
             <div className="flex items-start gap-2.5">
-              <AlertTriangle size={18} className="mt-0.5 text-amber-600 flex-shrink-0" />
+              <AlertTriangle size={18} className="mt-0.5 text-amber-400 flex-shrink-0" />
               <div className="space-y-1">
-                <h2 className="font-semibold text-amber-900">
+                <h2 className="font-semibold text-amber-100">
                   {routeCalculation.status === 'unverified'
                     ? 'Entrance Pending Verification'
                     : routeCalculation.status === 'same-node'
                       ? 'Identical Start & End'
                       : 'Route Unavailable — Disconnected'}
                 </h2>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
+                <p className="text-[11px] text-amber-300/90 leading-relaxed">
                   {routeCalculation.message}
                 </p>
-                <p className="text-[10px] text-amber-700 pt-1">
+                <p className="text-[10px] text-amber-400/80 pt-1">
                   Per strict campus navigation safety rules, unmapped or speculative paths are not generated.
                 </p>
               </div>
@@ -1115,13 +1115,13 @@ export function NavigationScreen() {
 
       {/* Landmarks Traversed */}
       {landmarksPassed.length > 0 && (
-        <div className="border-t border-slate-100 pt-2.5">
-          <div className="text-[11px] font-semibold text-slate-600">Landmarks along this path:</div>
+        <div className="border-t border-white/10 pt-2.5">
+          <div className="text-[11px] font-semibold text-slate-400">Landmarks along this path:</div>
           <div className="mt-1 flex flex-wrap gap-1">
             {landmarksPassed.map((landmark) => (
               <span
                 key={landmark}
-                className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700"
+                className="rounded-lg bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-medium text-slate-300"
               >
                 {landmark}
               </span>
@@ -1131,8 +1131,8 @@ export function NavigationScreen() {
       )}
 
       {/* Honest Technical Note */}
-      <div className="border-t border-slate-100 pt-2 text-[10px] text-slate-400">
-        <span className="font-medium text-slate-500">Route Engine:</span> Dijkstra calculation on campus 3D model graph. All paths marked provisional pending field ground-truthing.
+      <div className="border-t border-white/10 pt-2 text-[10px] text-slate-500">
+        <span className="font-medium text-slate-400">Route Engine:</span> Dijkstra calculation on campus 3D model graph. All paths marked provisional pending field ground-truthing.
       </div>
     </div>
   )
@@ -1145,7 +1145,7 @@ export function NavigationScreen() {
       <div className="hidden md:flex h-[calc(100vh-6.5rem)] min-h-[640px] w-full gap-4">
         {/* Left Column: Dedicated Collapsible Route Sidebar */}
         <aside
-          className={`flex flex-col h-full bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden transition-all duration-300 relative flex-shrink-0 ${
+          className={`flex flex-col h-full bg-[#0B1220]/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 relative flex-shrink-0 ${
             isSidebarCollapsed ? 'w-14 items-center' : 'w-[360px] xl:w-[380px]'
           }`}
         >
@@ -1155,17 +1155,17 @@ export function NavigationScreen() {
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#2A9D8F] hover:text-white transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
                 title="Expand route planner"
                 aria-label="Expand route planner"
               >
                 <PanelLeftOpen size={18} />
               </button>
-              <div className="h-px w-8 bg-slate-200" />
+              <div className="h-px w-8 bg-white/10" />
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
                 title="Reset route"
                 aria-label="Reset route"
               >
@@ -1174,35 +1174,35 @@ export function NavigationScreen() {
               <button
                 type="button"
                 onClick={handleSwap}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
                 title="Swap origin and destination"
                 aria-label="Swap origin and destination"
               >
                 <ArrowLeftRight size={16} />
               </button>
               <div className="mt-auto flex flex-col items-center pb-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#2A9D8F] animate-pulse" title="Campus Navigator Active" />
+                <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 animate-pulse shadow-sm shadow-cyan-400/50" title="Campus Navigator Active" />
               </div>
             </div>
           ) : (
             /* Expanded Full Sidebar */
             <div className="flex flex-col h-full p-4 overflow-y-auto">
               {/* Header: Title, Reset and Collapse Toggle */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2A9D8F] text-white shadow-sm">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-sm shadow-cyan-500/20">
                     <Navigation size={16} />
                   </div>
                   <div>
-                    <h1 className="text-sm font-semibold text-slate-900 leading-tight">Campus Navigator</h1>
-                    <p className="text-[10px] text-slate-500 truncate max-w-[190px]">MNMJEC Campus Model</p>
+                    <h1 className="text-sm font-semibold text-slate-100 leading-tight">Campus Navigator</h1>
+                    <p className="text-[10px] text-slate-400 truncate max-w-[190px]">MNMJEC Campus Model</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex h-8 items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    className="flex h-8 items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-2 text-xs font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     title="Reset route to default"
                   >
                     <RotateCcw size={12} />
@@ -1211,7 +1211,7 @@ export function NavigationScreen() {
                   <button
                     type="button"
                     onClick={() => setIsSidebarCollapsed(true)}
-                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
                     title="Collapse sidebar"
                     aria-label="Collapse sidebar"
                   >
@@ -1229,7 +1229,7 @@ export function NavigationScreen() {
         </aside>
 
         {/* Right Column: Large Dedicated 3D Campus Viewport (Sibling in Flexbox) */}
-        <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
+        <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-white/10 bg-[#0B1220] overflow-hidden shadow-2xl">
           <Campus3D
             key={`campus-3d-desktop-${cameraRevision}`}
             routePoints={liveRoutePoints}
@@ -1270,7 +1270,7 @@ export function NavigationScreen() {
           />
           {/* Subtle bottom-left hint */}
           <div className="pointer-events-none absolute bottom-4 left-4 z-10">
-            <div className="pointer-events-auto rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-medium text-slate-600 shadow-md ring-1 ring-slate-200/80 backdrop-blur-xl">
+            <div className="pointer-events-auto rounded-full bg-[#0B1220]/80 border border-white/10 px-3.5 py-1.5 text-[11px] font-medium text-slate-300 shadow-xl backdrop-blur-xl">
               Click any building to set destination • Drag to orbit • Scroll to zoom
             </div>
           </div>
@@ -1280,7 +1280,7 @@ export function NavigationScreen() {
       {/* ============================================================== */}
       {/* MOBILE LAYOUT (< md): Large Viewport + Collapsible Bottom Sheet */}
       {/* ============================================================== */}
-      <div className="flex md:hidden flex-col h-[calc(100dvh-10.5rem)] min-h-[460px] w-full relative rounded-3xl border border-slate-200/90 bg-slate-100 overflow-hidden shadow-sm">
+      <div className="flex md:hidden flex-col h-[calc(100dvh-10.5rem)] min-h-[460px] w-full relative rounded-3xl border border-white/10 bg-[#0B1220] overflow-hidden shadow-2xl">
         {/* Full 3D Campus Viewport */}
         <div className="absolute inset-0 h-full w-full">
           <Campus3D
@@ -1325,7 +1325,7 @@ export function NavigationScreen() {
 
         {/* Floating Mobile Bottom Sheet with 3 States: collapsed, half, expanded */}
         <div
-          className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-white/95 shadow-2xl ring-1 ring-slate-200/80 backdrop-blur-xl transition-all duration-300 ${
+          className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-[#0B1220]/95 shadow-2xl border-t border-x border-white/10 backdrop-blur-2xl transition-all duration-300 ${
             mobileSheetState === 'collapsed'
               ? 'h-14'
               : mobileSheetState === 'half'
@@ -1340,24 +1340,24 @@ export function NavigationScreen() {
                 setMobileSheetState((s) => (s === 'collapsed' ? 'half' : 'collapsed'))
               }
             }}
-            className="flex flex-col items-center px-4 pt-2 pb-2 border-b border-slate-100 flex-shrink-0 cursor-pointer select-none"
+            className="flex flex-col items-center px-4 pt-2 pb-2 border-b border-white/10 flex-shrink-0 cursor-pointer select-none"
           >
             <button
               type="button"
               onClick={() => {
                 setMobileSheetState((s) => (s === 'collapsed' ? 'half' : s === 'half' ? 'expanded' : 'collapsed'))
               }}
-              className="h-1.5 w-12 rounded-full bg-slate-300 hover:bg-slate-400 transition-colors mb-2"
+              className="h-1.5 w-12 rounded-full bg-slate-700 hover:bg-slate-500 transition-colors mb-2"
               aria-label="Toggle sheet height"
             />
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2A9D8F] text-white">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-sm shadow-cyan-500/20">
                   <Navigation size={14} />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-xs font-semibold text-slate-900 leading-tight">Campus Navigator</h2>
-                  <p className="text-[10px] text-slate-500">
+                  <h2 className="text-xs font-semibold text-slate-100 leading-tight">Campus Navigator</h2>
+                  <p className="text-[10px] text-slate-400">
                     {mobileSheetState === 'collapsed'
                       ? routeCalculation.status === 'ok'
                         ? 'Route calculated • Tap to view'
@@ -1370,7 +1370,7 @@ export function NavigationScreen() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-600"
+                  className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-300 hover:bg-white/10"
                   title="Reset"
                 >
                   <RotateCcw size={12} />
@@ -1379,7 +1379,7 @@ export function NavigationScreen() {
                   <button
                     type="button"
                     onClick={() => setMobileSheetState('half')}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                    className="rounded-lg border border-white/10 bg-white/5 p-1 text-slate-300 hover:bg-white/10"
                     title="Expand sheet"
                     aria-label="Expand sheet"
                   >
@@ -1390,7 +1390,7 @@ export function NavigationScreen() {
                     <button
                       type="button"
                       onClick={() => setMobileSheetState('collapsed')}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                      className="rounded-lg border border-white/10 bg-white/5 p-1 text-slate-300 hover:bg-white/10"
                       title="Collapse sheet"
                       aria-label="Collapse sheet"
                     >
@@ -1399,7 +1399,7 @@ export function NavigationScreen() {
                     <button
                       type="button"
                       onClick={() => setMobileSheetState('expanded')}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                      className="rounded-lg border border-white/10 bg-white/5 p-1 text-slate-300 hover:bg-white/10"
                       title="Maximize sheet"
                       aria-label="Maximize sheet"
                     >
@@ -1410,7 +1410,7 @@ export function NavigationScreen() {
                   <button
                     type="button"
                     onClick={() => setMobileSheetState('half')}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-1 text-slate-600 hover:bg-slate-100"
+                    className="rounded-lg border border-white/10 bg-white/5 p-1 text-slate-300 hover:bg-white/10"
                     title="Minimize sheet"
                     aria-label="Minimize sheet"
                   >
@@ -1433,8 +1433,8 @@ export function NavigationScreen() {
       {/* Supporting Information Cards below main workspace */}
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <SurfaceCard title="Campus Pathway Policy" subtitle="Accurate spatial guidance">
-          <div className="flex items-start gap-2.5 text-xs text-slate-600">
-            <Info size={16} className="text-[#2A9D8F] flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 text-xs text-slate-300">
+            <Info size={16} className="text-cyan-400 flex-shrink-0 mt-0.5" />
             <p>
               Navigation routes follow geometry extracted directly from the Blender campus GLB. If pathway connectivity is uncertain or pending survey, routes are honestly marked provisional.
             </p>
@@ -1442,8 +1442,8 @@ export function NavigationScreen() {
         </SurfaceCard>
 
         <SurfaceCard title="Real-Time 3D Interaction" subtitle="Responsive controls">
-          <div className="flex items-start gap-2.5 text-xs text-slate-600">
-            <Compass size={16} className="text-[#2A9D8F] flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 text-xs text-slate-300">
+            <Compass size={16} className="text-cyan-400 flex-shrink-0 mt-0.5" />
             <p>
               Use the top-right camera controls to toggle between 3D Isometric, 2D Top-down, Fit Route, and Campus Reset perspectives. Tap or click directly on any academic block in the 3D model to refocus your route.
             </p>

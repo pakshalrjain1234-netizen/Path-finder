@@ -103,19 +103,19 @@ export function CampusCalibrationModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 md:p-6 overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 md:p-6 overflow-y-auto">
+      <div className="relative w-full max-w-2xl rounded-3xl bg-[#0B1220] border border-white/10 shadow-2xl ring-1 ring-white/10 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 bg-slate-50/80">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-[#111827]/90">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2A9D8F] text-white shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-sm shadow-cyan-500/20">
               <Compass size={18} />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 leading-tight">
+              <h2 className="text-sm font-bold text-slate-100 leading-tight">
                 Campus Map Calibration & GPS Utility
               </h2>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-400">
                 Helmert 4-Parameter Conformal Alignment & Test Simulation
               </p>
             </div>
@@ -124,22 +124,22 @@ export function CampusCalibrationModal({
             id="btn-modal-close-x"
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-100 bg-slate-50/50 px-5 pt-2 text-xs">
+        <div className="flex border-b border-white/10 bg-[#0E1726] px-5 pt-2 text-xs">
           <button
             id="calibration-tab-benchmarks"
             type="button"
             onClick={() => setActiveTab('benchmarks')}
             className={`border-b-2 px-4 py-2 font-semibold transition ${
               activeTab === 'benchmarks'
-                ? 'border-[#2A9D8F] text-[#2A9D8F]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             Ground Control Points ({controlPoints.length})
@@ -150,13 +150,13 @@ export function CampusCalibrationModal({
             onClick={() => setActiveTab('geofence')}
             className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-semibold transition ${
               activeTab === 'geofence'
-                ? 'border-[#2A9D8F] text-[#2A9D8F]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <Layers size={14} />
             <span>Campus Geofence</span>
-            <span className="rounded-full bg-slate-200 px-1.5 py-0.2 text-[9px] font-bold uppercase text-slate-700">
+            <span className="rounded-full bg-cyan-950/60 border border-cyan-500/30 px-1.5 py-0.2 text-[9px] font-bold uppercase text-cyan-300">
               OSM 12 Nodes
             </span>
           </button>
@@ -166,14 +166,14 @@ export function CampusCalibrationModal({
             onClick={() => setActiveTab('test-mode')}
             className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-semibold transition ${
               activeTab === 'test-mode'
-                ? 'border-[#E76F51] text-[#E76F51]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-indigo-400 text-indigo-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <FlaskConical size={14} />
             <span>GPS Test Mode</span>
             {isTestMode && (
-              <span className="rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[9px] font-bold uppercase text-amber-800">
+              <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-1.5 py-0.2 text-[9px] font-bold uppercase text-amber-300">
                 Active
               </span>
             )}
@@ -181,7 +181,7 @@ export function CampusCalibrationModal({
         </div>
 
         {/* Body Content */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs text-slate-700">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs text-slate-300">
           {activeTab === 'benchmarks' && (
             <div className="space-y-4">
               {/* Calibration Status Overview */}
