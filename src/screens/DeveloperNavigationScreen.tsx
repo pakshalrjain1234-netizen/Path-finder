@@ -229,9 +229,8 @@ function DeveloperNavigationScreenInner() {
       <div className="flex flex-col md:flex-row h-[calc(100vh-10rem)] min-h-[580px] w-full gap-4">
         {/* Left Column: Developer Controls Sidebar */}
         <aside
-          className={`flex flex-col h-full bg-[#0B1220]/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 relative flex-shrink-0 ${
-            isSidebarCollapsed ? 'w-14 items-center' : 'w-full md:w-[380px] xl:w-[420px]'
-          }`}
+          className={`flex flex-col h-full bg-[#0B1220]/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 relative flex-shrink-0 ${isSidebarCollapsed ? 'w-14 items-center' : 'w-full md:w-[380px] xl:w-[420px]'
+            }`}
         >
           {isSidebarCollapsed ? (
             <div className="flex flex-col items-center py-4 gap-4 h-full">
@@ -341,11 +340,10 @@ function DeveloperNavigationScreenInner() {
                     setDevTab('scenarios')
                     setIsPlaying(false)
                   }}
-                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${
-                    devTab === 'scenarios'
+                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'scenarios'
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   GPS Scenarios (Phase 4B/4C)
                 </button>
@@ -355,11 +353,10 @@ function DeveloperNavigationScreenInner() {
                     setDevTab('virtual_walk')
                     stopLiveNav()
                   }}
-                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${
-                    devTab === 'virtual_walk'
+                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'virtual_walk'
                       ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   Virtual Walk (Phase 3.5)
                 </button>
@@ -534,11 +531,10 @@ function DeveloperNavigationScreenInner() {
                             key={speed}
                             type="button"
                             onClick={() => setSimSpeed(speed)}
-                            className={`rounded-md px-1.5 py-0.5 font-semibold transition ${
-                              simSpeed === speed
+                            className={`rounded-md px-1.5 py-0.5 font-semibold transition ${simSpeed === speed
                                 ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40'
                                 : 'text-slate-400 hover:text-slate-200'
-                            }`}
+                              }`}
                           >
                             {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}
                           </button>

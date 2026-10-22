@@ -1,7 +1,22 @@
 import { Html, Line, OrbitControls, useGLTF } from '@react-three/drei'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import type { ThreeEvent } from '@react-three/fiber'
-import { AlertCircle, Box, Compass as CompassIcon, Loader2, Maximize2, RefreshCcw, Target, ZoomIn, ZoomOut } from 'lucide-react'
+import {
+  AlertCircle,
+  Box,
+  Building2,
+  Compass as CompassIcon,
+  Focus,
+  GraduationCap,
+  Loader2,
+  Maximize2,
+  Navigation,
+  RefreshCcw,
+  Target,
+  Utensils,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react'
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Mesh, Object3D } from 'three'
 import { ACESFilmicToneMapping, Box3, Color, Matrix4, PCFSoftShadowMap, PerspectiveCamera, Vector3 } from 'three'
@@ -13,6 +28,14 @@ import {
   type CampusModelMappingEntry,
   type FloorKey,
 } from '../data/campusModelMapping'
+import {
+  CAMPUS_LANDMARKS,
+  type CampusLandmark,
+  type LabelVisibilityMode,
+  calculateZoomTierWithHysteresis,
+  isLandmarkVisible,
+} from '../data/campusLandmarks'
+export { CAMPUS_LANDMARKS, type CampusLandmark, type LabelVisibilityMode }
 import type { Point3 } from '../types/navigation'
 
 const MODEL_PATH = '/models/MNMJEC_Campus_Web.glb'
@@ -36,6 +59,9 @@ export interface Campus3DProps {
   showHud?: boolean
   showInstructionBadge?: boolean
   className?: string
+  labelVisibilityMode?: LabelVisibilityMode
+  categoryFilter?: string
+  onLabelVisibilityModeChange?: (mode: LabelVisibilityMode) => void
   onBuildingSelect?: (buildingId: string) => void
   onSelectionChange?: (buildingId: string | null) => void
   onModelReady?: (availableBuildings: CampusBuildingId[]) => void
@@ -82,6 +108,70 @@ function buildFrameFromPoints(points: Point3[]): ModelFrame | null {
     framedPosition: [center.x + radius * 1.5, center.y + radius * 0.9, center.z + radius * 1.5],
     topDownPosition: [center.x, center.y + radius * 2.5, center.z + 0.01],
     isometricPosition: [center.x + radius * 1.35, center.y + radius * 1.05, center.z + radius * 1.35],
+  }
+}
+
+function buildFrameFromPoint(point: Point3, radius = 24): ModelFrame {
+  const center = new Vector3(point[0], point[1], point[2])
+  const box = new Box3(
+    new Vector3(point[0] - radius, point[1] - 4, point[2] - radius),
+    new Vector3(point[0] + radius, point[1] + 16, point[2] + radius),
+  )
+  return {
+    box,
+    center,
+    radius,
+    framedPosition: [center.x + radius * 1.2, center.y + Math.max(radius * 0.9, 8), center.z + radius * 1.2],
+    topDownPosition: [center.x, center.y + radius * 2.2, center.z + 0.01],
+    isometricPosition: [center.x + radius * 1.1, center.y + Math.max(radius * 0.9, 8), center.z + radius * 1.1],
+  }
+}
+
+
+function buildFrameFromBuilding(scene: Object3D, buildingId: string): ModelFrame | null {
+  const entry = campusModelMapById[buildingId as CampusBuildingId]
+  if (!entry) {
+    const landmark = CAMPUS_LANDMARKS.find((lm) => lm.id === buildingId)
+    if (landmark) {
+      return buildFrameFromPoint(landmark.fallbackPosition, 18)
+    }
+    return null
+  }
+
+  const activeNames = new Set<string>([...entry.objectNames, ...(entry.interactionObjects ?? [])])
+  const box = new Box3()
+  let hasObjects = false
+
+  scene.traverse((object) => {
+    if (!('isMesh' in object) || !object.isMesh) return
+    const mesh = object as Mesh
+    const mapped = resolveCampusBuilding(mesh.name)
+    if (mapped === buildingId || activeNames.has(mesh.name)) {
+      mesh.updateWorldMatrix(true, false)
+      box.expandByObject(mesh)
+      hasObjects = true
+    }
+  })
+
+  if (!hasObjects || box.isEmpty()) {
+    const landmark = CAMPUS_LANDMARKS.find((lm) => lm.id === buildingId)
+    if (landmark) {
+      return buildFrameFromPoint(landmark.fallbackPosition, 18)
+    }
+    return null
+  }
+
+  const center = box.getCenter(new Vector3())
+  const size = box.getSize(new Vector3())
+  const radius = Math.max(size.length() / 2, 12)
+
+  return {
+    box,
+    center,
+    radius,
+    framedPosition: [center.x + radius * 1.4, center.y + radius * 1.1, center.z + radius * 1.4],
+    topDownPosition: [center.x, center.y + radius * 2.6, center.z + 0.01],
+    isometricPosition: [center.x + radius * 1.3, center.y + radius * 1.1, center.z + radius * 1.3],
   }
 }
 
@@ -408,14 +498,7 @@ function UserLocationMarker({
   )
 }
 
-const CAMPUS_LANDMARKS: Array<{ id: string; label: string; position: Point3; type: 'entrance' | 'academic' | 'facility' }> = [
-  { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', position: [181.0, 1.8, -6.2], type: 'entrance' },
-  { id: 'main-block', label: 'Main Block', position: [180.2, 8.5, -38.6], type: 'academic' },
-  { id: 'first-year-block', label: 'First Year Block', position: [166.5, 12.0, -38.6], type: 'academic' },
-  { id: 'civil-block', label: 'Civil Block', position: [145.2, 10.0, -38.6], type: 'academic' },
-  { id: 'it-block', label: 'IT Block', position: [96.8, 8.5, -45.8], type: 'academic' },
-  { id: 'canteen', label: 'Canteen & Mess', position: [37.4, 5.0, 2.0], type: 'facility' },
-]
+// Campus landmarks and priority tiers are imported from ../data/campusLandmarks
 
 function CampusScene({
   selectedBuildingId,
@@ -429,10 +512,13 @@ function CampusScene({
   isSimulating,
   userLocationPoint,
   userLocationAccuracyRadius,
+  labelVisibilityMode = 'major',
+  categoryFilter = 'All',
   onBuildingSelect,
   onSelectionChange,
   onModelReady,
   onFrameReady,
+  onBuildingFrameReady,
 }: {
   selectedBuildingId?: string
   selectedFloor?: string
@@ -445,10 +531,13 @@ function CampusScene({
   isSimulating?: boolean
   userLocationPoint?: Point3 | null
   userLocationAccuracyRadius?: number | null
+  labelVisibilityMode?: LabelVisibilityMode
+  categoryFilter?: string
   onBuildingSelect?: (buildingId: string) => void
   onSelectionChange?: (buildingId: string | null) => void
   onModelReady?: (availableBuildings: CampusBuildingId[]) => void
   onFrameReady: (frame: ModelFrame) => void
+  onBuildingFrameReady?: (frame: ModelFrame | null) => void
 }) {
   const gltf = useGLTF(MODEL_PATH)
   const scene = useMemo(() => {
@@ -471,20 +560,27 @@ function CampusScene({
         nameLower.includes('ground') ||
         nameLower.includes('lawn') ||
         nameLower.includes('terrain')
+      const isWindowOrGlass =
+        nameLower.includes('win') ||
+        nameLower.includes('glass') ||
+        nameLower.includes('panel')
 
       // Architectural materials calibration
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
       materials.forEach((m) => {
         if ('roughness' in m && typeof m.roughness === 'number') {
           if (isRoadOrWalkway) {
-            m.roughness = 0.86
+            m.roughness = 0.85
             if ('metalness' in m) (m as any).metalness = 0.02
           } else if (isGround) {
-            m.roughness = 0.92
+            m.roughness = 0.94
             if ('metalness' in m) (m as any).metalness = 0.01
+          } else if (isWindowOrGlass) {
+            m.roughness = 0.22
+            if ('metalness' in m) (m as any).metalness = 0.08
           } else {
-            m.roughness = 0.58
-            if ('metalness' in m) (m as any).metalness = 0.05
+            m.roughness = 0.65
+            if ('metalness' in m) (m as any).metalness = 0.04
           }
         }
       })
@@ -492,11 +588,33 @@ function CampusScene({
     })
     return instance
   }, [gltf.scene])
+
   const frame = useMemo(() => buildFrame(scene), [scene])
   const selectedFloorKey = useMemo(() => toFloorKey(selectedFloor), [selectedFloor])
   const { capture, restore } = useMaterialDefaults(scene)
+  const { camera, size } = useThree()
   const [localSelectedId, setLocalSelectedId] = useState<string | null>(selectedBuildingId ?? null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [zoomTier, setZoomTier] = useState<1 | 2 | 3>(1)
+  const lastTierRef = useRef<1 | 2 | 3>(1)
+
+  // Dynamically compute exact roof apex and horizontal centroid for every landmark from GLB meshes
+  const landmarkAnchors = useMemo(() => {
+    const anchors: Record<string, Point3> = {}
+    CAMPUS_LANDMARKS.forEach((landmark) => {
+      const bFrame = buildFrameFromBuilding(scene, landmark.id)
+      if (bFrame && bFrame.box && !bFrame.box.isEmpty()) {
+        anchors[landmark.id] = [
+          bFrame.center.x,
+          bFrame.box.max.y,
+          bFrame.center.z,
+        ]
+      } else {
+        anchors[landmark.id] = landmark.fallbackPosition
+      }
+    })
+    return anchors
+  }, [scene])
 
   useEffect(() => {
     onFrameReady(frame)
@@ -504,13 +622,41 @@ function CampusScene({
 
   useEffect(() => {
     const found = new Set<CampusBuildingId>()
-    scene.traverse((object) => { const id = resolveBuildingIdFromObject(object); if (id) found.add(id) })
+    scene.traverse((object) => {
+      const id = resolveBuildingIdFromObject(object)
+      if (id) found.add(id)
+    })
     onModelReady?.([...found])
   }, [scene, onModelReady])
 
+  const activeBuildingId = (selectedBuildingId !== undefined ? selectedBuildingId : localSelectedId) as CampusBuildingId | null
+
+  // Calculate building frame and notify parent whenever activeBuildingId changes
+  const activeBuildingFrame = useMemo(() => {
+    if (!activeBuildingId) return null
+    return buildFrameFromBuilding(scene, activeBuildingId)
+  }, [scene, activeBuildingId])
+
+  // Responsive LOD decluttering based on camera distance with hysteresis to avoid flickering
+  useFrame(() => {
+    const targetX = activeBuildingFrame?.center.x ?? 100
+    const targetY = activeBuildingFrame?.center.y ?? 0
+    const targetZ = activeBuildingFrame?.center.z ?? -60
+    const dist = camera.position.distanceTo(new Vector3(targetX, targetY, targetZ))
+
+    const next = calculateZoomTierWithHysteresis(dist, lastTierRef.current, size.width < 640)
+    if (next !== lastTierRef.current) {
+      lastTierRef.current = next
+      setZoomTier(next)
+    }
+  })
+
+  useEffect(() => {
+    onBuildingFrameReady?.(activeBuildingFrame)
+  }, [activeBuildingFrame, onBuildingFrameReady])
+
   useEffect(() => {
     restore()
-    const activeBuildingId = (selectedBuildingId !== undefined ? selectedBuildingId : localSelectedId) as CampusBuildingId | null
     const targetBuildingId = activeBuildingId || hoveredId
     const isHoverOnly = !activeBuildingId && Boolean(hoveredId)
     if (!targetBuildingId) return
@@ -531,18 +677,20 @@ function CampusScene({
         capture(material)
         let isFloor = false
         for (let current: Object3D | null = mesh; current && activeFloorNames; current = current.parent) {
-          if (activeFloorNames.has(current.name)) { isFloor = true; break }
+          if (activeFloorNames.has(current.name)) {
+            isFloor = true
+            break
+          }
         }
-        // Palette: Electric Blue (#3B82F6) for building, Violet (#8B5CF6) for floor, Cyan (#22D3EE) for hover
-        // Preserve base texture & colors (no solid paint override) to keep architectural identity intact
-        const highlightColor = isFloor ? '#8B5CF6' : isHoverOnly ? '#22D3EE' : '#3B82F6'
+        // Palette: Restrained Cyan/Blue (#38BDF8) for building, Violet (#8B5CF6) for floor, Hover Cyan (#22D3EE)
+        const highlightColor = isFloor ? '#8B5CF6' : isHoverOnly ? '#22D3EE' : '#38BDF8'
         if ('emissive' in material) {
           ;(material as any).emissive = new Color(highlightColor)
-          ;(material as any).emissiveIntensity = isHoverOnly ? 0.32 : isFloor ? 0.72 : 0.48
+          ;(material as any).emissiveIntensity = isHoverOnly ? 0.22 : isFloor ? 0.65 : 0.38
         }
       })
     })
-  }, [capture, hoveredId, localSelectedId, restore, scene, selectedBuildingId, selectedFloorKey])
+  }, [capture, hoveredId, activeBuildingId, restore, scene, selectedFloorKey])
 
   return (
     <group>
@@ -575,36 +723,133 @@ function CampusScene({
           setHoveredId(null)
         }}
       />
+
+      {/* Selected Building Ground Projection Halo */}
+      {activeBuildingFrame && (
+        <group position={[activeBuildingFrame.center.x, 0.03, activeBuildingFrame.center.z]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[Math.max(activeBuildingFrame.radius * 0.85, 4), Math.max(activeBuildingFrame.radius * 0.85 + 1.2, 5.2), 48]} />
+            <meshBasicMaterial color="#38BDF8" opacity={0.4} transparent side={2} depthWrite={false} />
+          </mesh>
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0, Math.max(activeBuildingFrame.radius * 0.85, 4), 48]} />
+            <meshBasicMaterial color="#0284C7" opacity={0.06} transparent side={2} depthWrite={false} />
+          </mesh>
+        </group>
+      )}
+
       {/* 3D Floating Landmark Badges for Quick Orientation when not navigating */}
       {(!routePoints || routePoints.length === 0) &&
-        CAMPUS_LANDMARKS.map((landmark) => (
-          <Html
-            key={landmark.id}
-            position={[landmark.position[0], landmark.position[1], landmark.position[2]]}
-            center
-            distanceFactor={140}
-          >
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                if (landmark.type !== 'entrance') {
-                  setLocalSelectedId(landmark.id)
-                  onBuildingSelect?.(landmark.id)
-                  onSelectionChange?.(landmark.id)
-                }
-              }}
-              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold shadow-lg backdrop-blur-xl transition-all hover:scale-105 cursor-pointer select-none whitespace-nowrap ${
-                (selectedBuildingId ?? localSelectedId) === landmark.id
-                  ? 'bg-blue-600/95 text-white border-blue-400 ring-2 ring-cyan-400/60 shadow-blue-500/50 scale-105'
-                  : 'bg-[#0B1220]/90 text-slate-200 border-white/20 hover:border-cyan-400 hover:text-white'
-              }`}
+        CAMPUS_LANDMARKS.map((landmark) => {
+          const isSelected = (selectedBuildingId ?? localSelectedId) === landmark.id
+          const isHovered = hoveredId === landmark.id
+
+          // Priority decluttering: Selected & hovered labels ALWAYS visible; otherwise filtered by zoom tier, labelVisibilityMode and categoryFilter
+          const isVisible = isLandmarkVisible(landmark, selectedBuildingId ?? localSelectedId, hoveredId, zoomTier, labelVisibilityMode, categoryFilter)
+          if (!isVisible) return null
+
+          const anchor = landmarkAnchors[landmark.id] ?? landmark.fallbackPosition
+
+          return (
+            <Html
+              key={landmark.id}
+              position={[anchor[0], anchor[1], anchor[2]]}
+              center={false}
+              zIndexRange={[isSelected ? 900 : isHovered ? 800 : 500, 0]}
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${landmark.type === 'entrance' ? 'bg-emerald-400' : 'bg-cyan-400'}`} />
-              <span>{landmark.label}</span>
-            </button>
-          </Html>
-        ))}
+              <div
+                className="relative flex flex-col items-center pointer-events-auto select-none"
+                style={{ transform: 'translate3d(-50%, -100%, 0)' }}
+              >
+                {/* Floating Pill Card */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (landmark.type !== 'entrance') {
+                      setLocalSelectedId(landmark.id)
+                      onBuildingSelect?.(landmark.id)
+                      onSelectionChange?.(landmark.id)
+                    }
+                  }}
+                  onPointerOver={(e) => {
+                    e.stopPropagation()
+                    setHoveredId(landmark.id)
+                  }}
+                  onPointerOut={(e) => {
+                    e.stopPropagation()
+                    setHoveredId(null)
+                  }}
+                  aria-label={`Select ${landmark.label}`}
+                  className={`group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-xl backdrop-blur-xl transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-blue-700 via-sky-800 to-blue-700 text-white border-2 border-cyan-300 ring-4 ring-cyan-400/30 shadow-cyan-500/50 scale-110 z-50'
+                      : isHovered
+                        ? 'bg-[#0F172A]/95 text-cyan-200 border border-cyan-400/80 shadow-cyan-500/30 scale-105 z-30'
+                        : 'bg-[#0B1220]/95 text-slate-100 border border-white/20 hover:border-cyan-400/80 hover:text-white hover:scale-105 shadow-black/80 z-10'
+                  }`}
+                >
+                  {/* Category Icon */}
+                  <span
+                    className={`flex items-center justify-center shrink-0 ${
+                      isSelected
+                        ? 'text-cyan-200'
+                        : isHovered
+                          ? 'text-cyan-300'
+                          : landmark.type === 'entrance'
+                            ? 'text-emerald-400'
+                            : landmark.type === 'facility'
+                              ? 'text-amber-400'
+                              : 'text-cyan-400'
+                    }`}
+                  >
+                    {landmark.type === 'entrance' && <Navigation className="h-3.5 w-3.5 rotate-45" />}
+                    {landmark.type === 'academic' && <GraduationCap className="h-3.5 w-3.5" />}
+                    {landmark.type === 'facility' &&
+                      (landmark.id === 'boys-hostel' ? <Building2 className="h-3.5 w-3.5" /> : <Utensils className="h-3.5 w-3.5" />)}
+                    {landmark.type === 'department' && <Building2 className="h-3.5 w-3.5" />}
+                  </span>
+
+                  {/* Building Name */}
+                  <span className={`tracking-tight ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
+                    {landmark.label}
+                  </span>
+
+                  {/* Selected Indicator Badge */}
+                  {isSelected && (
+                    <span className="flex items-center gap-1 rounded-full bg-cyan-400/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-cyan-200 border border-cyan-300/40">
+                      <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
+                      Selected
+                    </span>
+                  )}
+                </button>
+
+                {/* Anchor Stem & Pin Dot connecting floating label to building roof */}
+                <div className="flex flex-col items-center pointer-events-none -mt-px">
+                  <div
+                    className={`w-[1.5px] transition-all duration-200 ${
+                      isSelected
+                        ? 'h-3.5 bg-cyan-300 shadow-[0_0_8px_#22d3ee]'
+                        : isHovered
+                          ? 'h-3 bg-cyan-400'
+                          : 'h-2.5 bg-white/40'
+                    }`}
+                  />
+                  <div
+                    className={`rounded-full transition-all duration-200 ${
+                      isSelected
+                        ? 'h-2 w-2 bg-cyan-300 ring-2 ring-cyan-400/60 shadow-[0_0_8px_#22d3ee]'
+                        : isHovered
+                          ? 'h-1.5 w-1.5 bg-cyan-300'
+                          : 'h-1.5 w-1.5 bg-white/60'
+                    }`}
+                  />
+                </div>
+              </div>
+            </Html>
+          )
+        })}
+
       {routePoints && routePoints.length >= 2 && (
         <RouteOverlay
           points={routePoints}
@@ -616,6 +861,7 @@ function CampusScene({
           isSimulating={isSimulating}
         />
       )}
+
       {userLocationPoint && (
         <UserLocationMarker
           position={userLocationPoint}
@@ -626,31 +872,149 @@ function CampusScene({
   )
 }
 
-function CameraRig({ frame, preset, controlsRef, revision }: { frame: ModelFrame; preset: CameraPreset; controlsRef: React.RefObject<any>; revision: number }) {
+function CameraRig({
+  frame,
+  preset,
+  controlsRef,
+  revision,
+  isLocationMode = false,
+}: {
+  frame: ModelFrame
+  preset: CameraPreset
+  controlsRef: React.RefObject<any>
+  revision: number
+  isLocationMode?: boolean
+}) {
   const { camera, size } = useThree()
+  const targetPos = useRef<Vector3>(new Vector3())
+  const targetCenter = useRef<Vector3>(new Vector3())
+  const isTransitioning = useRef<boolean>(false)
+  const isInteracting = useRef<boolean>(false)
+
+  // Detect user preference for reduced motion
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false
+  }, [])
+
+  // Listen to orbit controls interaction start to let user take control immediately
+  useEffect(() => {
+    const controls = controlsRef.current
+    if (!controls) return
+    const onStart = () => {
+      isInteracting.current = true
+      isTransitioning.current = false
+    }
+    const onEnd = () => {
+      isInteracting.current = false
+    }
+    controls.addEventListener('start', onStart)
+    controls.addEventListener('end', onEnd)
+    return () => {
+      controls.removeEventListener('start', onStart)
+      controls.removeEventListener('end', onEnd)
+    }
+  }, [controlsRef])
+
   useEffect(() => {
     if (!frame.box || !(camera instanceof PerspectiveCamera)) return
-    // Fit actual corners to both viewport axes. Move only the camera, never the model.
-    const direction = preset === 'top-down' ? new Vector3(0, 1, 0.00001) : new Vector3(1, 1.3, 1.2).normalize()
-    const rotation = new Matrix4().lookAt(direction, new Vector3(), camera.up)
-    const right = new Vector3().setFromMatrixColumn(rotation, 0)
-    const up = new Vector3().setFromMatrixColumn(rotation, 1)
-    const tanY = Math.tan(camera.fov * Math.PI / 360)
-    const tanX = tanY * size.width / Math.max(size.height, 1)
-    let distance = 0
-    for (const x of [frame.box.min.x, frame.box.max.x]) for (const y of [frame.box.min.y, frame.box.max.y]) for (const z of [frame.box.min.z, frame.box.max.z]) {
-      const point = new Vector3(x, y, z).sub(frame.center)
-      distance = Math.max(distance, point.dot(direction) + 1.15 * Math.max(Math.abs(point.dot(right)) / tanX, Math.abs(point.dot(up)) / tanY))
+
+    let destPos: Vector3
+    if (isLocationMode) {
+      const controls = controlsRef.current
+      const currentTarget = controls ? controls.target.clone() : new Vector3()
+      const offset = camera.position.clone().sub(currentTarget)
+      const currentDist = offset.length()
+      // Clamp distance to a comfortable inspection range for student position
+      const clampedDist = Math.max(22, Math.min(55, currentDist))
+      if (Math.hypot(offset.x, offset.z) < 0.5) {
+        offset.set(1, 1.1, 1).normalize()
+      } else {
+        offset.normalize()
+      }
+      // Ensure vertical viewing pitch remains elevated above terrain
+      if (offset.y < 0.35) offset.y = 0.35
+      offset.normalize()
+      destPos = frame.center.clone().addScaledVector(offset, clampedDist)
+      // Safety: always keep camera height well above ground and terrain
+      destPos.y = Math.max(destPos.y, frame.center.y + 8, 4.5)
+    } else {
+      const direction =
+        preset === 'top-down'
+          ? new Vector3(0, 1, 0.00001)
+          : preset === 'isometric'
+            ? new Vector3(1, 1.1, 1).normalize()
+            : new Vector3(1, 1.25, 1.2).normalize()
+
+      const rotation = new Matrix4().lookAt(direction, new Vector3(), camera.up)
+      const right = new Vector3().setFromMatrixColumn(rotation, 0)
+      const up = new Vector3().setFromMatrixColumn(rotation, 1)
+      const tanY = Math.tan((camera.fov * Math.PI) / 360)
+      const tanX = (tanY * size.width) / Math.max(size.height, 1)
+
+      let distance = 0
+      for (const x of [frame.box.min.x, frame.box.max.x]) {
+        for (const y of [frame.box.min.y, frame.box.max.y]) {
+          for (const z of [frame.box.min.z, frame.box.max.z]) {
+            const point = new Vector3(x, y, z).sub(frame.center)
+            distance = Math.max(
+              distance,
+              point.dot(direction) +
+                1.2 * Math.max(Math.abs(point.dot(right)) / tanX, Math.abs(point.dot(up)) / tanY)
+            )
+          }
+        }
+      }
+
+      destPos = frame.center.clone().addScaledVector(direction, distance)
+      destPos.y = Math.max(destPos.y, frame.center.y + 4.0, 3.8)
     }
-    camera.far = Math.max(5000, distance + frame.radius * 20)
-    camera.position.copy(frame.center).addScaledVector(direction, distance)
-    camera.lookAt(frame.center)
-    camera.updateProjectionMatrix()
-    if (controlsRef.current) {
-      controlsRef.current.target.copy(frame.center)
-      controlsRef.current.update()
+
+    targetPos.current.copy(destPos)
+    targetCenter.current.copy(frame.center)
+
+    // Reset interaction lock on every programmatic camera command
+    isInteracting.current = false
+
+    if (prefersReducedMotion) {
+      camera.position.copy(destPos)
+      camera.lookAt(frame.center)
+      if (controlsRef.current) {
+        controlsRef.current.target.copy(frame.center)
+        controlsRef.current.update()
+      }
+      isTransitioning.current = false
+    } else {
+      isTransitioning.current = true
     }
-  }, [camera, size.width, size.height, frame, preset, revision, controlsRef])
+  }, [camera, size.width, size.height, frame, preset, revision, controlsRef, prefersReducedMotion, isLocationMode])
+
+  useFrame((_, delta) => {
+    if (isInteracting.current) {
+      isTransitioning.current = false
+      return
+    }
+    if (!isTransitioning.current) return
+    const controls = controlsRef.current
+    if (!controls) return
+
+    // Smooth exponential step
+    const step = Math.min(1, delta * 4.2)
+    camera.position.lerp(targetPos.current, step)
+    controls.target.lerp(targetCenter.current, step)
+    controls.update()
+
+    const posDist = camera.position.distanceTo(targetPos.current)
+    const targetDist = controls.target.distanceTo(targetCenter.current)
+
+    if (posDist < 0.08 && targetDist < 0.08) {
+      camera.position.copy(targetPos.current)
+      controls.target.copy(targetCenter.current)
+      controls.update()
+      isTransitioning.current = false
+    }
+  })
+
   return null
 }
 
@@ -659,15 +1023,23 @@ function ControlsLayer({
   setPreset,
   controlsRef,
   hasRoute,
+  hasSelectedBuilding,
+  labelVisibilityMode,
+  onLabelVisibilityModeChange,
   onFitRoute,
-  onResetView,
+  onFitCampus,
+  onFocusBuilding,
 }: {
   preset: CameraPreset
   setPreset: (preset: CameraPreset) => void
   controlsRef: React.RefObject<any>
   hasRoute?: boolean
+  hasSelectedBuilding?: boolean
+  labelVisibilityMode: LabelVisibilityMode
+  onLabelVisibilityModeChange: (mode: LabelVisibilityMode) => void
   onFitRoute?: () => void
-  onResetView?: () => void
+  onFitCampus: () => void
+  onFocusBuilding?: () => void
 }) {
   const zoom = useCallback(
     (factor: number) => {
@@ -683,27 +1055,92 @@ function ControlsLayer({
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20">
-      {/* Top-Right Camera Modes & Tools */}
-      <div className="pointer-events-none absolute right-3 top-3 z-20 flex flex-col items-end gap-2 md:right-4 md:top-4">
-        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1.5 shadow-2xl backdrop-blur-xl">
+      {/* Top-Right Camera Modes, Tools & Label Visibility Toggle - positioned safely below header */}
+      <div className="pointer-events-none absolute right-3 top-24 z-20 flex flex-col items-end gap-2 md:right-4 md:top-20">
+        {/* Compact Label Visibility Segmented Control */}
+        <div className="pointer-events-auto flex items-center rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1 shadow-2xl backdrop-blur-xl gap-0.5">
+          <span className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase hidden sm:inline">
+            Labels
+          </span>
           <button
             type="button"
-            onClick={() => {
-              setPreset('framed')
-              onResetView?.()
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
-            aria-label="Reset camera"
-            title="Reset camera to entire campus"
+            id="btn-label-mode-major"
+            onClick={() => onLabelVisibilityModeChange('major')}
+            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              labelVisibilityMode === 'major'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            }`}
+            title="Major Blocks (Default decluttered view)"
+          >
+            Major
+          </button>
+          <button
+            type="button"
+            id="btn-label-mode-all"
+            onClick={() => onLabelVisibilityModeChange('all')}
+            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              labelVisibilityMode === 'all'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            }`}
+            title="All Places (Display all known campus labels)"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            id="btn-label-mode-selected"
+            onClick={() => onLabelVisibilityModeChange('selected')}
+            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+              labelVisibilityMode === 'selected'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            }`}
+            title="Selected Only (Show only currently selected building label)"
+          >
+            Selected
+          </button>
+        </div>
+
+        {/* Primary Camera Navigation Controls Card */}
+        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1.5 shadow-2xl backdrop-blur-xl">
+          {/* Recenter Campus Overview */}
+          <button
+            type="button"
+            id="btn-camera-recenter-campus"
+            data-testid="btn-camera-fit-campus"
+            onClick={onFitCampus}
+            className="btn-camera-fit-campus flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+            aria-label="Recenter Campus Overview"
+            title="Recenter Campus (Default full-campus overview)"
           >
             <RefreshCcw size={15} />
+          </button>
+
+          {/* Focus Selected Building */}
+          <button
+            type="button"
+            id="btn-camera-focus-building"
+            onClick={onFocusBuilding}
+            disabled={!hasSelectedBuilding}
+            className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+              hasSelectedBuilding
+                ? 'text-cyan-300 hover:bg-cyan-950/60 hover:text-cyan-200 cursor-pointer'
+                : 'text-slate-600 cursor-not-allowed opacity-40'
+            }`}
+            aria-label="Focus Selected Building"
+            title={hasSelectedBuilding ? 'Focus Selected Building' : 'Select a building to focus'}
+          >
+            <Focus size={15} />
           </button>
 
           {hasRoute && (
             <button
               type="button"
+              id="btn-camera-fit-route"
               onClick={onFitRoute}
-              className="flex h-9 items-center gap-1.5 rounded-xl bg-cyan-950/70 px-2.5 text-[11px] font-bold text-cyan-300 hover:bg-cyan-900/80 transition border border-cyan-500/40"
+              className="flex h-9 items-center gap-1.5 rounded-xl bg-cyan-950/70 px-2.5 text-[11px] font-bold text-cyan-300 hover:bg-cyan-900/80 transition border border-cyan-500/40 cursor-pointer"
               aria-label="Fit entire route"
               title="Fit entire route within view"
             >
@@ -712,13 +1149,15 @@ function ControlsLayer({
             </button>
           )}
 
+          <div className="h-px w-6 bg-white/10" />
+
+          {/* 3D Isometric View */}
           <button
             type="button"
-            onClick={() => {
-              setPreset('isometric')
-            }}
-            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition ${
-              preset === 'isometric'
+            id="btn-camera-view-3d"
+            onClick={() => setPreset('isometric')}
+            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition cursor-pointer ${
+              preset === 'isometric' || preset === 'framed'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
                 : 'text-slate-300 hover:bg-white/10 hover:text-white'
             }`}
@@ -729,12 +1168,12 @@ function ControlsLayer({
             <span>3D</span>
           </button>
 
+          {/* Top-down 2D View */}
           <button
             type="button"
-            onClick={() => {
-              setPreset('top-down')
-            }}
-            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition ${
+            id="btn-camera-view-top"
+            onClick={() => setPreset('top-down')}
+            className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition cursor-pointer ${
               preset === 'top-down'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/40 border border-indigo-400/40'
                 : 'text-slate-300 hover:bg-white/10 hover:text-white'
@@ -760,7 +1199,7 @@ function ControlsLayer({
           <button
             type="button"
             onClick={() => zoom(0.82)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
             aria-label="Zoom in"
             title="Zoom in"
           >
@@ -770,7 +1209,7 @@ function ControlsLayer({
           <button
             type="button"
             onClick={() => zoom(1.22)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
             aria-label="Zoom out"
             title="Zoom out"
           >
@@ -798,9 +1237,13 @@ function CampusCanvas({
   showHud = true,
   showInstructionBadge = true,
   className,
+  labelVisibilityMode = 'major',
+  categoryFilter = 'All',
+  onLabelVisibilityModeChange,
   onBuildingSelect,
   onSelectionChange,
   onModelReady,
+  onResetView,
   onSceneError,
 }: {
   selectedBuildingId?: string
@@ -818,16 +1261,32 @@ function CampusCanvas({
   showHud?: boolean
   showInstructionBadge?: boolean
   className?: string
+  labelVisibilityMode?: LabelVisibilityMode
+  categoryFilter?: string
+  onLabelVisibilityModeChange?: (mode: LabelVisibilityMode) => void
   onBuildingSelect?: (buildingId: string) => void
   onSelectionChange?: (buildingId: string | null) => void
   onModelReady?: (availableBuildings: CampusBuildingId[]) => void
+  onResetView?: () => void
   onSceneError: (error: Error) => void
 }) {
   const controlsRef = useRef<any>(null)
   const [campusFrame, setCampusFrame] = useState<ModelFrame>(DEFAULT_FRAME)
-  const [frameMode, setFrameMode] = useState<'campus' | 'route'>(viewTarget === 'route' ? 'route' : 'campus')
-  const [preset, setPreset] = useState<CameraPreset>('framed')
+  const [buildingFrame, setBuildingFrame] = useState<ModelFrame | null>(null)
+  const [userLocFrame, setUserLocFrame] = useState<ModelFrame | null>(null)
+  const [labelMode, setLabelMode] = useState<LabelVisibilityMode>(labelVisibilityMode)
+  const [frameMode, setFrameMode] = useState<'campus' | 'route' | 'building' | 'location'>(
+    viewTarget === 'route' ? 'route' : selectedBuildingId ? 'building' : 'campus'
+  )
+  const [preset, setPreset] = useState<CameraPreset>('isometric')
   const [revision, setRevision] = useState(0)
+
+  // Sync external label visibility mode prop
+  useEffect(() => {
+    if (labelVisibilityMode) {
+      setLabelMode(labelVisibilityMode)
+    }
+  }, [labelVisibilityMode])
 
   const routeFrame = useMemo(() => {
     if (routePoints && routePoints.length > 0) {
@@ -836,16 +1295,29 @@ function CampusCanvas({
     return null
   }, [routePoints])
 
-  // Sync frame mode when viewTarget or route changes
+  // Sync frame mode when viewTarget, route, or selected building changes
   useEffect(() => {
     if (viewTarget === 'route' && routeFrame) {
       setFrameMode('route')
       setRevision((r) => r + 1)
+    } else if (buildingFrame) {
+      setFrameMode('building')
+      setRevision((r) => r + 1)
     }
-  }, [viewTarget, routeFrame])
+  }, [viewTarget, routeFrame, buildingFrame])
 
-  const activeFrame = frameMode === 'route' && routeFrame ? routeFrame : campusFrame
-  const containerClasses = className ?? 'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-200px)] md:min-h-[480px] overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-100 to-slate-200 shadow-sm'
+  const activeFrame =
+    frameMode === 'location' && userLocFrame
+      ? userLocFrame
+      : frameMode === 'route' && routeFrame
+        ? routeFrame
+        : frameMode === 'building' && buildingFrame
+          ? buildingFrame
+          : campusFrame
+
+  const containerClasses =
+    className ??
+    'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-200px)] md:min-h-[480px] overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-slate-100 to-slate-200 shadow-sm'
 
   const handleFitRoute = useCallback(() => {
     if (routeFrame) {
@@ -854,18 +1326,29 @@ function CampusCanvas({
     }
   }, [routeFrame])
 
-  const handleResetCamera = useCallback(() => {
+  const handleFitCampus = useCallback(() => {
     setFrameMode('campus')
-    setPreset('framed')
+    setBuildingFrame(null)
+    setUserLocFrame(null)
+    setPreset('isometric')
     setRevision((r) => r + 1)
-  }, [])
+    onResetView?.()
+  }, [onResetView])
+
+  const handleFocusBuilding = useCallback(() => {
+    if (buildingFrame) {
+      setFrameMode('building')
+      setRevision((r) => r + 1)
+    }
+  }, [buildingFrame])
+
 
   return (
     <div className={containerClasses}>
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: activeFrame.framedPosition, fov: 42, near: 0.2, far: 4000 }}
+        camera={{ position: activeFrame.isometricPosition, fov: 42, near: 0.2, far: 4000 }}
         onCreated={({ gl }) => {
           gl.setClearColor('#0B1220', 1)
           gl.toneMapping = ACESFilmicToneMapping
@@ -874,12 +1357,12 @@ function CampusCanvas({
           gl.shadowMap.type = PCFSoftShadowMap
         }}
       >
-        <fog attach="fog" args={['#0B1220', 160, 500]} />
-        <ambientLight intensity={0.5} color="#1E293B" />
-        <hemisphereLight args={['#38BDF8', '#061018', 0.85]} />
+        <fog attach="fog" args={['#0B1220', 160, 520]} />
+        <ambientLight intensity={0.42} color="#1E293B" />
+        <hemisphereLight args={['#60A5FA', '#061018', 0.75]} />
         <directionalLight
-          position={[50, 90, 45]}
-          intensity={1.85}
+          position={[55, 95, 45]}
+          intensity={1.7}
           color="#FFFDF5"
           castShadow
           shadow-mapSize={[1024, 1024]}
@@ -891,7 +1374,7 @@ function CampusCanvas({
           shadow-camera-bottom={-130}
           shadow-bias={-0.0003}
         />
-        <directionalLight position={[-45, 30, -50]} intensity={0.45} color="#818CF8" />
+        <directionalLight position={[-45, 30, -50]} intensity={0.4} color="#93C5FD" />
 
         {/* Sleek architectural dark ground base */}
         <mesh position={[activeFrame.center.x, -0.08, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
@@ -919,10 +1402,13 @@ function CampusCanvas({
               isSimulating={isSimulating}
               userLocationPoint={userLocationPoint}
               userLocationAccuracyRadius={userLocationAccuracyRadius}
+              labelVisibilityMode={labelMode}
+              categoryFilter={categoryFilter}
               onBuildingSelect={onBuildingSelect}
               onSelectionChange={onSelectionChange}
               onModelReady={onModelReady}
               onFrameReady={setCampusFrame}
+              onBuildingFrameReady={setBuildingFrame}
             />
           </ModelErrorBoundary>
         </Suspense>
@@ -930,29 +1416,48 @@ function CampusCanvas({
           ref={controlsRef}
           makeDefault
           enableDamping
-          dampingFactor={0.06}
+          dampingFactor={0.07}
           enablePan
           enableZoom
           enableRotate
-          rotateSpeed={0.65}
+          rotateSpeed={0.55}
           zoomSpeed={0.9}
-          panSpeed={0.7}
-          maxPolarAngle={Math.PI / 2 - 0.05}
-          minPolarAngle={0.05}
-          minDistance={10}
-          maxDistance={320}
+          panSpeed={0.65}
+          maxPolarAngle={Math.PI / 2 - 0.08}
+          minPolarAngle={0.12}
+          minDistance={8}
+          maxDistance={350}
           touches={{ ONE: 0, TWO: 2 }}
         />
-        <CameraRig frame={activeFrame} preset={preset} controlsRef={controlsRef} revision={revision} />
+        <CameraRig
+          frame={activeFrame}
+          preset={preset}
+          controlsRef={controlsRef}
+          revision={revision}
+          isLocationMode={frameMode === 'location'}
+        />
       </Canvas>
+
       <ControlsLayer
         preset={preset}
-        setPreset={(value) => { setPreset(value); setRevision((n) => n + 1) }}
+        setPreset={(value) => {
+          setPreset(value)
+          setRevision((n) => n + 1)
+        }}
         controlsRef={controlsRef}
         hasRoute={Boolean(routePoints && routePoints.length >= 2)}
+        hasSelectedBuilding={Boolean(selectedBuildingId || buildingFrame)}
+        labelVisibilityMode={labelMode}
+        onLabelVisibilityModeChange={(mode) => {
+          setLabelMode(mode)
+          onLabelVisibilityModeChange?.(mode)
+        }}
         onFitRoute={handleFitRoute}
-        onResetView={handleResetCamera}
+        onFitCampus={handleFitCampus}
+        onFocusBuilding={handleFocusBuilding}
       />
+
+
       {showInstructionBadge && (
         <div className="pointer-events-none absolute bottom-4 left-3 z-20 max-w-[calc(100%-6.5rem)] rounded-xl border border-white/10 bg-[#0B1220]/90 px-3 py-1.5 shadow-lg backdrop-blur-xl md:left-4">
           <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300">
@@ -989,9 +1494,13 @@ export function Campus3D({
   showHud = true,
   showInstructionBadge = true,
   className,
+  labelVisibilityMode = 'major',
+  categoryFilter = 'All',
+  onLabelVisibilityModeChange,
   onBuildingSelect,
   onSelectionChange,
   onModelReady,
+  onResetView,
 }: Campus3DProps) {
   const [error, setError] = useState<Error | null>(null)
 
@@ -1017,9 +1526,13 @@ export function Campus3D({
             showHud={showHud}
             showInstructionBadge={showInstructionBadge}
             className={className}
+            labelVisibilityMode={labelVisibilityMode}
+            categoryFilter={categoryFilter}
+            onLabelVisibilityModeChange={onLabelVisibilityModeChange}
             onBuildingSelect={onBuildingSelect}
             onSelectionChange={onSelectionChange}
             onModelReady={onModelReady}
+            onResetView={onResetView}
             onSceneError={setError}
           />
         </Suspense>
@@ -1027,3 +1540,4 @@ export function Campus3D({
     </ModelErrorBoundary>
   )
 }
+

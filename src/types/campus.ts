@@ -31,6 +31,8 @@ export interface Building {
   name: string
   category: string
   floorInfo: FloorInfo
+  aliases?: string[]
+  knownEntrance?: string
   notes?: string
 }
 

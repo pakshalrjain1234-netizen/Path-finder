@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Info } from 'lucide-react'
+import { BookmarkPlus, Compass, Info, Star } from 'lucide-react'
 import { FloorSelector } from '../components/FloorSelector'
 import { SurfaceCard } from '../components/SurfaceCard'
-import { buildingIndex } from '../data/buildings'
+import { buildings, buildingIndex } from '../data/buildings'
+import { useSavedLocations } from '../hooks/useSavedLocations'
 
 function floorsFromLabel(label: string) {
   const normalized = label.toLowerCase()
@@ -32,6 +33,7 @@ export function BuildingDetailsScreen() {
   const building = buildingId ? buildingIndex[buildingId] : undefined
   const floors = useMemo(() => floorsFromLabel(building?.floorInfo.label ?? 'Unknown'), [building?.floorInfo.label])
   const [selectedFloor, setSelectedFloor] = useState(floors[0])
+  const { isSaved, toggle } = useSavedLocations()
 
   if (!building) {
     return (
@@ -54,7 +56,7 @@ export function BuildingDetailsScreen() {
             <nav className="flex items-center gap-1.5 text-xs text-slate-400">
               <Link to="/explore" className="hover:text-cyan-300 transition-colors">Campus Explorer</Link>
               <span>›</span>
-              <span>Academic Blocks</span>
+              <span>{building.category}</span>
               <span>›</span>
               <span className="font-semibold text-cyan-400">{building.name}</span>
             </nav>
@@ -76,25 +78,32 @@ export function BuildingDetailsScreen() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-100">{building.name}</h1>
               <p className="mt-1 text-sm text-slate-400">{building.category}</p>
+              {building.aliases && building.aliases.length > 0 && (
+                <p className="mt-1 text-xs text-slate-400">
+                  <span className="text-slate-500 font-medium">Known aliases:</span> {building.aliases.join(', ')}
+                </p>
+              )}
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-[#111827]/80 p-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-500">Entrance</div>
-                  <div className="mt-1 font-medium text-slate-200">Entrance pending verification</div>
+                  <div className="mt-1 font-medium text-slate-200 text-xs">
+                    {building.knownEntrance ?? 'Entrance approach via campus walkway'}
+                  </div>
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-500">Vertical Span</div>
-                  <div className="mt-1 font-medium text-slate-200">{building.floorInfo.label}</div>
+                  <div className="mt-1 font-medium text-slate-200 text-xs">{building.floorInfo.label}</div>
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500">Accessibility</div>
-                  <div className="mt-1 font-medium text-slate-200">Accessibility data not verified</div>
+                  <div className="text-xs uppercase tracking-wider text-slate-500">Indoor Navigation</div>
+                  <div className="mt-1 font-medium text-amber-300/90 text-xs">Not mapped yet</div>
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-wider text-slate-500">Connectivity</div>
-                  <div className="mt-1 font-medium text-slate-200">Campus WiFi</div>
+                  <div className="mt-1 font-medium text-slate-200 text-xs">Campus Network</div>
                 </div>
               </div>
             </div>
@@ -105,19 +114,33 @@ export function BuildingDetailsScreen() {
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Link
                 to={`/navigation?to=${building.id}`}
-                className="flex flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-cyan-400 transition-all"
+                className="flex flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-cyan-400 transition-all min-w-[120px]"
               >
-                Navigate Here
+                Directions
               </Link>
               <Link
                 to={`/explore?focus=${building.id}`}
-                className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-cyan-300 hover:bg-white/10 transition-colors"
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 px-4 py-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-900/40 transition-colors"
               >
-                3D Plan
+                <Compass size={16} />
+                <span>3D View</span>
               </Link>
+              <button
+                type="button"
+                onClick={() => toggle(building.id)}
+                className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
+                  isSaved(building.id)
+                    ? 'border-amber-400/50 bg-amber-500/20 text-amber-300'
+                    : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                }`}
+                title={isSaved(building.id) ? 'Remove from saved' : 'Save location'}
+              >
+                {isSaved(building.id) ? <Star size={16} fill="currentColor" /> : <BookmarkPlus size={16} />}
+                <span>{isSaved(building.id) ? 'Saved' : 'Save'}</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -128,7 +151,7 @@ export function BuildingDetailsScreen() {
                     alert('Building link copied to clipboard!')
                   }
                 }}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors"
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors"
               >
                 Share
               </button>
@@ -137,7 +160,7 @@ export function BuildingDetailsScreen() {
             <div className="rounded-2xl border border-white/10 bg-[#111827]/80 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">Floor Directory</div>
-                <div className="text-xs text-slate-500">Floor count provided</div>
+                <div className="text-xs text-slate-500">{building.floorInfo.label}</div>
               </div>
               <FloorSelector floors={floors} selectedFloor={selectedFloor} onSelectFloor={setSelectedFloor} />
             </div>
@@ -170,12 +193,19 @@ export function BuildingDetailsScreen() {
           <div className="rounded-3xl border border-white/10 bg-[#0B1220]/90 p-4 shadow-glass backdrop-blur-xl md:p-5">
             <div className="text-sm font-semibold text-slate-100">Adjacent Blocks</div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {['Civil Block', 'First Year Block', 'Main Block', 'L Shape Block'].map((block) => (
-                <div key={block} className="rounded-2xl border border-white/10 bg-[#111827]/80 p-3 hover:border-cyan-500/30 transition-colors">
-                  <div className="text-sm font-medium text-slate-200">{block}</div>
-                  <div className="text-xs text-cyan-400">Floor count provided</div>
-                </div>
-              ))}
+              {buildings
+                .filter((b) => b.id !== building.id && (b.category === building.category || b.category === 'Academic'))
+                .slice(0, 4)
+                .map((b) => (
+                  <Link
+                    key={b.id}
+                    to={`/building/${b.id}`}
+                    className="rounded-2xl border border-white/10 bg-[#111827]/80 p-3 hover:border-cyan-500/40 hover:bg-[#162033] transition-all block"
+                  >
+                    <div className="text-sm font-medium text-slate-200 truncate">{b.name}</div>
+                    <div className="text-xs text-cyan-400">{b.floorInfo.label}</div>
+                  </Link>
+                ))}
             </div>
           </div>
 

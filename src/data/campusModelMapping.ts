@@ -13,6 +13,7 @@ export type CampusBuildingId =
   | 'jain-mess'
   | 'non-jain-mess'
   | 'canteen'
+  | 'open-air-theatre'
 
 export type FloorKey = 'G' | '1' | '2' | '3' | 'elevated'
 
@@ -156,6 +157,15 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
       G: ['CANTEEN_FLOOR_G', 'CANTEEN_FLOOR_G_MESH', 'CANTEEN_FLOOR_G_MESH_1'],
     },
     interactionObjects: ['CANTEEN_ENTRANCE_ANCHOR', 'CANTEEN_ENTRANCE_PROVISIONAL', 'C_CANTEEN_ENTRY_SIGN'],
+    indoorAvailable: false,
+  },
+  {
+    buildingId: 'open-air-theatre',
+    displayName: 'Open Air Theatre',
+    knownFloorLabel: 'Outdoor Amphitheatre',
+    objectNames: ['OAT_FOOTPRINT', 'C_OAT_STAGE_PROVISIONAL', 'C_OAT_CURVED_SEATING_PROVISIONAL', 'C_OAT_STAGE_STEPS'],
+    floorObjects: {},
+    interactionObjects: ['C_EDGE_WALK_OAT', 'WALK_OAT'],
     indoorAvailable: false,
   },
 ]
