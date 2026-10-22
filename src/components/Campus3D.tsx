@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import type { ThreeEvent } from '@react-three/fiber'
 import {
   AlertCircle,
+  BookOpen,
   Box,
   Building2,
   Compass as CompassIcon,
@@ -22,6 +23,7 @@ import type { Mesh, Object3D } from 'three'
 import { ACESFilmicToneMapping, Box3, Color, Matrix4, PCFSoftShadowMap, PerspectiveCamera, Vector3 } from 'three'
 import { buildings } from '../data/buildings'
 import {
+  CAMPUS_MODEL_CONFIG,
   campusModelMapById,
   resolveCampusBuilding,
   type CampusBuildingId,
@@ -38,7 +40,7 @@ import {
 export { CAMPUS_LANDMARKS, type CampusLandmark, type LabelVisibilityMode }
 import type { Point3 } from '../types/navigation'
 
-const MODEL_PATH = '/models/MNMJEC_Campus_Web.glb'
+const MODEL_PATH = CAMPUS_MODEL_CONFIG.activeModelPath
 // Load within Suspense so readiness reflects the actual scene.
 
 type CameraPreset = 'framed' | 'top-down' | 'isometric'
@@ -500,6 +502,32 @@ function UserLocationMarker({
 
 // Campus landmarks and priority tiers are imported from ../data/campusLandmarks
 
+interface LandmarkVisualConfig {
+  stemHeight: number
+  offsetX: number
+}
+
+const LANDMARK_VISUAL_OFFSETS: Record<string, LandmarkVisualConfig> = {
+  'main-block': { stemHeight: 12, offsetX: 0 },
+  'library': { stemHeight: 32, offsetX: 14 },
+  'first-year-block': { stemHeight: 12, offsetX: 0 },
+  'civil-block': { stemHeight: 16, offsetX: 0 },
+  'l-shape-block': { stemHeight: 14, offsetX: 0 },
+  'it-block': { stemHeight: 12, offsetX: 0 },
+  'mechanical-block': { stemHeight: 14, offsetX: 0 },
+  'mnm-school-of-architecture': { stemHeight: 14, offsetX: -12 },
+  'boys-hostel': { stemHeight: 30, offsetX: 14 },
+  'canteen': { stemHeight: 12, offsetX: -8 },
+  'jain-mess': { stemHeight: 20, offsetX: 12 },
+  'non-jain-mess': { stemHeight: 32, offsetX: -6 },
+  'physics-department': { stemHeight: 14, offsetX: -10 },
+  'english-department': { stemHeight: 14, offsetX: -8 },
+  'maths-department': { stemHeight: 26, offsetX: 12 },
+  'open-air-theatre': { stemHeight: 12, offsetX: 0 },
+  'main-gate-1': { stemHeight: 12, offsetX: 0 },
+  'west-entrance': { stemHeight: 12, offsetX: 0 },
+}
+
 function CampusScene({
   selectedBuildingId,
   selectedFloor,
@@ -602,6 +630,20 @@ function CampusScene({
   const landmarkAnchors = useMemo(() => {
     const anchors: Record<string, Point3> = {}
     CAMPUS_LANDMARKS.forEach((landmark) => {
+      if (landmark.id === 'l-shape-block') {
+        // Continuous medial axis midpoint on physical roof spine: [222.5, roofY, -90.3]
+        // Perfectly positioned on North wing roof, clear of Main Block, Library, and arbitrary corners
+        const bFrame = buildFrameFromBuilding(scene, 'l-shape-block')
+        const roofY = bFrame && bFrame.box && !bFrame.box.isEmpty() ? bFrame.box.max.y : 10.05
+        anchors[landmark.id] = [222.5, roofY, -90.3]
+        return
+      }
+      if (landmark.id === 'library') {
+        const bFrame = buildFrameFromBuilding(scene, 'library')
+        const roofY = bFrame && bFrame.box && !bFrame.box.isEmpty() ? bFrame.box.max.y : 8.3
+        anchors[landmark.id] = [193.5, roofY, -73.1]
+        return
+      }
       const bFrame = buildFrameFromBuilding(scene, landmark.id)
       if (bFrame && bFrame.box && !bFrame.box.isEmpty()) {
         anchors[landmark.id] = [
@@ -749,6 +791,9 @@ function CampusScene({
           if (!isVisible) return null
 
           const anchor = landmarkAnchors[landmark.id] ?? landmark.fallbackPosition
+          const visual = LANDMARK_VISUAL_OFFSETS[landmark.id] ?? { stemHeight: 12, offsetX: 0 }
+          const stemHeightPx = isSelected ? visual.stemHeight + 6 : visual.stemHeight
+          const offsetX = visual.offsetX
 
           return (
             <Html
@@ -761,7 +806,7 @@ function CampusScene({
                 className="relative flex flex-col items-center pointer-events-auto select-none"
                 style={{ transform: 'translate3d(-50%, -100%, 0)' }}
               >
-                {/* Floating Pill Card */}
+                {/* Floating Pill Card with horizontal leader offset */}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -780,6 +825,7 @@ function CampusScene({
                     e.stopPropagation()
                     setHoveredId(null)
                   }}
+                  style={{ transform: offsetX ? `translate3d(${offsetX}px, 0, 0)` : undefined }}
                   aria-label={`Select ${landmark.label}`}
                   className={`group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-xl backdrop-blur-xl transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
                     isSelected
@@ -806,7 +852,13 @@ function CampusScene({
                     {landmark.type === 'entrance' && <Navigation className="h-3.5 w-3.5 rotate-45" />}
                     {landmark.type === 'academic' && <GraduationCap className="h-3.5 w-3.5" />}
                     {landmark.type === 'facility' &&
-                      (landmark.id === 'boys-hostel' ? <Building2 className="h-3.5 w-3.5" /> : <Utensils className="h-3.5 w-3.5" />)}
+                      (landmark.id === 'boys-hostel' ? (
+                        <Building2 className="h-3.5 w-3.5" />
+                      ) : landmark.id === 'library' ? (
+                        <BookOpen className="h-3.5 w-3.5" />
+                      ) : (
+                        <Utensils className="h-3.5 w-3.5" />
+                      ))}
                     {landmark.type === 'department' && <Building2 className="h-3.5 w-3.5" />}
                   </span>
 
@@ -825,23 +877,29 @@ function CampusScene({
                 </button>
 
                 {/* Anchor Stem & Pin Dot connecting floating label to building roof */}
-                <div className="flex flex-col items-center pointer-events-none -mt-px">
+                <div className="relative flex flex-col items-center pointer-events-none -mt-px">
+                  <svg
+                    className="overflow-visible"
+                    width="1"
+                    height={stemHeightPx}
+                    style={{ position: 'relative' }}
+                  >
+                    <line
+                      x1={offsetX}
+                      y1={0}
+                      x2={0}
+                      y2={stemHeightPx}
+                      stroke={isSelected ? '#67e8f9' : isHovered ? '#22d3ee' : 'rgba(255,255,255,0.45)'}
+                      strokeWidth={isSelected ? '2' : '1.5'}
+                    />
+                  </svg>
                   <div
-                    className={`w-[1.5px] transition-all duration-200 ${
-                      isSelected
-                        ? 'h-3.5 bg-cyan-300 shadow-[0_0_8px_#22d3ee]'
-                        : isHovered
-                          ? 'h-3 bg-cyan-400'
-                          : 'h-2.5 bg-white/40'
-                    }`}
-                  />
-                  <div
-                    className={`rounded-full transition-all duration-200 ${
+                    className={`rounded-full transition-all duration-200 -mt-0.5 ${
                       isSelected
                         ? 'h-2 w-2 bg-cyan-300 ring-2 ring-cyan-400/60 shadow-[0_0_8px_#22d3ee]'
                         : isHovered
                           ? 'h-1.5 w-1.5 bg-cyan-300'
-                          : 'h-1.5 w-1.5 bg-white/60'
+                          : 'h-1.5 w-1.5 bg-white/70'
                     }`}
                   />
                 </div>

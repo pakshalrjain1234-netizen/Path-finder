@@ -136,8 +136,8 @@ describe('Phase 5C: 3D Campus Explorer & Building Discovery', () => {
       assert.equal(resolveCampusBuilding('UNKNOWN_OBJECT_XYZ'), null)
     })
 
-    it('contains all 15 authored campus entries in campusModelMapping', () => {
-      assert.equal(campusModelMapping.length, 15)
+    it('contains all 16 authored campus entries in campusModelMapping', () => {
+      assert.equal(campusModelMapping.length, 16)
       const mappedIds = new Set(campusModelMapping.map((e) => e.buildingId))
       assert.ok(mappedIds.has('main-block'))
       assert.ok(mappedIds.has('first-year-block'))
@@ -145,6 +145,7 @@ describe('Phase 5C: 3D Campus Explorer & Building Discovery', () => {
       assert.ok(mappedIds.has('it-block'))
       assert.ok(mappedIds.has('canteen'))
       assert.ok(mappedIds.has('open-air-theatre'))
+      assert.ok(mappedIds.has('library'))
     })
   })
 

@@ -1,4 +1,5 @@
 import {
+  AlertCircle,
   BookmarkPlus,
   ChevronDown,
   ChevronUp,
@@ -33,6 +34,7 @@ export function CampusExplorerScreen() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All')
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false)
   const [isCardCollapsed, setIsCardCollapsed] = useState<boolean>(false)
+  const [isLibraryNoticeOpen, setIsLibraryNoticeOpen] = useState<boolean>(false)
 
   const { isSaved, toggle: toggleSaved } = useSavedLocations()
 
@@ -407,15 +409,40 @@ export function CampusExplorerScreen() {
                     </div>
                   )}
 
+                  {/* Provisional status note for Dr. C. L. Mehta Central Library */}
+                  {selectedBuilding.id === 'library' && (
+                    <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11px] text-amber-200">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                        <AlertCircle size={14} className="shrink-0" />
+                        <span>Provisional 3D Placement</span>
+                      </div>
+                      <p className="mt-1 text-slate-300 leading-snug">
+                        Stage E3 position is provisional. Physical surveyor verification of entrance coordinates, floor layout, and walkway route is pending.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3">
-                    <Link
-                      to={`/navigation?to=${selectedBuilding.id}`}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition"
-                    >
-                      <Route size={14} className="text-white" />
-                      <span>Get Directions</span>
-                    </Link>
+                    {selectedBuilding.id === 'library' ? (
+                      <button
+                        type="button"
+                        id="btn-library-directions"
+                        onClick={() => setIsLibraryNoticeOpen(true)}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 py-2.5 text-xs font-bold text-amber-200 cursor-pointer transition"
+                      >
+                        <Route size={14} className="text-amber-300" />
+                        <span>Directions (Pending)</span>
+                      </button>
+                    ) : (
+                      <Link
+                        to={`/navigation?to=${selectedBuilding.id}`}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition"
+                      >
+                        <Route size={14} className="text-white" />
+                        <span>Get Directions</span>
+                      </Link>
+                    )}
                     <Link
                       to={`/building/${selectedBuilding.id}`}
                       className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition"
@@ -430,16 +457,64 @@ export function CampusExplorerScreen() {
               {/* Quick Compact Action when collapsed */}
               {isCardCollapsed && (
                 <div className="mt-2.5 flex items-center justify-between border-t border-white/10 pt-2">
-                  <span className="text-[11px] text-slate-400">Tap expand for floor levels</span>
-                  <Link
-                    to={`/navigation?to=${selectedBuilding.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-500"
-                  >
-                    <Route size={12} />
-                    <span>Directions</span>
-                  </Link>
+                  <span className="text-[11px] text-slate-400">
+                    {selectedBuilding.id === 'library' ? 'Provisional placement' : 'Tap expand for floor levels'}
+                  </span>
+                  {selectedBuilding.id === 'library' ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsLibraryNoticeOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600/30 border border-amber-500/40 px-3 py-1 text-[11px] font-bold text-amber-200"
+                    >
+                      <Route size={12} />
+                      <span>Directions</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/navigation?to=${selectedBuilding.id}`}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-500"
+                    >
+                      <Route size={12} />
+                      <span>Directions</span>
+                    </Link>
+                  )}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal explaining Library route is pending physical verification */}
+        {isLibraryNoticeOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+            <div className="w-full max-w-sm rounded-3xl border border-amber-500/40 bg-[#0B1220]/95 p-5 shadow-2xl text-white">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <AlertCircle size={18} />
+                <span>Library Route Pending Verification</span>
+              </div>
+              <p className="mt-2.5 text-xs text-slate-300 leading-relaxed">
+                The 3D model for <span className="font-semibold text-white">Dr. C. L. Mehta Central Library</span> is provisionally integrated in Stage E3.
+                Precise entrance coordinates and walkway connections are pending on-site surveyor confirmation.
+              </p>
+              <p className="mt-2 text-[11px] text-slate-400">
+                You can navigate to adjacent verified buildings such as Main Block or First Year Block.
+              </p>
+              <div className="mt-5 flex gap-2">
+                <Link
+                  to="/navigation?to=main-block"
+                  onClick={() => setIsLibraryNoticeOpen(false)}
+                  className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-center text-xs font-bold text-white transition shadow-lg shadow-blue-500/30"
+                >
+                  Route to Main Block
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsLibraryNoticeOpen(false)}
+                  className="rounded-xl border border-white/10 px-3.5 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

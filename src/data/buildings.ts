@@ -115,12 +115,12 @@ export const buildings: Building[] = [
   },
   {
     id: 'library',
-    name: 'Library',
+    name: 'Dr. C. L. Mehta Central Library',
     category: 'Facility',
-    floorInfo: { status: 'known', label: 'Ground Floor Building (3D Position Pending Verification)' },
-    aliases: ['Central Library', 'Library Building', 'Reading Hall', 'Book Bank'],
+    floorInfo: { status: 'known', label: 'Single ground-floor hall (Provisional)' },
+    aliases: ['Central Library', 'Library', 'Dr. C. L. Mehta Library', 'Reading Hall', 'Book Bank'],
     knownEntrance: 'Entrance pending physical verification',
-    notes: 'Separate ground-floor campus building according to campus layout. Exact 3D mesh mapping and entrance location pending physical surveyor verification.',
+    notes: 'Provisional Stage E3 3D placement. Separate ground-floor building located north of Main Block. Physical surveyor verification of exact entrance coordinate, floor plan, and navigation routing is pending.',
   },
   {
     id: 'open-air-theatre',

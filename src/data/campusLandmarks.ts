@@ -18,10 +18,11 @@ export const CAMPUS_LANDMARKS: CampusLandmark[] = [
   { id: 'mechanical-block', label: 'Mechanical Block', fallbackPosition: [56.9, 4.0, -75.6], type: 'academic', priorityTier: 1 },
   { id: 'mnm-school-of-architecture', label: 'School of Architecture', fallbackPosition: [18.3, 4.0, -123.1], type: 'academic', priorityTier: 1 },
 
-  // Tier 2: Key Campus Facilities & West Gate (Visible in Medium & Close zoom, or when selected)
+  // Tier 2: Key Campus Facilities, Central Library & West Gate (Visible in Medium & Close zoom, or when selected)
+  { id: 'library', label: 'Central Library', fallbackPosition: [193.5, 8.8, -73.1], type: 'facility', priorityTier: 2 },
   { id: 'canteen', label: 'Canteen', fallbackPosition: [37.3, 4.5, -9.1], type: 'facility', priorityTier: 2 },
   { id: 'boys-hostel', label: 'Boys Hostel', fallbackPosition: [29.7, 4.0, -191.0], type: 'facility', priorityTier: 2 },
-  { id: 'l-shape-block', label: 'L Shape Block', fallbackPosition: [200.4, 11.0, -67.1], type: 'academic', priorityTier: 2 },
+  { id: 'l-shape-block', label: 'L Shape Block', fallbackPosition: [222.5, 10.1, -90.3], type: 'academic', priorityTier: 2 },
   { id: 'open-air-theatre', label: 'Open Air Theatre', fallbackPosition: [227.5, 2.5, -60.9], type: 'facility', priorityTier: 2 },
   { id: 'west-entrance', label: 'Gate 2 (West Entrance)', fallbackPosition: [54.2, 3.7, -99.5], type: 'entrance', priorityTier: 2 },
 

@@ -112,6 +112,14 @@ export function NavigationScreen() {
 
   // Calculate route plan automatically
   const routeCalculation = useMemo(() => {
+    if (toId === 'library' || fromId === 'library') {
+      return {
+        status: 'unverified' as const,
+        route: null,
+        message: 'Precise entrance and route to Dr. C. L. Mehta Central Library are pending physical surveyor verification. Please select Main Block or First Year Block.',
+      }
+    }
+
     if (!originNodeId) {
       const fromOpt = locationOptions.find((l) => l.id === fromId)
       return {

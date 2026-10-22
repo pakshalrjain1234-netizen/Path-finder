@@ -11,8 +11,8 @@ import { buildings } from '../../data/buildings.ts'
 
 describe('Phase 5C: 3D Campus Building Labels & Positioning', () => {
   describe('Campus Landmarks Integrity & Tiers', () => {
-    it('contains all 17 authentic campus landmarks with valid priority tiers', () => {
-      assert.equal(CAMPUS_LANDMARKS.length, 17)
+    it('contains all 18 authentic campus landmarks with valid priority tiers', () => {
+      assert.equal(CAMPUS_LANDMARKS.length, 18)
       for (const lm of CAMPUS_LANDMARKS) {
         assert.ok(lm.id.length > 0, 'Landmark must have a non-empty id')
         assert.ok(lm.label.length > 0, 'Landmark must have a non-empty label')
@@ -48,7 +48,7 @@ describe('Phase 5C: 3D Campus Building Labels & Positioning', () => {
       const tier2Ids = CAMPUS_LANDMARKS.filter((lm) => lm.priorityTier === 2).map((lm) => lm.id)
       assert.deepEqual(
         tier2Ids.sort(),
-        ['boys-hostel', 'canteen', 'l-shape-block', 'open-air-theatre', 'west-entrance'].sort()
+        ['boys-hostel', 'canteen', 'l-shape-block', 'library', 'open-air-theatre', 'west-entrance'].sort()
       )
     })
 
@@ -104,11 +104,13 @@ describe('Phase 5C: 3D Campus Building Labels & Positioning', () => {
         assert.ok(isDiscoverable, `Landmark ${reqId} must be discoverable in buildings or landmarks`)
       }
 
-      // Special non-fabrication check: Library is a separate ground-floor building according to the campus layout.
-      // Its exact 3D model anchor and entrance are pending verification against real campus footage,
-      // so it is discoverable in registry without an invented 3D marker
+      // Phase 5D integration check: Library is registered in 3D landmarks against Stage E3 GLB geometry
+      // with provisional placement status preserved
       assert.ok(buildingIds.has('library'), 'Library must be searchable in buildings registry')
-      assert.ok(!landmarkIds.has('library'), 'Library must not have a fabricated 3D landmark anchor')
+      assert.ok(landmarkIds.has('library'), 'Library must have a Stage E3 3D landmark anchor')
+      const libLm = CAMPUS_LANDMARKS.find((lm) => lm.id === 'library')!
+      assert.equal(libLm.type, 'facility')
+      assert.equal(libLm.priorityTier, 2)
     })
   })
 
@@ -429,8 +431,8 @@ describe('Phase 5C: 3D Campus Building Labels & Positioning', () => {
 
       const lib = buildings.find((b) => b.id === 'library')
       assert.ok(lib, 'Library must be in buildings registry')
-      assert.ok(lib.floorInfo.label.includes('Pending Verification'), 'Library 3D position must be pending verification')
-      assert.ok(!landmarkIds.has('library'), 'Library must not have fabricated 3D landmark anchor')
+      assert.ok(lib.floorInfo.label.includes('Provisional'), 'Library floorInfo must indicate Provisional status')
+      assert.ok(landmarkIds.has('library'), 'Library must have Stage E3 3D landmark anchor')
     })
   })
 })

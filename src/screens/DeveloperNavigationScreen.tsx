@@ -88,6 +88,13 @@ function DeveloperNavigationScreenInner() {
 
   // Route calculation
   const routeCalculation = useMemo(() => {
+    if (toId === 'library' || fromId === 'library') {
+      return {
+        route: null,
+        status: 'unavailable',
+        message: 'Precise entrance and route to Dr. C. L. Mehta Central Library are pending physical surveyor verification. Please select Main Block or First Year Block.',
+      }
+    }
     if (!originNodeId || !destinationNodeId || originNodeId === destinationNodeId) {
       return { route: null, status: 'unavailable', message: 'Select distinct start and destination nodes.' }
     }
@@ -97,7 +104,7 @@ function DeveloperNavigationScreenInner() {
       status: result.status,
       message: result.status === 'ok' ? null : result.message,
     }
-  }, [originNodeId, destinationNodeId])
+  }, [fromId, toId, originNodeId, destinationNodeId])
 
   const route: RoutePlan | null = routeCalculation.route
 

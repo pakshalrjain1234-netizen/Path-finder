@@ -13,6 +13,7 @@ export type CampusBuildingId =
   | 'jain-mess'
   | 'non-jain-mess'
   | 'canteen'
+  | 'library'
 
 export type KnownFloor = {
   status: 'known'
