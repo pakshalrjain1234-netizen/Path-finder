@@ -348,8 +348,8 @@ function DeveloperNavigationScreenInner() {
                     setIsPlaying(false)
                   }}
                   className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'scenarios'
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
                     }`}
                 >
                   GPS Scenarios (Phase 4B/4C)
@@ -361,8 +361,8 @@ function DeveloperNavigationScreenInner() {
                     stopLiveNav()
                   }}
                   className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'virtual_walk'
-                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
                     }`}
                 >
                   Virtual Walk (Phase 3.5)
@@ -539,8 +539,8 @@ function DeveloperNavigationScreenInner() {
                             type="button"
                             onClick={() => setSimSpeed(speed)}
                             className={`rounded-md px-1.5 py-0.5 font-semibold transition ${simSpeed === speed
-                                ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40'
-                                : 'text-slate-400 hover:text-slate-200'
+                              ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40'
+                              : 'text-slate-400 hover:text-slate-200'
                               }`}
                           >
                             {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}

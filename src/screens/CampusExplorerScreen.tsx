@@ -3,24 +3,35 @@ import {
   BookmarkPlus,
   ChevronDown,
   ChevronUp,
+  Crosshair,
+  HeartPulse,
   Info,
   MapPin,
+  MessageSquare,
+  Printer,
   Route,
   Search,
-  Sliders,
+  Sparkles,
   Star,
   X,
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Campus3D } from '../components/Campus3D'
 import { CampusCalibrationModal } from '../components/CampusCalibrationModal'
+import { CampusTourOverlay } from '../components/CampusTourOverlay'
 import { GpsLocationButton } from '../components/GpsLocationButton'
 import { GpsStatusBanner } from '../components/GpsStatusBanner'
+import { VisitorFeedbackModal } from '../components/VisitorFeedbackModal'
+import { useAuth } from '../context/AuthContext'
 import { buildings } from '../data/buildings'
 import { campusModelMapById } from '../data/campusModelMapping'
+import { CAMPUS_SERVICE_POIS, findCampusPoi, searchCampusPois } from '../data/campusPois'
+import { useCampusTour } from '../hooks/useCampusTour'
 import { useGpsLocation } from '../hooks/useGpsLocation'
 import { useSavedLocations } from '../hooks/useSavedLocations'
+import { issueService } from '../services/issueService'
+import type { CampusIssueReport } from '../types/issues'
 
 const CATEGORIES = ['All', 'Academic', 'Department', 'Facility'] as const
 type CategoryFilter = (typeof CATEGORIES)[number]
@@ -35,19 +46,52 @@ export function CampusExplorerScreen() {
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false)
   const [isCardCollapsed, setIsCardCollapsed] = useState<boolean>(false)
   const [isLibraryNoticeOpen, setIsLibraryNoticeOpen] = useState<boolean>(false)
+  const [isPoiNoticeOpen, setIsPoiNoticeOpen] = useState<boolean>(false)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false)
+  const [isCameraFollowing, setIsCameraFollowing] = useState<boolean>(false)
+  const [locationViewRevision, setLocationViewRevision] = useState<number>(0)
 
+  const { role, user } = useAuth()
+  const [issueReports, setIssueReports] = useState<CampusIssueReport[]>([])
+
+  useEffect(() => {
+    // Only load issue records if authorized role (never visitor)
+    if (role === 'visitor') {
+      setIssueReports([])
+      return
+    }
+    setIssueReports(issueService.getIssuesForRole(role, user?.id))
+    const unsubscribe = issueService.onChange(() => {
+      setIssueReports(issueService.getIssuesForRole(role, user?.id))
+    })
+    return () => unsubscribe()
+  }, [role, user?.id])
+
+  const handleTourBuildingSelect = useCallback((buildingId: string | null) => {
+    setSelectedBuildingId(buildingId ?? '')
+  }, [])
+  const tour = useCampusTour(handleTourBuildingSelect)
   const { isSaved, toggle: toggleSaved } = useSavedLocations()
+
+  const { startTour } = tour
+  // Auto-launch tour if requested via URL query param (e.g. /explore?tour=true)
+  useEffect(() => {
+    if (searchParams.get('tour') === 'true') {
+      const mode = searchParams.get('mode') === 'highlights' ? 'highlights' : 'full'
+      startTour(mode)
+    }
+  }, [searchParams, startTour])
 
   // React to URL search params (e.g., /explore?focus=it-block or /explore?building=main-block)
   useEffect(() => {
     const focusId = searchParams.get('focus') || searchParams.get('building')
-    if (focusId && buildings.some((b) => b.id === focusId)) {
+    if (focusId && (buildings.some((b) => b.id === focusId) || CAMPUS_SERVICE_POIS.some((p) => p.id === focusId))) {
       setSelectedBuildingId(focusId)
       setIsCardCollapsed(false)
     }
   }, [searchParams])
 
-  // GPS & Calibration state
+  // GPS state
   const {
     isTracking,
     serviceStatus,
@@ -65,6 +109,11 @@ export function CampusExplorerScreen() {
 
   const selectedBuilding = useMemo(
     () => buildings.find((building) => building.id === selectedBuildingId) ?? null,
+    [selectedBuildingId],
+  )
+
+  const selectedPoi = useMemo(
+    () => (selectedBuildingId ? findCampusPoi(selectedBuildingId) : null),
     [selectedBuildingId],
   )
 
@@ -112,141 +161,142 @@ export function CampusExplorerScreen() {
     })
   }, [searchQuery, selectedCategory])
 
+  // Filtered POIs for search query matching
+  const filteredPois = useMemo(() => {
+    if (!searchQuery.trim()) return []
+    return searchCampusPois(searchQuery)
+  }, [searchQuery])
+
   return (
-    <div className="relative h-[calc(100vh-64px)] md:h-screen w-full overflow-hidden bg-[#061018] flex flex-col">
-      {/* Map-First 3D Canvas (occupies full screen space) */}
-      <div className="relative flex-1 w-full h-full min-h-0 bg-[#0B1220]">
+    <div className="relative h-[calc(100vh-3.5rem)] md:h-screen w-full overflow-hidden bg-[#101827]">
+      {/* 3D Campus Scene: Centerpiece taking 100% of viewport */}
+      <div className="absolute inset-0 z-0">
         <Campus3D
+          key={`explorer-3d-${locationViewRevision}`}
           className="h-full w-full"
-          selectedBuildingId={selectedBuildingId}
-          selectedFloor={selectedFloor}
           showHud={false}
-          categoryFilter={selectedCategory}
+          showInstructionBadge={false}
+          selectedFloor={selectedFloor}
+          selectedBuildingId={selectedBuildingId}
           userLocationPoint={classification.modelPoint}
-          userLocationAccuracyRadius={classification.accuracyRadiusModel}
-          onBuildingSelect={(token) => {
-            setSelectedBuildingId(token)
-            setIsSearchFocused(false)
+          userLocationAccuracyRadius={classification.accuracyRadiusModel ?? undefined}
+          userLocationIsSimulated={classification.isSimulated}
+          userLocationLabel={classification.isSimulated ? 'Simulated Location (Test Mode)' : 'Your Location'}
+          viewTarget={isCameraFollowing && classification.modelPoint ? 'location' : 'campus'}
+          onBuildingSelect={(id) => {
+            setSelectedBuildingId(id ?? '')
             setIsCardCollapsed(false)
+            setIsCameraFollowing(false)
           }}
-          onSelectionChange={(buildingId) => {
-            setSelectedBuildingId(buildingId ?? '')
-          }}
-          onResetView={() => {
-            setSelectedBuildingId('')
+          isTourActive={tour.isTourActive}
+          activeTourStop={tour.currentStop}
+          onTourCameraArrived={tour.handleCameraArrived}
+          issueReports={issueReports}
+          onIssueSelect={(report) => {
+            if (report.buildingId) {
+              setSelectedBuildingId(report.buildingId)
+              setIsCardCollapsed(false)
+              setIsCameraFollowing(false)
+            }
           }}
         />
+      </div>
 
-        {/* Floating Top Header: Search & Category Filter Pills */}
-        <div className="pointer-events-none absolute inset-x-3 top-3 z-30 flex flex-col gap-2 md:left-4 md:right-auto md:top-4 md:w-[410px]">
-          {/* Search Box & Mobile Header Container */}
-          <div className="pointer-events-auto relative rounded-2xl border border-white/10 bg-[#0B1220]/90 p-2 shadow-2xl backdrop-blur-xl">
-            {/* Top row: search field + mobile GPS tools */}
-            <div className="flex items-center gap-2">
-              <div className="flex flex-1 items-center gap-2 rounded-xl bg-white/5 px-2.5 py-1.5 border border-white/5 focus-within:border-cyan-400/40 transition">
-                <Search size={15} className="text-slate-400 shrink-0" />
+      {/* Cinematic Campus Tour Overlay (Controlled by Phase 7F.2 state machine) */}
+      <CampusTourOverlay tour={tour} />
+
+      {/* Floating UI Layer for Campus Exploration */}
+      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+        {/* Floating Top Search Bar & Category Filters */}
+        {!tour.isTourActive && (
+          <div className="pointer-events-none absolute inset-x-3 top-3 z-30 flex justify-center md:inset-x-auto md:left-4 md:top-4 md:w-96">
+            <div className="pointer-events-auto w-full">
+              {/* Floating Search Input */}
+              <div className="relative flex items-center rounded-2xl border border-[#293A50] bg-[#192638]/95 px-3.5 py-2.5 shadow-xl backdrop-blur-xl">
+                <Search size={18} className="text-[#60A5FA] shrink-0 mr-2.5" />
                 <input
-                  id="campus-search-input"
-                  data-testid="input-campus-search"
                   type="text"
+                  id="campus-search-input"
+                  data-testid="campus-search-input"
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setIsSearchFocused(true)
-                  }}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Search campus buildings, departments..."
-                  className="w-full bg-transparent text-xs font-semibold text-white placeholder:text-slate-400 outline-none"
+                  placeholder="Search buildings, labs, departments..."
+                  className="w-full bg-transparent text-xs sm:text-sm font-semibold text-white placeholder-[#94A3B8] focus:outline-none"
                 />
-                {searchQuery && (
+                {searchQuery ? (
                   <button
                     type="button"
                     onClick={() => {
                       setSearchQuery('')
                       setIsSearchFocused(false)
                     }}
-                    className="rounded-full p-0.5 text-slate-400 hover:text-white cursor-pointer"
+                    className="text-[#94A3B8] hover:text-white transition p-1 cursor-pointer"
                     aria-label="Clear search"
                   >
-                    <X size={14} />
+                    <X size={15} />
                   </button>
+                ) : (
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#94A3B8] hidden sm:inline px-1.5 py-0.5 rounded bg-[#162235]">
+                    ESC
+                  </span>
                 )}
               </div>
 
-              {/* Mobile-only compact GPS & Calibration trigger */}
-              <div className="flex md:hidden items-center gap-1 shrink-0">
-                <GpsLocationButton
-                  isTracking={isTracking}
-                  serviceStatus={serviceStatus}
-                  positionStatus={classification.status}
-                  isTestMode={isTestMode}
-                  onStart={startLocation}
-                  onStop={stopLocation}
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsCalibrationOpen(true)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer"
-                  title="Campus Calibration"
-                  aria-label="Campus Calibration"
-                >
-                  <Sliders size={14} className="text-cyan-400" />
-                </button>
-              </div>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="mt-2 flex items-center gap-1.5 border-t border-white/10 pt-2 overflow-x-auto no-scrollbar">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  id={`btn-category-${cat.toLowerCase()}`}
-                  data-testid={`filter-category-${cat.toLowerCase()}`}
-                  onClick={() => {
-                    setSelectedCategory(cat)
-                  }}
-                  className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all whitespace-nowrap cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 border border-blue-400/40'
-                      : 'bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white'
-                  }`}
-                >
-                  <span>{cat}</span>
-                  <span
-                    className={`rounded-full px-1.5 py-0.2 text-[9px] font-black ${
-                      selectedCategory === cat ? 'bg-white/20 text-white' : 'bg-black/30 text-slate-400'
+              {/* Category Pills Bar */}
+              <div className="mt-2 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    id={`filter-category-${cat.toLowerCase()}`}
+                    data-testid={`filter-category-${cat.toLowerCase()}`}
+                    onClick={() => {
+                      setSelectedCategory(cat)
+                      setIsSearchFocused(true)
+                    }}
+                    className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all shrink-0 cursor-pointer shadow-sm ${
+                      selectedCategory === cat
+                        ? 'bg-[#2563EB] text-white shadow-blue-500/20'
+                        : 'bg-[#162235] text-[#94A3B8] border border-[#293A50] hover:bg-[#192638] hover:text-white'
                     }`}
                   >
-                    {categoryCounts[cat]}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Search Autocomplete / Discoverable Locations Results Dropdown */}
-            {(isSearchFocused || searchQuery.trim().length > 0) && (
-              <div
-                id="search-results-dropdown"
-                data-testid="search-results-dropdown"
-                className="absolute inset-x-0 top-full mt-2 max-h-72 overflow-y-auto rounded-2xl border border-white/15 bg-[#0B1220]/95 p-1.5 shadow-2xl backdrop-blur-2xl z-50"
-              >
-                <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/5 mb-1">
-                  <span>
-                    {selectedCategory === 'All' ? 'All Mapped Locations' : `${selectedCategory} Locations`} (
-                    {filteredBuildings.length})
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchFocused(false)}
-                    className="text-slate-400 hover:text-white cursor-pointer"
-                    aria-label="Close location list"
-                  >
-                    <X size={12} />
+                    <span>{cat}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[9px] font-black ${
+                        selectedCategory === cat ? 'bg-white/25 text-white' : 'bg-[#24364D] text-[#94A3B8]'
+                      }`}
+                    >
+                      {categoryCounts[cat]}
+                    </span>
                   </button>
-                </div>
-                {filteredBuildings.length > 0 ? (
-                  filteredBuildings.map((b) => (
+                ))}
+              </div>
+
+              {/* Search Autocomplete / Discoverable Locations Results Dropdown */}
+              {(isSearchFocused || searchQuery.trim().length > 0) && (
+                <div
+                  id="search-results-dropdown"
+                  data-testid="search-results-dropdown"
+                  className="absolute inset-x-0 top-full mt-2 max-h-72 overflow-y-auto rounded-2xl border border-[#293A50] bg-[#192638] p-1.5 shadow-2xl z-50"
+                >
+                  <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] border-b border-[#293A50] mb-1">
+                    <span>
+                      {selectedCategory === 'All' ? 'All Mapped Locations' : `${selectedCategory} Locations`} (
+                      {filteredBuildings.length + filteredPois.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsSearchFocused(false)}
+                      className="text-[#94A3B8] hover:text-white cursor-pointer"
+                      aria-label="Close location list"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+
+                  {/* Registered Primary Campus Buildings */}
+                  {filteredBuildings.map((b) => (
                     <button
                       key={b.id}
                       type="button"
@@ -258,55 +308,128 @@ export function CampusExplorerScreen() {
                         setSearchQuery('')
                         setIsCardCollapsed(false)
                       }}
-                      className="flex w-full items-center justify-between rounded-xl p-2 text-left hover:bg-blue-950/60 transition cursor-pointer"
+                      className="flex w-full items-center justify-between rounded-xl p-2 text-left hover:bg-[#24364D] transition cursor-pointer"
                     >
                       <div className="min-w-0 pr-2">
-                        <div className="text-xs font-bold text-white truncate">{b.name}</div>
-                        <div className="text-[10px] text-slate-400 font-medium truncate">
+                        <div className="text-xs font-bold text-[#F1F5F9] truncate">{b.name}</div>
+                        <div className="text-[10px] text-[#94A3B8] font-medium truncate">
                           {b.aliases && b.aliases.length > 0 ? b.aliases.slice(0, 2).join(', ') : b.floorInfo.label}
                         </div>
                       </div>
-                      <span className="rounded-md bg-[#162033] px-1.5 py-0.5 text-[9px] font-bold text-cyan-300 uppercase border border-cyan-500/20 shrink-0">
+                      <span className="rounded-md bg-[#162235] px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] uppercase border border-[#293A50] shrink-0">
                         {b.category}
                       </span>
                     </button>
-                  ))
-                ) : (
-                  <div className="p-3 text-center text-xs text-slate-400 font-medium">
-                    No {selectedCategory !== 'All' ? selectedCategory.toLowerCase() : ''} locations found matching &quot;{searchQuery}&quot;
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+                  ))}
 
-        {/* Floating Top-Right Tools on Desktop: GPS Location & Calibration */}
-        <div className="pointer-events-none absolute hidden md:flex right-4 top-4 z-30 items-center gap-2">
-          <div className="pointer-events-auto flex items-center gap-1.5 rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1.5 shadow-2xl backdrop-blur-xl">
-            <GpsLocationButton
-              isTracking={isTracking}
-              serviceStatus={serviceStatus}
-              positionStatus={classification.status}
-              isTestMode={isTestMode}
-              onStart={startLocation}
-              onStop={stopLocation}
-            />
-            <button
-              id="campus-calibration-button"
-              type="button"
-              onClick={() => setIsCalibrationOpen(true)}
-              className="flex h-9 items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2.5 text-xs font-semibold text-slate-300 hover:border-cyan-400/50 hover:text-white hover:bg-white/10 transition cursor-pointer"
-              title="Open Campus Calibration & GPS Test Utility"
-            >
-              <Sliders size={14} className="text-cyan-400" />
-              <span className="hidden sm:inline text-[11px] font-bold">Calibration</span>
-            </button>
+                  {/* Provisional Campus Service POIs (Apollo Shine & Xerox Shop) */}
+                  {filteredPois.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      id={`location-result-${p.id}`}
+                      data-testid={`location-result-${p.id}`}
+                      onClick={() => {
+                        setSelectedBuildingId(p.id)
+                        setIsSearchFocused(false)
+                        setSearchQuery('')
+                        setIsCardCollapsed(false)
+                      }}
+                      className="flex w-full items-center justify-between rounded-xl p-2 text-left hover:bg-[#24364D] border border-amber-500/30 bg-amber-950/20 my-0.5 transition cursor-pointer"
+                    >
+                      <div className="min-w-0 pr-2">
+                        <div className="text-xs font-bold text-amber-300 truncate flex items-center gap-1.5">
+                          {p.id === 'apollo-shine' ? <HeartPulse size={12} className="text-rose-400 shrink-0" /> : <Printer size={12} className="text-[#60A5FA] shrink-0" />}
+                          <span>{p.name}</span>
+                        </div>
+                        <div className="text-[10px] text-[#94A3B8] font-medium truncate">
+                          Frontage • {p.aliases.slice(0, 2).join(', ')}
+                        </div>
+                      </div>
+                      <span className="rounded-md bg-amber-900/40 px-1.5 py-0.5 text-[9px] font-bold text-amber-300 uppercase border border-amber-600/40 shrink-0">
+                        Provisional
+                      </span>
+                    </button>
+                  ))}
+
+                  {filteredBuildings.length === 0 && filteredPois.length === 0 && (
+                    <div className="p-3 text-center text-xs text-[#94A3B8] font-medium">
+                      No {selectedCategory !== 'All' ? selectedCategory.toLowerCase() : ''} locations found matching &quot;{searchQuery}&quot;
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Floating Top-Right Tools on Desktop: Take Campus Tour + GPS Location & Feedback */}
+        {!tour.isTourActive && (
+          <div className="pointer-events-none absolute hidden md:flex right-4 top-4 z-30 items-center gap-2">
+            {/* Take Campus Tour CTA */}
+            <button
+              type="button"
+              id="btn-take-campus-tour"
+              data-testid="btn-take-campus-tour"
+              onClick={() => tour.startTour('full')}
+              className="pointer-events-auto flex h-10 items-center gap-2 rounded-xl bg-[#2563EB] hover:bg-blue-700 px-4 text-xs font-extrabold text-white shadow-md shadow-blue-600/20 hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer"
+              title="Take interactive 3D virtual tour of MNMJEC"
+            >
+              <Sparkles size={15} className="text-white" />
+              <span>Take Campus Tour</span>
+            </button>
+
+            <div className="pointer-events-auto flex items-center gap-1.5 rounded-xl border border-[#293A50] bg-[#162235]/95 p-1 shadow-card backdrop-blur-xl">
+              <GpsLocationButton
+                isTracking={isTracking}
+                serviceStatus={serviceStatus}
+                positionStatus={classification.status}
+                isTestMode={isTestMode}
+                onStart={startLocation}
+                onStop={stopLocation}
+              />
+
+              {/* Recenter & Follow Controls when transformed 3D location exists */}
+              {classification.modelPoint && (
+                <button
+                  id="btn-recenter-my-location"
+                  data-testid="btn-recenter-my-location"
+                  type="button"
+                  onClick={() => {
+                    setIsCameraFollowing(true)
+                    setLocationViewRevision((r) => r + 1)
+                  }}
+                  className={`flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-bold transition cursor-pointer border ${
+                    isCameraFollowing
+                      ? 'border-[#34D399] bg-[#34D399]/20 text-[#34D399]'
+                      : 'border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D]'
+                  }`}
+                  title={isCameraFollowing ? 'Following location' : 'Recenter camera on your location'}
+                >
+                  <Crosshair size={13} className={isCameraFollowing ? 'text-[#34D399]' : 'text-[#60A5FA]'} />
+                  <span className="hidden lg:inline text-[11px]">
+                    {isCameraFollowing ? 'Following' : 'Recenter'}
+                  </span>
+                </button>
+              )}
+
+              <button
+                id="btn-give-visitor-feedback"
+                data-testid="btn-give-visitor-feedback"
+                type="button"
+                onClick={() => setIsFeedbackModalOpen(true)}
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-[#293A50] bg-[#192638] hover:bg-[#24364D] px-2.5 text-xs font-semibold text-[#94A3B8] hover:text-white transition cursor-pointer"
+                title="Give Website & Navigation Feedback"
+              >
+                <MessageSquare size={13} className="text-[#60A5FA]" />
+                <span className="hidden sm:inline text-[11px] font-bold">Feedback</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* GPS Live Status Banner (top-center float) */}
-        {classification.status !== 'idle' && (
+        {!tour.isTourActive && classification.status !== 'idle' && (
           <div className="pointer-events-none absolute inset-x-4 top-20 z-30 flex justify-center md:top-4">
             <div className="pointer-events-auto max-w-lg w-full">
               <GpsStatusBanner
@@ -320,18 +443,17 @@ export function CampusExplorerScreen() {
         )}
 
         {/* Floating Bottom Card / Collapsible Sheet: Selected Building Information */}
-        {/* Placed at bottom-20 on mobile to leave full clearance for the mobile bottom navigation bar */}
-        {selectedBuilding && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-20 z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
-            <div className="pointer-events-auto w-full rounded-3xl border border-white/15 bg-[#0B1220]/95 p-4 shadow-2xl backdrop-blur-2xl text-white">
+        {!tour.isTourActive && selectedBuilding && (
+          <div className="pointer-events-none absolute inset-x-3 bottom-16 z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
+            <div className="pointer-events-auto w-full rounded-3xl border border-[#293A50] bg-[#192638]/95 p-4 shadow-2xl backdrop-blur-xl text-[#F1F5F9]">
               {/* Card Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-blue-950/80 px-2 py-0.5 text-[10px] font-bold tracking-wider text-cyan-300 uppercase border border-cyan-500/30">
+                    <span className="rounded-md bg-[#162235] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#60A5FA] uppercase border border-[#293A50]">
                       {selectedBuilding.category}
                     </span>
-                    <span className="text-[11px] font-medium text-slate-400">
+                    <span className="text-[11px] font-medium text-[#94A3B8]">
                       {selectedBuilding.floorInfo.label}
                     </span>
                   </div>
@@ -339,8 +461,8 @@ export function CampusExplorerScreen() {
                     {selectedBuilding.name}
                   </h2>
                   {selectedBuilding.knownEntrance && (
-                    <p className="mt-0.5 text-[11px] text-slate-400 flex items-center gap-1 truncate">
-                      <MapPin size={11} className="text-cyan-400 shrink-0" />
+                    <p className="mt-0.5 text-[11px] text-[#94A3B8] flex items-center gap-1 truncate font-medium">
+                      <MapPin size={11} className="text-[#60A5FA] shrink-0" />
                       <span>{selectedBuilding.knownEntrance}</span>
                     </p>
                   )}
@@ -350,10 +472,10 @@ export function CampusExplorerScreen() {
                   <button
                     type="button"
                     onClick={() => toggleSaved(selectedBuilding.id)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full border transition ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-full border transition cursor-pointer ${
                       isSaved(selectedBuilding.id)
-                        ? 'border-amber-400/50 bg-amber-500/20 text-amber-300'
-                        : 'border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                        ? 'border-amber-400 bg-amber-500/20 text-amber-300'
+                        : 'border-[#293A50] text-[#94A3B8] hover:bg-[#24364D] hover:text-white'
                     }`}
                     title={isSaved(selectedBuilding.id) ? 'Remove from saved' : 'Save location'}
                   >
@@ -362,7 +484,7 @@ export function CampusExplorerScreen() {
                   <button
                     type="button"
                     onClick={() => setIsCardCollapsed(!isCardCollapsed)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition md:hidden"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#94A3B8] hover:bg-[#24364D] hover:text-white transition md:hidden cursor-pointer"
                     title={isCardCollapsed ? 'Expand panel' : 'Collapse panel'}
                   >
                     {isCardCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -370,7 +492,7 @@ export function CampusExplorerScreen() {
                   <button
                     type="button"
                     onClick={() => setSelectedBuildingId('')}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#94A3B8] hover:text-white hover:bg-[#24364D] transition cursor-pointer"
                     title="Close inspection"
                   >
                     <X size={16} />
@@ -383,10 +505,10 @@ export function CampusExplorerScreen() {
                 <>
                   {/* Floor Switcher if known floors exist */}
                   {availableFloors.length > 0 && (
-                    <div className="mt-3 border-t border-white/10 pt-2.5">
+                    <div className="mt-3 border-t border-[#293A50] pt-2.5">
                       <div className="flex items-center justify-between text-[11px] mb-1.5">
                         <span className="font-bold text-slate-300">Floor Level</span>
-                        <span className="text-slate-400">
+                        <span className="text-[#94A3B8]">
                           {selectedMapping?.indoorAvailable ? 'Indoor mapped' : 'Provisional floor levels'}
                         </span>
                       </div>
@@ -396,10 +518,10 @@ export function CampusExplorerScreen() {
                             key={floor}
                             type="button"
                             onClick={() => setSelectedFloor(floor)}
-                            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                               selectedFloor.toUpperCase() === floor
-                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/30 border border-blue-400/30'
-                                : 'bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white'
+                                ? 'bg-[#2563EB] text-white shadow-sm shadow-blue-500/20'
+                                : 'bg-[#162235] text-[#94A3B8] border border-[#293A50] hover:bg-[#24364D] hover:text-white'
                             }`}
                           >
                             Floor {floor}
@@ -411,33 +533,33 @@ export function CampusExplorerScreen() {
 
                   {/* Provisional status note for Dr. C. L. Mehta Central Library */}
                   {selectedBuilding.id === 'library' && (
-                    <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11px] text-amber-200">
-                      <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                    <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 p-3 text-[11px] text-amber-300">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-400">
                         <AlertCircle size={14} className="shrink-0" />
                         <span>Provisional 3D Placement</span>
                       </div>
-                      <p className="mt-1 text-slate-300 leading-snug">
+                      <p className="mt-1 text-[#94A3B8] leading-snug">
                         Stage E3 position is provisional. Physical surveyor verification of entrance coordinates, floor layout, and walkway route is pending.
                       </p>
                     </div>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3">
+                  <div className="mt-4 flex items-center gap-2 border-t border-[#293A50] pt-3">
                     {selectedBuilding.id === 'library' ? (
                       <button
                         type="button"
                         id="btn-library-directions"
                         onClick={() => setIsLibraryNoticeOpen(true)}
-                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 py-2.5 text-xs font-bold text-amber-200 cursor-pointer transition"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-900/40 hover:bg-amber-800/40 border border-amber-600/40 py-2.5 text-xs font-bold text-amber-300 cursor-pointer transition"
                       >
-                        <Route size={14} className="text-amber-300" />
+                        <Route size={14} className="text-amber-400" />
                         <span>Directions (Pending)</span>
                       </button>
                     ) : (
                       <Link
                         to={`/navigation?to=${selectedBuilding.id}`}
-                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#2563EB] hover:bg-blue-600 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:scale-[1.01] active:scale-[0.99] transition"
                       >
                         <Route size={14} className="text-white" />
                         <span>Get Directions</span>
@@ -445,7 +567,7 @@ export function CampusExplorerScreen() {
                     )}
                     <Link
                       to={`/building/${selectedBuilding.id}`}
-                      className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition"
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-[#24364D] transition"
                     >
                       <Info size={14} />
                       <span>Details</span>
@@ -456,15 +578,15 @@ export function CampusExplorerScreen() {
 
               {/* Quick Compact Action when collapsed */}
               {isCardCollapsed && (
-                <div className="mt-2.5 flex items-center justify-between border-t border-white/10 pt-2">
-                  <span className="text-[11px] text-slate-400">
+                <div className="mt-2.5 flex items-center justify-between border-t border-[#293A50] pt-2">
+                  <span className="text-[11px] text-[#94A3B8]">
                     {selectedBuilding.id === 'library' ? 'Provisional placement' : 'Tap expand for floor levels'}
                   </span>
                   {selectedBuilding.id === 'library' ? (
                     <button
                       type="button"
                       onClick={() => setIsLibraryNoticeOpen(true)}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600/30 border border-amber-500/40 px-3 py-1 text-[11px] font-bold text-amber-200"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-900/40 border border-amber-600/40 px-3 py-1 text-[11px] font-bold text-amber-300 cursor-pointer"
                     >
                       <Route size={12} />
                       <span>Directions</span>
@@ -472,7 +594,7 @@ export function CampusExplorerScreen() {
                   ) : (
                     <Link
                       to={`/navigation?to=${selectedBuilding.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-500"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3 py-1 text-[11px] font-bold text-white hover:bg-blue-600"
                     >
                       <Route size={12} />
                       <span>Directions</span>
@@ -484,33 +606,150 @@ export function CampusExplorerScreen() {
           </div>
         )}
 
+        {/* Floating Bottom Card: Selected Provisional Service POI (Apollo Shine or Xerox Shop) */}
+        {!tour.isTourActive && !selectedBuilding && selectedPoi && (
+          <div className="pointer-events-none absolute inset-x-3 bottom-16 z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
+            <div className="pointer-events-auto w-full rounded-3xl border border-amber-500/30 bg-[#192638]/95 p-4 shadow-2xl backdrop-blur-xl text-[#F1F5F9]">
+              {/* Card Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-amber-900/40 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-300 uppercase border border-amber-600/40">
+                      Facility • Provisional POI
+                    </span>
+                    <span className="text-[11px] font-medium text-[#94A3B8]">
+                      Campus Services Area
+                    </span>
+                  </div>
+                  <h2 className="mt-1.5 text-base font-extrabold tracking-tight text-white truncate flex items-center gap-2">
+                    {selectedPoi.id === 'apollo-shine' ? (
+                      <HeartPulse className="h-4 w-4 text-rose-400 shrink-0" />
+                    ) : (
+                      <Printer className="h-4 w-4 text-[#60A5FA] shrink-0" />
+                    )}
+                    <span>{selectedPoi.name}</span>
+                  </h2>
+                  <p className="mt-0.5 text-[11px] text-[#94A3B8] flex items-center gap-1 truncate font-medium">
+                    <MapPin size={11} className="text-amber-400 shrink-0" />
+                    <span>Campus Service Frontage (West of Main Gate 1)</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBuildingId('')}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#94A3B8] hover:text-white hover:bg-[#24364D] transition cursor-pointer"
+                    title="Close inspection"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="mt-3 border-t border-[#293A50] pt-2.5">
+                <p className="text-xs text-[#94A3B8] leading-relaxed">
+                  {selectedPoi.description}
+                </p>
+
+                {/* Provisional Notice */}
+                <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 p-3 text-[11px] text-amber-300">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-400">
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>Provisional Landmark Notice</span>
+                  </div>
+                  <p className="mt-1 text-[#94A3B8] leading-snug">
+                    {selectedPoi.provisionalNotice}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="mt-4 flex items-center gap-2 border-t border-[#293A50] pt-3">
+                  <button
+                    type="button"
+                    id={`btn-${selectedPoi.id}-directions`}
+                    data-testid={`btn-${selectedPoi.id}-directions`}
+                    onClick={() => setIsPoiNoticeOpen(true)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-900/40 hover:bg-amber-800/40 border border-amber-600/40 py-2.5 text-xs font-bold text-amber-300 cursor-pointer transition"
+                  >
+                    <Route size={14} className="text-amber-400" />
+                    <span>Directions (Pending)</span>
+                  </button>
+                  <Link
+                    to="/navigation?to=main-gate-1"
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 text-xs font-semibold text-white hover:bg-[#24364D] transition"
+                  >
+                    <MapPin size={14} />
+                    <span>Gate 1</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Modal explaining Library route is pending physical verification */}
         {isLibraryNoticeOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
-            <div className="w-full max-w-sm rounded-3xl border border-amber-500/40 bg-[#0B1220]/95 p-5 shadow-2xl text-white">
+          <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-sm rounded-3xl border border-[#293A50] bg-[#192638] p-5 shadow-2xl text-[#F1F5F9]">
               <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
                 <AlertCircle size={18} />
                 <span>Library Route Pending Verification</span>
               </div>
-              <p className="mt-2.5 text-xs text-slate-300 leading-relaxed">
+              <p className="mt-2.5 text-xs text-[#94A3B8] leading-relaxed">
                 The 3D model for <span className="font-semibold text-white">Dr. C. L. Mehta Central Library</span> is provisionally integrated in Stage E3.
                 Precise entrance coordinates and walkway connections are pending on-site surveyor confirmation.
               </p>
-              <p className="mt-2 text-[11px] text-slate-400">
+              <p className="mt-2 text-[11px] text-[#64748B]">
                 You can navigate to adjacent verified buildings such as Main Block or First Year Block.
               </p>
               <div className="mt-5 flex gap-2">
                 <Link
                   to="/navigation?to=main-block"
                   onClick={() => setIsLibraryNoticeOpen(false)}
-                  className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-center text-xs font-bold text-white transition shadow-lg shadow-blue-500/30"
+                  className="flex-1 rounded-xl bg-[#2563EB] hover:bg-blue-600 py-2.5 text-center text-xs font-bold text-white transition shadow-sm"
                 >
                   Route to Main Block
                 </Link>
                 <button
                   type="button"
                   onClick={() => setIsLibraryNoticeOpen(false)}
-                  className="rounded-xl border border-white/10 px-3.5 py-2.5 text-xs font-medium text-slate-300 hover:bg-white/10 cursor-pointer"
+                  className="rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 text-xs font-semibold text-[#94A3B8] hover:text-white hover:bg-[#24364D] cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal explaining Provisional Service POI route is pending physical verification */}
+        {isPoiNoticeOpen && selectedPoi && (
+          <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-sm rounded-3xl border border-[#293A50] bg-[#192638] p-5 shadow-2xl text-[#F1F5F9]">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <AlertCircle size={18} />
+                <span>{selectedPoi.name} Route Notice</span>
+              </div>
+              <p className="mt-2.5 text-xs text-[#94A3B8] leading-relaxed">
+                {selectedPoi.name} is identified along the campus service frontage near Main Gate 1. Exact doorway coordinates and pedestrian graph connections are pending surveyor verification.
+              </p>
+              <p className="mt-2 text-[11px] text-[#64748B]">
+                You can navigate to Main Gate 1 for closest verified pedestrian approach.
+              </p>
+              <div className="mt-5 flex gap-2">
+                <Link
+                  to="/navigation?to=main-gate-1"
+                  onClick={() => setIsPoiNoticeOpen(false)}
+                  className="flex-1 rounded-xl bg-[#2563EB] hover:bg-blue-600 py-2.5 text-center text-xs font-bold text-white transition shadow-sm"
+                >
+                  Route to Gate 1
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsPoiNoticeOpen(false)}
+                  className="rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 text-xs font-semibold text-[#94A3B8] hover:text-white hover:bg-[#24364D] cursor-pointer"
                 >
                   Close
                 </button>
@@ -520,7 +759,7 @@ export function CampusExplorerScreen() {
         )}
       </div>
 
-      {/* Campus Calibration & GPS Test Utility Modal (Preserved 100%) */}
+      {/* Campus Calibration & GPS Test Utility Modal (Preserved in DOM for testing & dev access) */}
       <CampusCalibrationModal
         isOpen={isCalibrationOpen}
         onClose={() => setIsCalibrationOpen(false)}
@@ -531,6 +770,12 @@ export function CampusExplorerScreen() {
         isTestMode={isTestMode}
         onToggleTestMode={toggleTestMode}
         onInjectTestPosition={injectTestPosition}
+      />
+
+      {/* Visitor Experience & Usability Feedback Modal */}
+      <VisitorFeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
       />
     </div>
   )

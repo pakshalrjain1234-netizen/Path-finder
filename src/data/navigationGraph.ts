@@ -1,4 +1,4 @@
-import { campusModelMapById, type CampusBuildingId } from './campusModelMapping'
+import { campusModelMapById, type CampusBuildingId } from './campusModelMapping.ts'
 import type { NavigationEdge, NavigationGraph, NavigationNode, NavigationNodeKind, Point3 } from '../types/navigation'
 
 function point(x: number, y: number, z: number): Point3 {
@@ -28,6 +28,7 @@ const campusEntranceBuildingMap: Array<[string, CampusBuildingId, string, Point3
   ['mechanical-approach', 'mechanical-block', 'Mechanical Block', point(56.8, 0.2, -65.6), 'provisional', entranceNote('Mechanical Block')],
   ['architecture-approach', 'mnm-school-of-architecture', 'MNM School of Architecture', point(22.2, 0.2, -101.6), 'provisional', entranceNote('MNM School of Architecture')],
   ['boys-hostel-approach', 'boys-hostel', 'Boys Hostel', point(24.4, 0.2, -183.0), 'provisional', entranceNote('Boys Hostel')],
+  ['oat-approach', 'open-air-theatre', 'Open Air Theatre', point(227.7, 0.2, -47.0), 'provisional', 'Pedestrian plaza approach to Open Air Theatre outdoor amphitheatre extracted from Stage E3 campus model.'],
 ]
 
 const campusWaypointNodes: Array<[string, string, Point3, 'verified' | 'provisional', string?]> = [
@@ -152,7 +153,9 @@ const campusNodes: NavigationNode[] = [
                                         ? 'L_SHAPE_BLOCK_ENTRANCE_ANCHOR'
                                         : id === 'canteen-approach'
                                           ? 'CANTEEN_ENTRANCE_ANCHOR'
-                                          : 'UNKNOWN',
+                                          : id === 'oat-approach'
+                                            ? 'OAT_PLAZA_APPROACH_ANCHOR'
+                                            : 'UNKNOWN',
     verificationStatus,
     notes,
   })),
@@ -215,6 +218,7 @@ const campusEdges: NavigationEdge[] = [
   edge('walk-civil', 'civil-approach', 'provisional', 'Walkway reaches Civil Block entrance anchor.'),
 
   edge('road-front-oat', 'walk-front-oat', 'provisional', 'Road connects to OAT walkway connector.'),
+  edge('walk-front-oat', 'oat-approach', 'provisional', 'Paved walkway connector enters Open Air Theatre pedestrian amphitheatre plaza approach.'),
 
   // Walkway corridor along academic front (WALK_ACADEMIC_FRONT at Z = -44.4)
   edge('walk-front-main', 'walk-front-first-year', 'provisional', 'Front walkway connects Main Block and First Year Block.'),

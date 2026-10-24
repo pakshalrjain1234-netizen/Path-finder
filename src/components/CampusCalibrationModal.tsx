@@ -103,7 +103,7 @@ export function CampusCalibrationModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 md:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center bg-black/80 backdrop-blur-md p-3 md:p-6 overflow-y-auto">
       <div className="relative w-full max-w-2xl rounded-3xl bg-[#0B1220] border border-white/10 shadow-2xl ring-1 ring-white/10 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-[#111827]/90">

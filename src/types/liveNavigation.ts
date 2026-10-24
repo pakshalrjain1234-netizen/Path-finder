@@ -71,6 +71,7 @@ export interface LiveNavigationState {
   rawModelPosition: Point3 | null
   matchedModelPosition: Point3 | null
   displayPosition: Point3 | null // Softly snapped or raw depending on confidence
+  crossTrackDistance: number
   accuracyRadiusMeters: number
   accuracyRadiusModel: number
   heading: number | null

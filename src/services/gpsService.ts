@@ -231,6 +231,23 @@ export class GpsLocationService {
   }
 
   private handlePositionSuccess(position: GeolocationPosition): void {
+    // Reject invalid coordinate numbers
+    if (
+      !position.coords ||
+      !Number.isFinite(position.coords.latitude) ||
+      !Number.isFinite(position.coords.longitude) ||
+      !Number.isFinite(position.coords.accuracy) ||
+      position.coords.accuracy < 0
+    ) {
+      return
+    }
+
+    // Reject stale updates (older than 30 seconds)
+    const now = Date.now()
+    if (position.timestamp && now - position.timestamp > 30000) {
+      return
+    }
+
     this.currentStatus = 'active'
     const coords: GpsCoordinates = {
       latitude: position.coords.latitude,
@@ -240,7 +257,7 @@ export class GpsLocationService {
       altitudeAccuracy: position.coords.altitudeAccuracy,
       heading: position.coords.heading,
       speed: position.coords.speed,
-      timestamp: position.timestamp || Date.now(),
+      timestamp: position.timestamp || now,
     }
 
     this.lastCoordinates = coords

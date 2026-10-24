@@ -11,7 +11,7 @@ export interface CampusLandmark {
 export const CAMPUS_LANDMARKS: CampusLandmark[] = [
   // Tier 1: Major Academic Blocks & Main Gate (Visible across all zoom levels)
   { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', fallbackPosition: [181.0, 2.2, -6.2], type: 'entrance', priorityTier: 1 },
-  { id: 'main-block', label: 'Main Block', fallbackPosition: [193.5, 7.5, -65.8], type: 'academic', priorityTier: 1 },
+  { id: 'main-block', label: 'Main Block', fallbackPosition: [193.5, 7.5, -58.5], type: 'academic', priorityTier: 1 },
   { id: 'first-year-block', label: 'First Year Block', fallbackPosition: [166.8, 14.0, -73.1], type: 'academic', priorityTier: 1 },
   { id: 'civil-block', label: 'Civil Block', fallbackPosition: [144.5, 11.0, -68.2], type: 'academic', priorityTier: 1 },
   { id: 'it-block', label: 'IT Block', fallbackPosition: [96.9, 4.0, -50.5], type: 'academic', priorityTier: 1 },

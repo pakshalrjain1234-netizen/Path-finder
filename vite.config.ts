@@ -55,6 +55,17 @@ export default defineConfig({
               },
             },
           },
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith('.glb'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'campus-3d-models',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
         ],
       },
       devOptions: {

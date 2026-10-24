@@ -15,6 +15,8 @@ export type CampusBuildingId =
   | 'canteen'
   | 'open-air-theatre'
   | 'library'
+  | 'apollo-shine'
+  | 'xerox-shop'
 
 export type FloorKey = 'G' | '1' | '2' | '3' | 'elevated'
 
@@ -282,10 +284,30 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
   },
 ]
 
-export const campusModelMapById = Object.fromEntries(campusModelMapping.map((entry) => [entry.buildingId, entry])) as Record<CampusBuildingId, CampusModelMappingEntry>
+export const campusModelMapById: Record<CampusBuildingId, CampusModelMappingEntry> = {
+  ...Object.fromEntries(campusModelMapping.map((entry) => [entry.buildingId, entry])),
+  'apollo-shine': {
+    buildingId: 'apollo-shine',
+    displayName: 'Apollo Shine',
+    knownFloorLabel: 'Provisional wellness clinic facility',
+    objectNames: ['E2_APOLLO_BUILDING', 'E2_APOLLO_BUILDING_MESH'],
+    floorObjects: { G: ['E2_APOLLO_BUILDING'] },
+    interactionObjects: ['E2_APOLLO_BUILDING'],
+    indoorAvailable: false,
+  },
+  'xerox-shop': {
+    buildingId: 'xerox-shop',
+    displayName: 'Xerox Shop',
+    knownFloorLabel: 'Provisional reprographics facility',
+    objectNames: ['E2_XEROX_SHOP', 'E2_XEROX_SHOP_MESH'],
+    floorObjects: { G: ['E2_XEROX_SHOP'] },
+    interactionObjects: ['E2_XEROX_SHOP'],
+    indoorAvailable: false,
+  },
+} as Record<CampusBuildingId, CampusModelMappingEntry>
 
 export const campusObjectToBuildingId = new Map<string, CampusBuildingId>(
-  campusModelMapping.flatMap((entry) => entry.objectNames.concat(entry.interactionObjects ?? [], Object.values(entry.floorObjects).flat()).map((name) => [name, entry.buildingId] as const)),
+  Object.values(campusModelMapById).flatMap((entry) => entry.objectNames.concat(entry.interactionObjects ?? [], Object.values(entry.floorObjects).flat()).map((name) => [name, entry.buildingId] as const)),
 )
 
 // Exterior meshes (windows, roof edges, canopies) use the same authored prefix.
@@ -305,6 +327,8 @@ export function resolveCampusBuilding(name: string): CampusBuildingId | null {
   if (name.startsWith('E2_BOYS_HOSTEL_')) return 'boys-hostel'
   if (name.startsWith('E2_CIVIL_')) return 'civil-block'
   if (name.startsWith('E2_LIBRARY_') || name.startsWith('LIBRARY_') || name.includes('LIBRARY')) return 'library'
+  if (name.startsWith('E2_APOLLO_') || name.includes('APOLLO')) return 'apollo-shine'
+  if (name.startsWith('E2_XEROX_') || name.includes('XEROX')) return 'xerox-shop'
 
   for (const entry of campusModelMapping) {
     const prefix = entry.buildingId.replaceAll('-', '_').toUpperCase()

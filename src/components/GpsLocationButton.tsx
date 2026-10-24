@@ -28,9 +28,9 @@ export function GpsLocationButton({
         id="gps-location-button"
         type="button"
         disabled
-        className={`flex items-center gap-2 rounded-xl border border-white/10 bg-[#162033]/90 px-3.5 py-2 text-xs font-semibold text-slate-300 transition-all ${className}`}
+        className={`flex items-center gap-2 rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2 text-xs font-semibold text-[#94A3B8] transition-all ${className}`}
       >
-        <Loader2 size={15} className="animate-spin text-cyan-400" />
+        <Loader2 size={15} className="animate-spin text-[#60A5FA]" />
         <span>{compact ? 'Locating...' : 'Acquiring GPS Signal...'}</span>
       </button>
     )
@@ -51,12 +51,12 @@ export function GpsLocationButton({
             : isCalibrated
               ? 'border-emerald-500/40 bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50'
               : isPending
-                ? 'border-cyan-500/40 bg-cyan-950/50 text-cyan-300 hover:bg-cyan-900/50'
-                : 'border-white/10 bg-[#162033]/90 text-slate-200 hover:bg-[#1f2d47]'
+                ? 'border-blue-500/40 bg-blue-950/50 text-blue-300 hover:bg-blue-900/50'
+                : 'border-[#293A50] bg-[#162235] text-[#F1F5F9] hover:bg-[#24364D]'
         } ${className}`}
         title="Stop GPS tracking"
       >
-        <LocateFixed size={15} className={isTestMode ? 'text-amber-400 animate-pulse' : 'text-cyan-400 animate-pulse'} />
+        <LocateFixed size={15} className={isTestMode ? 'text-amber-400 animate-pulse' : 'text-[#60A5FA] animate-pulse'} />
         <span>{compact ? 'Tracking' : isTestMode ? 'Test GPS Active (Stop)' : 'Live GPS Active (Stop)'}</span>
       </button>
     )
@@ -82,10 +82,10 @@ export function GpsLocationButton({
       id="gps-location-button"
       type="button"
       onClick={onStart}
-      className={`flex items-center gap-2 rounded-xl border border-white/10 bg-[#162033]/90 px-3.5 py-2 text-xs font-semibold text-slate-200 shadow-lg hover:border-cyan-500/40 hover:text-cyan-300 hover:bg-[#1f2d47] transition-all ${className}`}
+      className={`flex items-center gap-2 rounded-xl border border-[#293A50] bg-[#162235] px-3.5 py-2 text-xs font-semibold text-[#F1F5F9] shadow-lg hover:border-[#60A5FA]/40 hover:text-[#60A5FA] hover:bg-[#24364D] transition-all cursor-pointer ${className}`}
       title="Request location permission and locate on campus"
     >
-      <Crosshair size={15} className="text-cyan-400" />
+      <Crosshair size={15} className="text-[#60A5FA]" />
       <span>{compact ? 'Locate' : 'Find My Location'}</span>
     </button>
   )

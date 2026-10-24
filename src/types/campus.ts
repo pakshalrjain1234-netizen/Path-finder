@@ -14,6 +14,8 @@ export type CampusBuildingId =
   | 'non-jain-mess'
   | 'canteen'
   | 'library'
+  | 'apollo-shine'
+  | 'xerox-shop'
 
 export type KnownFloor = {
   status: 'known'

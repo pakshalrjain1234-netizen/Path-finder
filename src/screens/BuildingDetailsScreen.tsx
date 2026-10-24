@@ -39,8 +39,8 @@ export function BuildingDetailsScreen() {
     return (
       <div className="mx-auto flex max-w-4xl flex-col gap-4 p-4 md:p-6">
         <SurfaceCard title="Building Details">
-          <p className="text-sm text-slate-300">Building not found.</p>
-          <Link to="/search" className="mt-3 inline-block text-sm text-cyan-400 underline">
+          <p className="text-sm text-[#94A3B8]">Building not found.</p>
+          <Link to="/search" className="mt-3 inline-block text-sm text-[#60A5FA] hover:text-[#93C5FD] transition-colors">
             Go back to search
           </Link>
         </SurfaceCard>
@@ -49,61 +49,61 @@ export function BuildingDetailsScreen() {
   }
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 text-[#F1F5F9]">
       <div className="grid gap-4 xl:grid-cols-[420px_1fr]">
-        <section className="rounded-3xl border border-white/10 bg-[#0B1220]/90 shadow-2xl backdrop-blur-xl">
-          <div className="border-b border-white/10 p-4 md:p-5">
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400">
-              <Link to="/explore" className="hover:text-cyan-300 transition-colors">Campus Explorer</Link>
+        <section className="rounded-3xl border border-[#293A50] bg-[#162235]/90 shadow-2xl backdrop-blur-xl">
+          <div className="border-b border-[#293A50] p-4 md:p-5">
+            <nav className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
+              <Link to="/explore" className="hover:text-[#60A5FA] transition-colors">Campus Explorer</Link>
               <span>›</span>
               <span>{building.category}</span>
               <span>›</span>
-              <span className="font-semibold text-cyan-400">{building.name}</span>
+              <span className="font-semibold text-[#60A5FA]">{building.name}</span>
             </nav>
           </div>
 
           <div className="space-y-4 p-4 md:p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="rounded-full border border-cyan-500/30 bg-cyan-950/40 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-cyan-300">
-                  Campus model available
+                <span className="rounded-full border border-[#60A5FA]/30 bg-[#60A5FA]/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#93C5FD]">
+                  Campus Model Available
                 </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-slate-400">
+                <span className="rounded-full border border-[#293A50] bg-[#192638] px-2 py-0.5 text-[11px] text-[#94A3B8]">
                   {building.floorInfo.label}
                 </span>
               </div>
-              <span className="text-xs font-mono text-slate-500">ID: {building.id.toUpperCase()}</span>
+              <span className="text-xs font-mono text-[#94A3B8]">ID: {building.id.toUpperCase()}</span>
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-100">{building.name}</h1>
-              <p className="mt-1 text-sm text-slate-400">{building.category}</p>
+              <h1 className="text-2xl font-bold tracking-tight text-[#F1F5F9]">{building.name}</h1>
+              <p className="mt-1 text-sm text-[#94A3B8]">{building.category}</p>
               {building.aliases && building.aliases.length > 0 && (
-                <p className="mt-1 text-xs text-slate-400">
-                  <span className="text-slate-500 font-medium">Known aliases:</span> {building.aliases.join(', ')}
+                <p className="mt-1 text-xs text-[#94A3B8]">
+                  <span className="text-[#64748B] font-medium">Known aliases:</span> {building.aliases.join(', ')}
                 </p>
               )}
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#111827]/80 p-4">
+            <div className="rounded-2xl border border-[#293A50] bg-[#192638]/90 p-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500">Entrance</div>
-                  <div className="mt-1 font-medium text-slate-200 text-xs">
+                  <div className="text-xs uppercase tracking-wider text-[#94A3B8]">Entrance</div>
+                  <div className="mt-1 font-medium text-[#F1F5F9] text-xs">
                     {building.knownEntrance ?? 'Entrance approach via campus walkway'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500">Vertical Span</div>
-                  <div className="mt-1 font-medium text-slate-200 text-xs">{building.floorInfo.label}</div>
+                  <div className="text-xs uppercase tracking-wider text-[#94A3B8]">Vertical Span</div>
+                  <div className="mt-1 font-medium text-[#F1F5F9] text-xs">{building.floorInfo.label}</div>
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500">Indoor Navigation</div>
+                  <div className="text-xs uppercase tracking-wider text-[#94A3B8]">Indoor Navigation</div>
                   <div className="mt-1 font-medium text-amber-300/90 text-xs">Not mapped yet</div>
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500">Connectivity</div>
-                  <div className="mt-1 font-medium text-slate-200 text-xs">Campus Network</div>
+                  <div className="text-xs uppercase tracking-wider text-[#94A3B8]">Connectivity</div>
+                  <div className="mt-1 font-medium text-[#F1F5F9] text-xs">Campus Network</div>
                 </div>
               </div>
             </div>
@@ -117,13 +117,13 @@ export function BuildingDetailsScreen() {
             <div className="flex flex-wrap gap-2">
               <Link
                 to={`/navigation?to=${building.id}`}
-                className="flex flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-cyan-400 transition-all min-w-[120px]"
+                className="flex flex-1 items-center justify-center rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all min-w-[120px]"
               >
                 Directions
               </Link>
               <Link
                 to={`/explore?focus=${building.id}`}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 px-4 py-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-900/40 transition-colors"
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-[#293A50] bg-[#192638] px-4 py-3 text-sm font-semibold text-[#60A5FA] hover:border-[#60A5FA]/40 hover:bg-[#162235] transition-colors"
               >
                 <Compass size={16} />
                 <span>3D View</span>
@@ -134,7 +134,7 @@ export function BuildingDetailsScreen() {
                 className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
                   isSaved(building.id)
                     ? 'border-amber-400/50 bg-amber-500/20 text-amber-300'
-                    : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                    : 'border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-[#F1F5F9] hover:border-[#60A5FA]/30'
                 }`}
                 title={isSaved(building.id) ? 'Remove from saved' : 'Save location'}
               >
@@ -151,16 +151,16 @@ export function BuildingDetailsScreen() {
                     alert('Building link copied to clipboard!')
                   }
                 }}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 transition-colors"
+                className="rounded-xl border border-[#293A50] bg-[#192638] px-3 py-3 text-sm font-semibold text-[#94A3B8] hover:text-[#F1F5F9] hover:border-[#60A5FA]/30 transition-colors"
               >
                 Share
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#111827]/80 p-4">
+            <div className="rounded-2xl border border-[#293A50] bg-[#192638]/90 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">Floor Directory</div>
-                <div className="text-xs text-slate-500">{building.floorInfo.label}</div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Floor Directory</div>
+                <div className="text-xs text-[#64748B]">{building.floorInfo.label}</div>
               </div>
               <FloorSelector floors={floors} selectedFloor={selectedFloor} onSelectFloor={setSelectedFloor} />
             </div>
@@ -168,8 +168,8 @@ export function BuildingDetailsScreen() {
         </section>
 
         <section className="space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0B1220]/90 p-4 shadow-glass backdrop-blur-xl md:p-5">
-            <div className="text-sm font-semibold text-slate-100">Floor Directory</div>
+          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
+            <div className="text-sm font-semibold text-[#F1F5F9]">Floor Directory</div>
             <div className="mt-3 grid gap-2">
               {floors.map((floor) => (
                 <div
@@ -177,12 +177,12 @@ export function BuildingDetailsScreen() {
                   onClick={() => setSelectedFloor(floor)}
                   className={`rounded-2xl p-3 border transition-all cursor-pointer ${
                     floor === selectedFloor
-                      ? 'border-cyan-500/50 bg-cyan-950/50 text-cyan-200'
-                      : 'border-white/5 bg-[#111827]/60 text-slate-300 hover:bg-white/5'
+                      ? 'border-[#60A5FA]/50 bg-[#60A5FA]/10 text-[#93C5FD]'
+                      : 'border-[#293A50] bg-[#192638]/80 text-[#94A3B8] hover:border-[#60A5FA]/30 hover:text-[#F1F5F9]'
                   }`}
                 >
                   <div className="text-sm font-medium">{floor}</div>
-                  <div className={`text-xs ${floor === selectedFloor ? 'text-cyan-300/80' : 'text-slate-500'}`}>
+                  <div className={`text-xs ${floor === selectedFloor ? 'text-[#93C5FD]/80' : 'text-[#64748B]'}`}>
                     Indoor map not mapped yet
                   </div>
                 </div>
@@ -190,8 +190,8 @@ export function BuildingDetailsScreen() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0B1220]/90 p-4 shadow-glass backdrop-blur-xl md:p-5">
-            <div className="text-sm font-semibold text-slate-100">Adjacent Blocks</div>
+          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
+            <div className="text-sm font-semibold text-[#F1F5F9]">Adjacent Blocks</div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {buildings
                 .filter((b) => b.id !== building.id && (b.category === building.category || b.category === 'Academic'))
@@ -200,21 +200,21 @@ export function BuildingDetailsScreen() {
                   <Link
                     key={b.id}
                     to={`/building/${b.id}`}
-                    className="rounded-2xl border border-white/10 bg-[#111827]/80 p-3 hover:border-cyan-500/40 hover:bg-[#162033] transition-all block"
+                    className="rounded-2xl border border-[#293A50] bg-[#192638]/80 p-3 hover:border-[#60A5FA]/40 hover:bg-[#162235] transition-all block"
                   >
-                    <div className="text-sm font-medium text-slate-200 truncate">{b.name}</div>
-                    <div className="text-xs text-cyan-400">{b.floorInfo.label}</div>
+                    <div className="text-sm font-medium text-[#F1F5F9] truncate">{b.name}</div>
+                    <div className="text-xs text-[#60A5FA]">{b.floorInfo.label}</div>
                   </Link>
                 ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0B1220]/90 p-4 shadow-glass backdrop-blur-xl md:p-5">
+          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#60A5FA]/10 text-[#60A5FA] border border-[#60A5FA]/20">
                 <Info size={20} />
               </div>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-[#94A3B8]">
                 Floor counts and vertical spans provided based on campus 3D model. Detailed room maps remain pending until mapped.
               </p>
             </div>
@@ -223,7 +223,7 @@ export function BuildingDetailsScreen() {
       </div>
 
       <SurfaceCard title="Selected Floor" subtitle={`Current selection: ${selectedFloor}`}>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-[#94A3B8]">
           This is a layout scaffold only; indoor room numbers and anchor points will remain pending until verified against future GLB updates.
         </p>
       </SurfaceCard>
