@@ -38,12 +38,13 @@ import {
 } from '../data/campusModelMapping'
 import {
   CAMPUS_LANDMARKS,
+  VERIFIED_ROOF_ANCHORS,
   type CampusLandmark,
   type LabelVisibilityMode,
   calculateZoomTierWithHysteresis,
   isLandmarkVisible,
 } from '../data/campusLandmarks'
-export { CAMPUS_LANDMARKS, type CampusLandmark, type LabelVisibilityMode }
+export { CAMPUS_LANDMARKS, VERIFIED_ROOF_ANCHORS, type CampusLandmark, type LabelVisibilityMode }
 import type { Point3 } from '../types/navigation'
 
 const MODEL_PATH = CAMPUS_MODEL_CONFIG.activeModelPath
@@ -221,15 +222,26 @@ function buildFrameFromBuilding(scene: Object3D, buildingId: string): ModelFrame
 
   const center = box.getCenter(new Vector3())
   const size = box.getSize(new Vector3())
+
+  // Dedicated framing center & scale for large, dual-wing, or irregular complexes
+  if (buildingId === 'l-shape-block') {
+    center.set(212.0, 6.0, -74.0)
+  } else if (buildingId === 'mechanical-block') {
+    center.set(38.0, 6.5, -76.0)
+  } else if (buildingId === 'mnm-school-of-architecture') {
+    center.set(24.0, 5.5, -124.0)
+  }
+
   // Minimum radius of 30 ensures full structure + surrounding roads & landmarks are visible without roof-only close-ups
   const radius = Math.max(size.length() / 2, 30)
 
-  // Expand box symmetrically around the center to include surrounding roads and avoid rooftop domination
-  box.expandByPoint(new Vector3(center.x - radius * 0.85, center.y - 4, center.z - radius * 0.85))
-  box.expandByPoint(new Vector3(center.x + radius * 0.85, center.y + 16, center.z + radius * 0.85))
+  // Expand a clone of box symmetrically around the center for camera distance without corrupting actual building roof bounds
+  const framingBox = box.clone()
+  framingBox.expandByPoint(new Vector3(center.x - radius * 0.85, center.y - 4, center.z - radius * 0.85))
+  framingBox.expandByPoint(new Vector3(center.x + radius * 0.85, center.y + 16, center.z + radius * 0.85))
 
   return {
-    box,
+    box: framingBox,
     center,
     radius,
     framedPosition: [center.x + radius * 1.35, center.y + Math.max(radius * 0.95, 16), center.z + radius * 1.35],
@@ -750,20 +762,20 @@ interface LandmarkVisualConfig {
 
 const LANDMARK_VISUAL_OFFSETS: Record<string, LandmarkVisualConfig> = {
   'main-block': { stemHeight: 12, offsetX: 0 },
-  'library': { stemHeight: 14, offsetX: 0 },
+  'library': { stemHeight: 12, offsetX: 0 },
   'first-year-block': { stemHeight: 12, offsetX: 0 },
-  'civil-block': { stemHeight: 16, offsetX: 0 },
-  'l-shape-block': { stemHeight: 14, offsetX: 0 },
+  'civil-block': { stemHeight: 12, offsetX: 0 },
+  'l-shape-block': { stemHeight: 12, offsetX: 0 },
   'it-block': { stemHeight: 12, offsetX: 0 },
-  'mechanical-block': { stemHeight: 14, offsetX: 0 },
-  'mnm-school-of-architecture': { stemHeight: 14, offsetX: -12 },
-  'boys-hostel': { stemHeight: 30, offsetX: 14 },
-  'canteen': { stemHeight: 12, offsetX: -8 },
-  'jain-mess': { stemHeight: 20, offsetX: 12 },
-  'non-jain-mess': { stemHeight: 32, offsetX: -6 },
-  'physics-department': { stemHeight: 14, offsetX: -10 },
-  'english-department': { stemHeight: 14, offsetX: -8 },
-  'maths-department': { stemHeight: 26, offsetX: 12 },
+  'mechanical-block': { stemHeight: 12, offsetX: 0 },
+  'mnm-school-of-architecture': { stemHeight: 12, offsetX: 0 },
+  'boys-hostel': { stemHeight: 12, offsetX: 0 },
+  'canteen': { stemHeight: 12, offsetX: 0 },
+  'jain-mess': { stemHeight: 12, offsetX: 3 },
+  'non-jain-mess': { stemHeight: 12, offsetX: -3 },
+  'physics-department': { stemHeight: 12, offsetX: 0 },
+  'english-department': { stemHeight: 12, offsetX: 0 },
+  'maths-department': { stemHeight: 12, offsetX: 0 },
   'open-air-theatre': { stemHeight: 12, offsetX: 0 },
   'main-gate-1': { stemHeight: 12, offsetX: 0 },
   'west-entrance': { stemHeight: 12, offsetX: 0 },
@@ -901,37 +913,14 @@ function CampusScene({
   const [zoomTier, setZoomTier] = useState<1 | 2 | 3>(1)
   const lastTierRef = useRef<1 | 2 | 3>(1)
 
-  // Dynamically compute exact roof apex and horizontal centroid for every landmark from GLB meshes
+  // Exact roof apex and centroid for every landmark directly corresponding to Stage E3 GLB geometry
   const landmarkAnchors = useMemo(() => {
     const anchors: Record<string, Point3> = {}
     CAMPUS_LANDMARKS.forEach((landmark) => {
-      if (landmark.id === 'l-shape-block') {
-        // Continuous medial axis midpoint on physical roof spine: [222.5, roofY, -90.3]
-        // Perfectly positioned on North wing roof, clear of Main Block, Library, and arbitrary corners
-        const bFrame = buildFrameFromBuilding(scene, 'l-shape-block')
-        const roofY = bFrame && bFrame.box && !bFrame.box.isEmpty() ? bFrame.box.max.y : 10.05
-        anchors[landmark.id] = [222.5, roofY, -90.3]
-        return
-      }
-      if (landmark.id === 'library') {
-        const bFrame = buildFrameFromBuilding(scene, 'library')
-        const roofY = bFrame && bFrame.box && !bFrame.box.isEmpty() ? bFrame.box.max.y : 8.3
-        anchors[landmark.id] = [193.5, roofY, -73.1]
-        return
-      }
-      const bFrame = buildFrameFromBuilding(scene, landmark.id)
-      if (bFrame && bFrame.box && !bFrame.box.isEmpty()) {
-        anchors[landmark.id] = [
-          bFrame.center.x,
-          bFrame.box.max.y,
-          bFrame.center.z,
-        ]
-      } else {
-        anchors[landmark.id] = landmark.fallbackPosition
-      }
+      anchors[landmark.id] = VERIFIED_ROOF_ANCHORS[landmark.id] ?? landmark.fallbackPosition
     })
     return anchors
-  }, [scene])
+  }, [])
 
   useEffect(() => {
     onFrameReady(frame)
@@ -1133,7 +1122,7 @@ function CampusScene({
                       ? 'bg-gradient-to-r from-violet-950 via-purple-900 to-violet-950 text-white border-2 border-[#A78BFA] ring-4 ring-[#A78BFA]/30 shadow-violet-500/50 scale-110 z-50'
                       : isHovered
                         ? 'bg-[#192638] text-[#93C5FD] border border-[#60A5FA] shadow-md scale-105 z-30'
-                        : 'bg-[#162235]/95 text-[#F1F5F9] border border-[#293A50] hover:border-[#60A5FA] hover:text-white hover:scale-105 shadow-black/80 z-10'
+                        : 'bg-[#162235]/92 text-[#E2E8F0] border border-[#293A50]/80 hover:border-[#60A5FA] hover:text-white hover:scale-105 shadow-md z-10'
                   }`}
                 >
                   {/* Category Icon */}
@@ -1164,7 +1153,7 @@ function CampusScene({
                   </span>
 
                   {/* Building Name */}
-                  <span className={`tracking-tight max-w-[145px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
+                  <span className={`tracking-tight max-w-[125px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-200'}`}>
                     {landmark.label}
                   </span>
 
@@ -1492,16 +1481,34 @@ function CameraRig({
       }
       lastTargetStopIdRef.current = activeTourStop.id
       arrivedStopIdRef.current = null
-      const destPos = new Vector3(
-        activeTourStop.cameraPosition[0],
-        Math.max(activeTourStop.cameraPosition[1], 4.0),
-        activeTourStop.cameraPosition[2]
-      )
+
       const destTarget = new Vector3(
         activeTourStop.targetPoint[0],
         activeTourStop.targetPoint[1],
         activeTourStop.targetPoint[2]
       )
+      const baseCamPos = new Vector3(
+        activeTourStop.cameraPosition[0],
+        Math.max(activeTourStop.cameraPosition[1], 4.0),
+        activeTourStop.cameraPosition[2]
+      )
+
+      // Responsive mobile tour framing:
+      // In mobile portrait (< 768px), horizontal field-of-view is constricted and
+      // the bottom narration card overlay occupies ~26-30% of vertical screen height.
+      // Scale camera distance back along the viewing direction and elevate appropriately
+      // so the complete building structure, facade, entrance, and surroundings remain fully visible.
+      const isMobile = size.width < 768
+      const destPos = baseCamPos.clone()
+      if (isMobile) {
+        const offset = baseCamPos.clone().sub(destTarget)
+        const mobileScale = Math.min(1.42, Math.max(1.22, (768 / Math.max(size.width, 360)) * 0.68))
+        offset.multiplyScalar(mobileScale)
+        // Elevate camera slightly to ensure safe terrain clearance and headroom above captions
+        offset.y = Math.max(offset.y * 1.05, 18.0)
+        destPos.copy(destTarget).add(offset)
+      }
+
       targetPos.current.copy(destPos)
       targetCenter.current.copy(destTarget)
       isInteracting.current = false

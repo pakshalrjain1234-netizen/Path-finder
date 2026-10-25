@@ -10,29 +10,38 @@ export interface CampusLandmark {
 
 export const CAMPUS_LANDMARKS: CampusLandmark[] = [
   // Tier 1: Major Academic Blocks & Main Gate (Visible across all zoom levels)
-  { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', fallbackPosition: [181.0, 2.2, -6.2], type: 'entrance', priorityTier: 1 },
-  { id: 'main-block', label: 'Main Block', fallbackPosition: [193.5, 7.5, -58.5], type: 'academic', priorityTier: 1 },
-  { id: 'first-year-block', label: 'First Year Block', fallbackPosition: [166.8, 14.0, -73.1], type: 'academic', priorityTier: 1 },
-  { id: 'civil-block', label: 'Civil Block', fallbackPosition: [144.5, 11.0, -68.2], type: 'academic', priorityTier: 1 },
-  { id: 'it-block', label: 'IT Block', fallbackPosition: [96.9, 4.0, -50.5], type: 'academic', priorityTier: 1 },
-  { id: 'mechanical-block', label: 'Mechanical Block', fallbackPosition: [56.9, 4.0, -75.6], type: 'academic', priorityTier: 1 },
-  { id: 'mnm-school-of-architecture', label: 'School of Architecture', fallbackPosition: [18.3, 4.0, -123.1], type: 'academic', priorityTier: 1 },
+  { id: 'main-gate-1', label: 'Main Entrance (Gate 1)', fallbackPosition: [181.0, 2.6, -6.2], type: 'entrance', priorityTier: 1 },
+  { id: 'main-block', label: 'Main Block', fallbackPosition: [193.5, 7.3, -58.5], type: 'academic', priorityTier: 1 },
+  { id: 'first-year-block', label: 'First Year Block', fallbackPosition: [166.8, 13.9, -73.8], type: 'academic', priorityTier: 1 },
+  { id: 'civil-block', label: 'Civil Block', fallbackPosition: [144.5, 10.6, -64.8], type: 'academic', priorityTier: 1 },
+  { id: 'it-block', label: 'IT Block', fallbackPosition: [96.9, 10.4, -51.2], type: 'academic', priorityTier: 1 },
+  { id: 'mechanical-block', label: 'Mechanical Block', fallbackPosition: [32.0, 12.5, -76.3], type: 'academic', priorityTier: 1 },
+  { id: 'mnm-school-of-architecture', label: 'School of Architecture', fallbackPosition: [18.3, 10.6, -123.8], type: 'academic', priorityTier: 1 },
 
   // Tier 2: Key Campus Facilities, Central Library & West Gate (Visible in Medium & Close zoom, or when selected)
-  { id: 'library', label: 'Central Library', fallbackPosition: [193.5, 8.8, -73.1], type: 'facility', priorityTier: 2 },
-  { id: 'canteen', label: 'Canteen', fallbackPosition: [37.3, 4.5, -9.1], type: 'facility', priorityTier: 2 },
-  { id: 'boys-hostel', label: 'Boys Hostel', fallbackPosition: [29.7, 4.0, -191.0], type: 'facility', priorityTier: 2 },
-  { id: 'l-shape-block', label: 'L Shape Block', fallbackPosition: [222.5, 10.1, -90.3], type: 'academic', priorityTier: 2 },
-  { id: 'open-air-theatre', label: 'Open Air Theatre', fallbackPosition: [227.5, 2.5, -60.9], type: 'facility', priorityTier: 2 },
-  { id: 'west-entrance', label: 'Gate 2 (West Entrance)', fallbackPosition: [54.2, 3.7, -99.5], type: 'entrance', priorityTier: 2 },
+  { id: 'library', label: 'Central Library', fallbackPosition: [193.5, 8.5, -73.1], type: 'facility', priorityTier: 2 },
+  { id: 'canteen', label: 'Canteen', fallbackPosition: [37.3, 4.0, -9.8], type: 'facility', priorityTier: 2 },
+  { id: 'boys-hostel', label: 'Boys Hostel', fallbackPosition: [29.7, 13.8, -191.7], type: 'facility', priorityTier: 2 },
+  { id: 'l-shape-block', label: 'L Shape Block', fallbackPosition: [222.5, 10.6, -90.3], type: 'academic', priorityTier: 2 },
+  { id: 'open-air-theatre', label: 'Open Air Theatre', fallbackPosition: [227.5, 2.7, -60.9], type: 'facility', priorityTier: 2 },
+  { id: 'west-entrance', label: 'Gate 2 (West Entrance)', fallbackPosition: [54.2, 2.8, -99.5], type: 'entrance', priorityTier: 2 },
 
   // Tier 3: Specific Departments & Dining Halls (Visible in Close zoom, or when selected)
-  { id: 'physics-department', label: 'Physics Dept', fallbackPosition: [14.4, 7.5, -53.3], type: 'department', priorityTier: 3 },
-  { id: 'english-department', label: 'English Dept', fallbackPosition: [70.7, 7.5, -31.0], type: 'department', priorityTier: 3 },
-  { id: 'maths-department', label: 'Maths Dept', fallbackPosition: [96.7, 4.5, -31.6], type: 'department', priorityTier: 3 },
-  { id: 'jain-mess', label: 'Jain Mess', fallbackPosition: [40.3, 4.5, -31.3], type: 'facility', priorityTier: 3 },
-  { id: 'non-jain-mess', label: 'Non-Jain Mess', fallbackPosition: [13.4, 4.5, -31.3], type: 'facility', priorityTier: 3 },
+  { id: 'physics-department', label: 'Physics Dept', fallbackPosition: [14.4, 7.3, -54.4], type: 'department', priorityTier: 3 },
+  { id: 'english-department', label: 'English Dept', fallbackPosition: [70.7, 7.3, -32.0], type: 'department', priorityTier: 3 },
+  { id: 'maths-department', label: 'Maths Dept', fallbackPosition: [96.7, 4.0, -32.0], type: 'department', priorityTier: 3 },
+  { id: 'jain-mess', label: 'Jain Mess', fallbackPosition: [40.3, 4.0, -32.0], type: 'facility', priorityTier: 3 },
+  { id: 'non-jain-mess', label: 'Non-Jain Mess', fallbackPosition: [13.4, 3.7, -32.0], type: 'facility', priorityTier: 3 },
 ]
+
+/**
+ * Authoritative 3D roof anchors directly derived from Stage E3 GLB geometry.
+ * Used identically across 3D Campus Explorer, Cinematic Tour, and issue placement.
+ */
+export const VERIFIED_ROOF_ANCHORS: Record<string, Point3> = Object.fromEntries(
+  CAMPUS_LANDMARKS.map((lm) => [lm.id, lm.fallbackPosition])
+)
+
 
 export type LabelVisibilityMode = 'all' | 'major' | 'selected'
 

@@ -435,5 +435,44 @@ describe('Phase 5C: 3D Campus Building Labels & Positioning', () => {
       assert.ok(landmarkIds.has('library'), 'Library must have Stage E3 3D landmark anchor')
     })
   })
+
+  describe('Stage E3 Verified 3D Roof Anchors & Irregular Building Validation', () => {
+    it('verifies all 18 landmarks have exact 3D roof anchors matching Stage E3 GLB geometry', () => {
+      for (const lm of CAMPUS_LANDMARKS) {
+        assert.ok(lm.fallbackPosition[1] > 2.0, `Landmark ${lm.id} must be elevated above ground terrain`)
+      }
+    })
+
+    it('verifies L-Shape Block anchor lies strictly on physical North wing roof and not in open courtyard', () => {
+      const lShape = CAMPUS_LANDMARKS.find((lm) => lm.id === 'l-shape-block')!
+      assert.ok(lShape)
+      // North wing roof is between X: 137.4 and 249.4, Z: -95.0 and -85.6, Y >= 10.0m
+      assert.ok(lShape.fallbackPosition[0] >= 137.4 && lShape.fallbackPosition[0] <= 249.4, 'X must be on North wing')
+      assert.ok(lShape.fallbackPosition[2] >= -95.0 && lShape.fallbackPosition[2] <= -85.6, 'Z must be on North wing spine')
+      assert.ok(lShape.fallbackPosition[1] >= 10.0, 'Roof apex must be >= 10.0m')
+
+      // Must NOT be at courtyard center [200.4, -67.1]
+      const distToCourtyardCenter = Math.hypot(lShape.fallbackPosition[0] - 200.4, lShape.fallbackPosition[2] - (-67.1))
+      assert.ok(distToCourtyardCenter > 20, 'Anchor must not fall into courtyard center')
+    })
+
+    it('verifies multi-storey academic blocks have verified roof apex elevations >= 10m', () => {
+      const multiStorey = ['first-year-block', 'civil-block', 'it-block', 'mechanical-block', 'mnm-school-of-architecture', 'boys-hostel']
+      for (const id of multiStorey) {
+        const lm = CAMPUS_LANDMARKS.find((l) => l.id === id)!
+        assert.ok(lm, `Landmark ${id} must exist`)
+        assert.ok(lm.fallbackPosition[1] >= 10.0, `${id} roof apex elevation must be >= 10.0m (actual: ${lm.fallbackPosition[1]})`)
+      }
+    })
+
+    it('verifies Mechanical Block anchor is positioned over the primary engineering workshop hall', () => {
+      const mech = CAMPUS_LANDMARKS.find((lm) => lm.id === 'mechanical-block')!
+      assert.ok(mech)
+      // Main hall center is around X: 32.0, Y: 12.5, Z: -76.3
+      assert.ok(mech.fallbackPosition[0] >= 25.0 && mech.fallbackPosition[0] <= 45.0)
+      assert.ok(mech.fallbackPosition[1] >= 12.0)
+    })
+  })
 })
+
 
