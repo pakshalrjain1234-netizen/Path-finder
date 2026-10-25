@@ -16,6 +16,7 @@ interface AuthContextValue {
   isAdmin: boolean
   isDemo: boolean
   isInitializing: boolean
+  hasSession: boolean
   permissions: RolePermissions
   login: (role: 'admin' | 'student', username?: string, password?: string) => Promise<{ success: boolean; error?: string }>
   loginAsVisitor: () => void
@@ -53,10 +54,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const user = session?.user ?? VISITOR_USER
   const role: UserRole = user.role
+  const hasSession = Boolean(session)
   const isAuthenticated = Boolean(session && role !== 'visitor')
-  const isVisitor = role === 'visitor'
-  const isStudent = role === 'student'
-  const isAdmin = role === 'admin'
+  const isVisitor = Boolean(session && role === 'visitor')
+  const isStudent = Boolean(session && role === 'student')
+  const isAdmin = Boolean(session && role === 'admin')
   const isDemo = Boolean(session?.isDemo)
 
   const permissions = useMemo(() => getRolePermissions(role), [role])
@@ -85,12 +87,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAdmin,
       isDemo,
       isInitializing,
+      hasSession,
       permissions,
       login,
       loginAsVisitor,
       logout,
     }),
-    [session, user, role, isAuthenticated, isVisitor, isStudent, isAdmin, isDemo, isInitializing, permissions]
+    [session, user, role, isAuthenticated, isVisitor, isStudent, isAdmin, isDemo, isInitializing, hasSession, permissions]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

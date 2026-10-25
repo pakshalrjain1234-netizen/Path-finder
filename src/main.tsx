@@ -5,7 +5,16 @@ import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import App from './App.tsx'
 
-registerSW({ immediate: true })
+registerSW({
+  immediate: true,
+  onRegisteredSW(_swUrl, registration) {
+    if (registration) {
+      setInterval(() => {
+        registration.update().catch(() => {})
+      }, 60 * 60 * 1000)
+    }
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

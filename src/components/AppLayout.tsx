@@ -17,7 +17,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { defaultGpsService } from '../services/gpsService.ts'
 import type { GpsServiceStatus } from '../types/gps.ts'
@@ -25,7 +25,8 @@ import { VisitorFeedbackModal } from './VisitorFeedbackModal'
 
 export function AppLayout() {
   const navigate = useNavigate()
-  const { role, user, isAuthenticated, logout } = useAuth()
+  const location = useLocation()
+  const { session, role, user, isAuthenticated, isInitializing, logout } = useAuth()
   const [gpsStatus, setGpsStatus] = useState<GpsServiceStatus>(defaultGpsService.getStatus())
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
@@ -104,6 +105,26 @@ export function AppLayout() {
       { to: '/help', label: 'Help', icon: HelpCircle },
     ]
   }, [role])
+
+  // Prevent flash or redirect before auth initialization finishes
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#101827] flex items-center justify-center p-6 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#60A5FA] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-[#94A3B8] font-semibold tracking-wide">
+            Verifying Campus Session...
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  // Opening the website without an authenticated session or explicit visitor choice must display Login / Role Selection
+  if (!session) {
+    const fromPath = location.pathname === '/' ? '/welcome' : location.pathname
+    return <Navigate to="/login" state={{ from: fromPath }} replace />
+  }
 
   return (
     <div className="min-h-screen bg-[#101827] text-[#F1F5F9] md:grid md:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[290px_minmax(0,1fr)]">

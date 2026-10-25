@@ -4,6 +4,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Compass,
+  Eye,
+  EyeOff,
   GraduationCap,
   KeyRound,
   Layers,
@@ -25,7 +27,7 @@ type LoginView = 'portal' | 'student' | 'admin'
 export function LoginRoleScreen() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { session, isAuthenticated, login, loginAsVisitor, logout } = useAuth()
+  const { session, isAuthenticated, isInitializing, login, loginAsVisitor, logout } = useAuth()
 
   // Dedicated multi-screen navigation state
   const [viewMode, setViewMode] = useState<LoginView>('portal')
@@ -33,10 +35,12 @@ export function LoginRoleScreen() {
   // Dedicated student credential state
   const [studentUsername, setStudentUsername] = useState('')
   const [studentPassword, setStudentPassword] = useState('')
+  const [showStudentPassword, setShowStudentPassword] = useState(false)
 
   // Dedicated administrator credential state
   const [adminUsername, setAdminUsername] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
+  const [showAdminPassword, setShowAdminPassword] = useState(false)
 
   // Common submission states
   const [error, setError] = useState<string | null>(null)
@@ -51,6 +55,7 @@ export function LoginRoleScreen() {
     setError(null)
     setStudentUsername('')
     setStudentPassword('')
+    setShowStudentPassword(false)
     setViewMode('student')
   }
 
@@ -59,6 +64,7 @@ export function LoginRoleScreen() {
     setError(null)
     setAdminUsername('')
     setAdminPassword('')
+    setShowAdminPassword(false)
     setViewMode('admin')
   }
 
@@ -67,8 +73,10 @@ export function LoginRoleScreen() {
     setError(null)
     setStudentUsername('')
     setStudentPassword('')
+    setShowStudentPassword(false)
     setAdminUsername('')
     setAdminPassword('')
+    setShowAdminPassword(false)
     setViewMode('portal')
   }
 
@@ -88,7 +96,8 @@ export function LoginRoleScreen() {
       if (res.success) {
         // Clear transient password from memory immediately
         setStudentPassword('')
-        const target = from && !from.startsWith('/admin') ? from : '/welcome'
+        setShowStudentPassword(false)
+        const target = from && !from.startsWith('/admin') ? from : '/issues'
         navigate(target, { replace: true })
       } else {
         setError(res.error || 'Authentication failed. Please check your student credentials.')
@@ -116,7 +125,8 @@ export function LoginRoleScreen() {
       if (res.success) {
         // Clear transient password from memory immediately
         setAdminPassword('')
-        navigate(from || '/welcome', { replace: true })
+        setShowAdminPassword(false)
+        navigate(from || '/admin/issues', { replace: true })
       } else {
         setError(res.error || 'Authentication failed. Please verify administrator credentials.')
       }
@@ -135,6 +145,19 @@ export function LoginRoleScreen() {
         ? from
         : '/welcome'
     navigate(target, { replace: true })
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#101827] flex items-center justify-center p-6 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#60A5FA] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-[#94A3B8] font-semibold tracking-wide">
+            Verifying Campus Session...
+          </span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -286,9 +309,11 @@ export function LoginRoleScreen() {
 
                 {/* 3 Interactive Access Choices */}
                 <div className="space-y-3.5">
-                  {/* Choice 1: Student Access */}
+                  {/* Choice 1: Student Login */}
                   <button
                     type="button"
+                    id="btn-choice-student-login"
+                    data-testid="btn-choice-student-login"
                     onClick={handleOpenStudentView}
                     className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
                   >
@@ -299,7 +324,7 @@ export function LoginRoleScreen() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#60A5FA] transition-colors">
-                            Student Access
+                            Student Login
                           </h3>
                           <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.2 text-[9px] font-bold text-[#60A5FA] uppercase">
                             Passport
@@ -315,9 +340,11 @@ export function LoginRoleScreen() {
                     </div>
                   </button>
 
-                  {/* Choice 2: Administrator Access */}
+                  {/* Choice 2: Admin Login */}
                   <button
                     type="button"
+                    id="btn-choice-admin-login"
+                    data-testid="btn-choice-admin-login"
                     onClick={handleOpenAdminView}
                     className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
                   >
@@ -328,7 +355,7 @@ export function LoginRoleScreen() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#60A5FA] transition-colors">
-                            Administrator Command
+                            Admin Login
                           </h3>
                           <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.2 text-[9px] font-bold text-purple-300 uppercase">
                             Operations
@@ -344,9 +371,10 @@ export function LoginRoleScreen() {
                     </div>
                   </button>
 
-                  {/* Choice 3: Explore as Visitor */}
+                  {/* Choice 3: Continue as Visitor */}
                   <button
                     type="button"
+                    id="btn-continue-as-visitor"
                     data-testid="btn-continue-as-visitor"
                     onClick={handleVisitorEntry}
                     className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#34D399] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
@@ -358,7 +386,7 @@ export function LoginRoleScreen() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#34D399] transition-colors">
-                            Explore as Visitor
+                            Continue as Visitor
                           </h3>
                           <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 text-[9px] font-bold text-[#34D399] uppercase">
                             Public
@@ -439,18 +467,31 @@ export function LoginRoleScreen() {
                     <label htmlFor="student-security-key" className="block text-xs font-semibold text-[#F1F5F9] mb-1.5">
                       Student Password
                     </label>
-                    <input
-                      id="student-security-key"
-                      name="student_security_key"
-                      data-testid="input-password"
-                      type="password"
-                      autoComplete="current-password"
-                      disabled={loading}
-                      value={studentPassword}
-                      onChange={(e) => setStudentPassword(e.target.value)}
-                      placeholder="Enter student account password"
-                      className="w-full rounded-xl border border-[#293A50] bg-[#162235] px-4 py-2.5 text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:border-[#60A5FA] focus:outline-none transition shadow-sm"
-                    />
+                    <div className="relative">
+                      <input
+                        id="student-security-key"
+                        name="student_security_key"
+                        data-testid="input-password"
+                        type={showStudentPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        disabled={loading}
+                        value={studentPassword}
+                        onChange={(e) => setStudentPassword(e.target.value)}
+                        placeholder="Enter student account password"
+                        className="w-full rounded-xl border border-[#293A50] bg-[#162235] pl-4 pr-11 py-2.5 text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:border-[#60A5FA] focus:outline-none transition shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        id="btn-toggle-student-password"
+                        data-testid="btn-toggle-student-password"
+                        onClick={() => setShowStudentPassword((prev) => !prev)}
+                        aria-label={showStudentPassword ? 'Hide password' : 'Show password'}
+                        aria-pressed={showStudentPassword}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center h-7 w-7 rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#192638] focus:outline-none focus:ring-1 focus:ring-[#60A5FA] transition-colors cursor-pointer"
+                      >
+                        {showStudentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
 
                   {error && (
@@ -537,18 +578,31 @@ export function LoginRoleScreen() {
                     <label htmlFor="admin-security-key" className="block text-xs font-semibold text-[#F1F5F9] mb-1.5">
                       Administrator Password
                     </label>
-                    <input
-                      id="admin-security-key"
-                      name="admin_security_key"
-                      data-testid="input-password"
-                      type="password"
-                      autoComplete="current-password"
-                      disabled={loading}
-                      value={adminPassword}
-                      onChange={(e) => setAdminPassword(e.target.value)}
-                      placeholder="Enter administrator password"
-                      className="w-full rounded-xl border border-[#293A50] bg-[#162235] px-4 py-2.5 text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:border-[#60A5FA] focus:outline-none transition shadow-sm"
-                    />
+                    <div className="relative">
+                      <input
+                        id="admin-security-key"
+                        name="admin_security_key"
+                        data-testid="input-password"
+                        type={showAdminPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        disabled={loading}
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        placeholder="Enter administrator password"
+                        className="w-full rounded-xl border border-[#293A50] bg-[#162235] pl-4 pr-11 py-2.5 text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:border-[#60A5FA] focus:outline-none transition shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        id="btn-toggle-admin-password"
+                        data-testid="btn-toggle-admin-password"
+                        onClick={() => setShowAdminPassword((prev) => !prev)}
+                        aria-label={showAdminPassword ? 'Hide password' : 'Show password'}
+                        aria-pressed={showAdminPassword}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center h-7 w-7 rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#192638] focus:outline-none focus:ring-1 focus:ring-[#60A5FA] transition-colors cursor-pointer"
+                      >
+                        {showAdminPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
 
                   {error && (

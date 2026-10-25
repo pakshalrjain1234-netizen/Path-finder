@@ -2,6 +2,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabaseClient.ts'
 import type { AuthSession, RolePermissions, User, UserRole } from '../types/auth'
 
 const AUTH_STORAGE_KEY = 'pathfinder_auth_session'
+const VISITOR_SESSION_KEY = 'pathfinder_visitor_session'
 
 // Demonstration User Accounts (clearly designated for local prototype testing)
 export const DEMO_USERS: Record<Exclude<UserRole, 'visitor'>, User> = {
@@ -173,22 +174,27 @@ class AuthService {
           return
         }
       } catch {
-        // continue to visitor/local check
+        // continue to local check
       }
     }
 
-    // 2. Check local storage for active visitor or demo session
+    // 2. Check local storage for active student/admin demo accounts ONLY
+    // Purge any stale visitor session stored in localStorage from earlier builds
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY)
       if (stored) {
         const parsed: AuthSession = JSON.parse(stored)
-        if (parsed.expiresAt > Date.now()) {
+        if (parsed?.user?.role === 'visitor') {
+          // Clear stale or conflicting visitor-session state safely
+          localStorage.removeItem(AUTH_STORAGE_KEY)
+        } else if (parsed.expiresAt > Date.now()) {
           // If Supabase is configured, we do NOT restore mock student/admin accounts from localStorage!
-          if (isSupabaseConfigured && parsed.isDemo && parsed.user.role !== 'visitor') {
+          if (isSupabaseConfigured && parsed.isDemo) {
             localStorage.removeItem(AUTH_STORAGE_KEY)
             this.currentSession = null
           } else {
             this.currentSession = parsed
+            return
           }
         } else {
           localStorage.removeItem(AUTH_STORAGE_KEY)
@@ -198,6 +204,26 @@ class AuthService {
     } catch {
       this.currentSession = null
     }
+
+    // 3. Check sessionStorage for active visitor session within this specific tab ONLY
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        const visitorStored = sessionStorage.getItem(VISITOR_SESSION_KEY)
+        if (visitorStored) {
+          const parsed: AuthSession = JSON.parse(visitorStored)
+          if (parsed?.user?.role === 'visitor' && parsed.expiresAt > Date.now()) {
+            this.currentSession = parsed
+            return
+          } else {
+            sessionStorage.removeItem(VISITOR_SESSION_KEY)
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    this.currentSession = null
   }
 
   public getSession(): AuthSession | null {
@@ -321,6 +347,13 @@ class AuthService {
         }
 
         this.currentSession = session
+        try {
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            sessionStorage.removeItem(VISITOR_SESSION_KEY)
+          }
+        } catch {
+          // ignore
+        }
         this.notify()
         return { success: true, session }
       } catch (err: any) {
@@ -359,6 +392,9 @@ class AuthService {
     this.currentSession = session
     try {
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session))
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem(VISITOR_SESSION_KEY)
+      }
     } catch {
       // ignore
     }
@@ -376,8 +412,21 @@ class AuthService {
     }
 
     this.currentSession = session
+    // Store visitor session ONLY in sessionStorage for the active tab session.
+    // Never persist visitor mode into localStorage so fresh visits return to Role Selection.
     try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session))
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem(VISITOR_SESSION_KEY, JSON.stringify(session))
+      }
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem(AUTH_STORAGE_KEY)
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed?.user?.role === 'visitor') {
+            localStorage.removeItem(AUTH_STORAGE_KEY)
+          }
+        }
+      }
     } catch {
       // ignore
     }
@@ -394,7 +443,12 @@ class AuthService {
   public async logout() {
     this.currentSession = null
     try {
-      localStorage.removeItem(AUTH_STORAGE_KEY)
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_STORAGE_KEY)
+        if (window.sessionStorage) {
+          sessionStorage.removeItem(VISITOR_SESSION_KEY)
+        }
+      }
     } catch {
       // ignore
     }
