@@ -562,7 +562,7 @@ function RouteOverlay({
                 <meshBasicMaterial color="#B45309" opacity={0.18} transparent side={2} depthWrite={false} />
               </mesh>
               <Html position={[0, 1.9, 0]} center zIndexRange={[45, 0]}>
-                <div className="flex flex-col items-center pointer-events-none select-none -translate-x-1/2 -translate-y-full">
+                <div className="flex flex-col items-center pointer-events-none select-none -translate-y-3">
                   <div className="flex items-center gap-1.5 rounded-full border-2 border-[#FBBF24] bg-[#451A03]/95 px-3 py-1.5 text-xs font-bold text-[#FEF3C7] shadow-2xl backdrop-blur-md whitespace-nowrap">
                     <span className="h-2 w-2 rounded-full bg-[#FBBF24] animate-pulse" />
                     <span>Walking Route Ends Here</span>
@@ -589,7 +589,7 @@ function RouteOverlay({
                 <meshBasicMaterial color="#A78BFA" opacity={0.12} transparent side={2} depthWrite={false} />
               </mesh>
               <Html position={[0, 1.9, 0]} center zIndexRange={[45, 0]}>
-                <div className="flex items-center gap-1.5 rounded-full border-2 border-[#A78BFA] bg-[#2E1065]/95 px-3 py-1 text-xs font-bold text-[#EDE9FE] shadow-2xl backdrop-blur-md pointer-events-none select-none whitespace-nowrap -translate-x-1/2 -translate-y-full">
+                <div className="flex items-center gap-1.5 rounded-full border-2 border-[#A78BFA] bg-[#2E1065]/95 px-3 py-1 text-xs font-bold text-[#EDE9FE] shadow-2xl backdrop-blur-md pointer-events-none select-none whitespace-nowrap -translate-y-3">
                   <span className="h-2 w-2 rounded-full bg-[#A78BFA] ring-2 ring-violet-300" />
                   <span>Destination: {targetDestinationName ?? 'Destination'}</span>
                 </div>
@@ -1168,13 +1168,13 @@ function CampusScene({
                   </span>
 
                   {/* Building Name */}
-                  <span className={`tracking-tight ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
+                  <span className={`tracking-tight max-w-[145px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
                     {landmark.label}
                   </span>
 
-                  {/* Selected Indicator Badge in Elegant Violet */}
-                  {isSelected && (
-                    <span className="flex items-center gap-1 rounded-full bg-violet-400/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-violet-200 border border-violet-300/40">
+                  {/* Selected Indicator Badge in Elegant Violet (Suppressed if route destination marker already rendered) */}
+                  {isSelected && (!routePoints || routePoints.length === 0) && (
+                    <span className="flex items-center gap-1 rounded-full bg-violet-400/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-violet-200 border border-violet-300/40 shrink-0">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
                       Destination
                     </span>
@@ -1278,16 +1278,18 @@ function CampusScene({
                   >
                     {isApollo ? <HeartPulse className="h-3.5 w-3.5" /> : <Printer className="h-3.5 w-3.5" />}
                   </span>
-                  <span className={`tracking-tight ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
+                  <span className={`tracking-tight max-w-[145px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
                     {poi.name}
                   </span>
-                  <span className={`rounded px-1 py-0.5 text-[8px] font-bold border ${
-                    isSelected
-                      ? 'bg-violet-500/30 text-violet-200 border-violet-400/40'
-                      : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
-                  }`}>
-                    {isSelected ? 'Destination' : 'Provisional'}
-                  </span>
+                  {(!isSelected || !routePoints || routePoints.length === 0) && (
+                    <span className={`rounded px-1 py-0.5 text-[8px] font-bold border shrink-0 ${
+                      isSelected
+                        ? 'bg-violet-500/30 text-violet-200 border-violet-400/40'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+                    }`}>
+                      {isSelected ? 'Destination' : 'Provisional'}
+                    </span>
+                  )}
                 </button>
                 <div className="relative flex flex-col items-center pointer-events-none -mt-px">
                   <svg className="overflow-visible" width="1" height={stemHeightPx} style={{ position: 'relative' }}>
@@ -1712,10 +1714,10 @@ function ControlsLayer({
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20">
-      {/* Top-Right Camera Modes, Tools & Label Visibility Toggle - positioned safely below header */}
-      <div className="pointer-events-none absolute right-3 top-24 z-20 flex flex-col items-end gap-2 md:right-4 md:top-20">
+      {/* Top-Right Camera Modes, Tools & Label Visibility Toggle */}
+      <div className="pointer-events-none absolute right-2.5 top-3 z-20 flex flex-col items-end gap-1.5 md:right-4 md:top-4">
         {/* Compact Label Visibility Segmented Control */}
-        <div className="pointer-events-auto flex items-center rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1 shadow-2xl backdrop-blur-xl gap-0.5">
+        <div className="pointer-events-auto flex items-center rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1 shadow-2xl backdrop-blur-xl gap-0.5">
           <span className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase hidden sm:inline">
             Labels
           </span>
@@ -1723,7 +1725,7 @@ function ControlsLayer({
             type="button"
             id="btn-label-mode-major"
             onClick={() => onLabelVisibilityModeChange('major')}
-            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+            className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'major'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
                 : 'text-slate-300 hover:bg-white/10 hover:text-white'
@@ -1736,7 +1738,7 @@ function ControlsLayer({
             type="button"
             id="btn-label-mode-all"
             onClick={() => onLabelVisibilityModeChange('all')}
-            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+            className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'all'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
                 : 'text-slate-300 hover:bg-white/10 hover:text-white'
@@ -1749,7 +1751,7 @@ function ControlsLayer({
             type="button"
             id="btn-label-mode-selected"
             onClick={() => onLabelVisibilityModeChange('selected')}
-            className={`rounded-xl px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+            className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'selected'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
                 : 'text-slate-300 hover:bg-white/10 hover:text-white'
@@ -1761,7 +1763,7 @@ function ControlsLayer({
         </div>
 
         {/* Primary Camera Navigation Controls Card */}
-        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1.5 shadow-2xl backdrop-blur-xl">
+        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1.5 shadow-2xl backdrop-blur-xl">
           {/* Recenter Campus Overview */}
           <button
             type="button"
@@ -1875,8 +1877,8 @@ function ControlsLayer({
       </div>
 
       {/* Bottom-Right Zoom Controls */}
-      <div className="pointer-events-none absolute bottom-4 right-3 z-20 flex flex-col gap-1.5 md:right-4">
-        <div className="pointer-events-auto flex flex-col rounded-2xl border border-white/10 bg-[#0B1220]/90 p-1 shadow-2xl backdrop-blur-xl">
+      <div className="pointer-events-none absolute bottom-20 md:bottom-4 right-3 md:right-4 z-20 flex flex-col gap-1.5">
+        <div className="pointer-events-auto flex flex-col rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1 shadow-2xl backdrop-blur-xl">
           <button
             type="button"
             onClick={() => zoom(0.82)}

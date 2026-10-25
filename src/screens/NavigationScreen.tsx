@@ -880,23 +880,23 @@ export function NavigationScreen() {
 
         {/* Route Overview Card (When route is valid) */}
         {routeCalculation.status === 'ok' && route && (
-          <div className="flex items-center justify-between rounded-xl bg-[#192638] border border-[#293A50] p-2.5 text-xs text-[#F1F5F9] shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-[#60A5FA] border border-blue-500/20">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 rounded-xl bg-[#192638] border border-[#293A50] p-2.5 text-xs text-[#F1F5F9] shadow-sm">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-[#60A5FA] border border-blue-500/20">
                 <Footprints size={15} />
               </div>
-              <div>
-                <div className="font-semibold text-white flex items-center gap-1.5">
+              <div className="min-w-0">
+                <div className="font-semibold text-white flex items-center gap-1.5 flex-wrap">
                   <span>~{totalRouteDistance.toFixed(0)} m</span>
                   <span className="text-[#94A3B8]">•</span>
                   <span>~{estimatedWalkingMinutes} min walk</span>
                 </div>
-                <div className="text-[10px] text-[#94A3B8]">
+                <div className="text-[10px] text-[#94A3B8] truncate">
                   {route.steps.length} turns • {routeCalculation.isApproachRoute ? `Verified approach to ${routeCalculation.approachDestinationName}` : 'Scale provisional • Verified walkways'}
                 </div>
               </div>
             </div>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider border ${
+            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider border ${
               routeCalculation.isApproachRoute
                 ? 'bg-amber-900/40 text-amber-300 border-amber-600/40'
                 : 'bg-blue-500/10 text-[#60A5FA] border-blue-500/30'
@@ -984,19 +984,18 @@ export function NavigationScreen() {
               /* ACTIVE GUIDED NAVIGATION STATE (Turn-by-Turn Card) */
               <div className="space-y-3 rounded-2xl border border-[#293A50] bg-[#192638] p-3.5 shadow-xl">
                 {/* Active Guidance Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider text-[#60A5FA]">
-                    <span className={`h-2 w-2 rounded-full ${isAutoNavActive ? 'bg-[#60A5FA] animate-ping' : 'bg-[#60A5FA] animate-pulse'}`} />
-                    <span>
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 font-bold text-[11px] sm:text-xs uppercase tracking-wider text-[#60A5FA] min-w-0">
+                    <span className={`h-2 w-2 shrink-0 rounded-full ${isAutoNavActive ? 'bg-[#60A5FA] animate-ping' : 'bg-[#60A5FA] animate-pulse'}`} />
+                    <span className="truncate">
                       {isAutoNavActive
                         ? isTestMode
                           ? 'Automatic GPS Guidance (Test Mode)'
-                          : 'Automatic Live GPS Navigation Active'
+                          : 'Automatic Live GPS Navigation'
                         : 'Walkway Guidance Active (Manual Stepper)'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       id={isMobile ? 'btn-exit-navigation-mobile' : 'btn-exit-navigation'}
                       type="button"
@@ -1639,10 +1638,12 @@ export function NavigationScreen() {
         <div
           className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-[#162235]/98 shadow-2xl border-t border-x border-[#293A50] backdrop-blur-xl transition-all duration-300 text-[#F1F5F9] ${
             mobileSheetState === 'collapsed'
-              ? 'h-14'
+              ? isNavigating
+                ? 'h-20'
+                : 'h-16'
               : mobileSheetState === 'half'
-                ? 'h-[52%] max-h-[380px]'
-                : 'h-[85%]'
+                ? 'h-[46%] max-h-[340px]'
+                : 'h-[82%]'
           }`}
         >
           {/* Grab Handle & Sheet Header */}
@@ -1662,77 +1663,167 @@ export function NavigationScreen() {
               className="h-1.5 w-12 rounded-full bg-[#24364D] hover:bg-[#34465E] transition-colors mb-2"
               aria-label="Toggle sheet height"
             />
-            <div className="flex w-full items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
-                  <Navigation size={14} />
+            {isNavigating && currentStep && mobileSheetState === 'collapsed' ? (
+              <div className="flex w-full items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${
+                      isArrived ? 'bg-emerald-600' : 'bg-[#2563EB]'
+                    }`}
+                  >
+                    {isArrived ? (
+                      <CheckCircle2 size={16} />
+                    ) : currentStep.title.toLowerCase().includes('right') ? (
+                      <CornerUpRight size={16} />
+                    ) : currentStep.title.toLowerCase().includes('left') ? (
+                      <CornerUpLeft size={16} />
+                    ) : activeStepIndex === 0 ? (
+                      <Compass size={16} />
+                    ) : (
+                      <ArrowUp size={16} />
+                    )}
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-wider">
+                        {isArrived ? 'Arrived' : `Step ${activeStepIndex + 1}/${route?.steps.length}`}
+                      </span>
+                    </div>
+                    <div className="text-xs font-semibold text-white truncate leading-tight">
+                      {isArrived ? 'Destination Arrived' : currentStep.title}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <h2 className="text-xs font-semibold text-white leading-tight">Campus Navigator</h2>
-                  <p className="text-[10px] text-[#94A3B8]">
-                    {mobileSheetState === 'collapsed'
-                      ? routeCalculation.status === 'ok'
-                        ? isNavigating
-                          ? `Step ${activeStepIndex + 1} of ${route?.steps.length}`
-                          : 'Route calculated • Tap to view'
-                        : 'Route unavailable • Tap'
-                      : 'Misrimal Navajee Munoth Jain'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="rounded-lg border border-[#293A50] bg-[#192638] px-2 py-1 text-[11px] font-medium text-[#94A3B8] hover:text-white shadow-sm"
-                  title="Reset"
-                >
-                  <RotateCcw size={12} />
-                </button>
-                {mobileSheetState === 'collapsed' ? (
+
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
-                    onClick={() => setMobileSheetState('half')}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                    disabled={activeStepIndex === 0}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setActiveStepIndex((idx) => Math.max(0, idx - 1))
+                    }}
+                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white disabled:opacity-30 shadow-sm"
+                    title="Previous step"
+                    aria-label="Previous step"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!route || activeStepIndex >= route.steps.length - 1}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setActiveStepIndex((idx) => (route ? Math.min(route.steps.length - 1, idx + 1) : idx))
+                    }}
+                    className="rounded-lg bg-[#2563EB] p-1.5 text-white hover:bg-blue-600 disabled:opacity-30 shadow-sm"
+                    title="Next step"
+                    aria-label="Next step"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setMobileSheetState('half')
+                    }}
+                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm"
                     title="Expand sheet"
                     aria-label="Expand sheet"
                   >
-                    <ChevronUp size={16} />
+                    <ChevronUp size={14} />
                   </button>
-                ) : mobileSheetState === 'half' ? (
-                  <div className="flex items-center gap-1">
+                </div>
+              </div>
+            ) : (
+              <div className="flex w-full items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
+                    <Navigation size={14} />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <h2 className="text-xs font-semibold text-white leading-tight truncate">Campus Navigator</h2>
+                    <p className="text-[10px] text-[#94A3B8] truncate">
+                      {mobileSheetState === 'collapsed'
+                        ? routeCalculation.status === 'ok'
+                          ? isNavigating
+                            ? `Step ${activeStepIndex + 1} of ${route?.steps.length}`
+                            : 'Route calculated • Tap to view'
+                          : 'Route unavailable • Tap'
+                        : 'Misrimal Navajee Munoth Jain'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleReset()
+                    }}
+                    className="rounded-lg border border-[#293A50] bg-[#192638] px-2 py-1 text-[11px] font-medium text-[#94A3B8] hover:text-white shadow-sm"
+                    title="Reset"
+                  >
+                    <RotateCcw size={12} />
+                  </button>
+                  {mobileSheetState === 'collapsed' ? (
                     <button
                       type="button"
-                      onClick={() => setMobileSheetState('collapsed')}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setMobileSheetState('half')
+                      }}
                       className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
-                      title="Collapse sheet"
-                      aria-label="Collapse sheet"
-                    >
-                      <ChevronDown size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMobileSheetState('expanded')}
-                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
-                      title="Maximize sheet"
-                      aria-label="Maximize sheet"
+                      title="Expand sheet"
+                      aria-label="Expand sheet"
                     >
                       <ChevronUp size={16} />
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setMobileSheetState('half')}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
-                    title="Minimize sheet"
-                    aria-label="Minimize sheet"
-                  >
-                    <ChevronDown size={16} />
-                  </button>
-                )}
+                  ) : mobileSheetState === 'half' ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setMobileSheetState('collapsed')
+                        }}
+                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                        title="Collapse sheet"
+                        aria-label="Collapse sheet"
+                      >
+                        <ChevronDown size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setMobileSheetState('expanded')
+                        }}
+                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                        title="Maximize sheet"
+                        aria-label="Maximize sheet"
+                      >
+                        <ChevronUp size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setMobileSheetState('half')
+                      }}
+                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                      title="Minimize sheet"
+                      aria-label="Minimize sheet"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sheet Body (Hidden when collapsed) */}

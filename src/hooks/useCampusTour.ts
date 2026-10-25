@@ -114,6 +114,7 @@ export function useCampusTour(
   const settleTimerRef = useRef<NodeJS.Timeout | null>(null)
   const dwellTimerRef = useRef<NodeJS.Timeout | null>(null)
   const readingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const narrationWatchdogTimerRef = useRef<NodeJS.Timeout | null>(null)
   const progressAnimRef = useRef<number | null>(null)
   const phaseBeforePauseRef = useRef<TourPlaybackPhase>('idle')
   const narrationStartTimeRef = useRef<number>(0)
@@ -184,11 +185,31 @@ export function useCampusTour(
       clearTimeout(readingTimerRef.current)
       readingTimerRef.current = null
     }
+    if (narrationWatchdogTimerRef.current) {
+      clearTimeout(narrationWatchdogTimerRef.current)
+      narrationWatchdogTimerRef.current = null
+    }
     if (progressAnimRef.current) {
       cancelAnimationFrame(progressAnimRef.current)
       progressAnimRef.current = null
     }
   }, [])
+
+  // Immediate speech cessation when component unmounts or user navigates away from tour
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        tourNarrationService.cancel()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      clearAllTimers()
+      tourNarrationService.cancel()
+    }
+  }, [clearAllTimers])
 
   const setAutoplay = useCallback((value: boolean) => {
     setAutoplayState(value)
@@ -296,22 +317,46 @@ export function useCampusTour(
     progressAnimRef.current = requestAnimationFrame(updateProgress)
 
     if (!isMutedRef.current && tourNarrationService.isSupported()) {
+      // Safe recovery watchdog for Android Chrome:
+      // If voice narration stalls, freezes, or onEnd never fires, advance safely after reading estimate + safety margin
+      const maxSafetyMs = Math.max(6500, estReadingMs + 3200)
+      narrationWatchdogTimerRef.current = setTimeout(() => {
+        if (targetSeqId === sequenceIdRef.current) {
+          console.warn('Speech synthesis safety recovery triggered for:', activeCurrentStop.title)
+          tourNarrationService.cancel()
+          handleNarrationCompleted(targetSeqId)
+        }
+      }, maxSafetyMs)
+
       // Natural voice speech playback with strict completion callback
       tourNarrationService.speak(activeCurrentStop.narration, {
         onStart: () => {
           // Narration successfully commenced
         },
         onEnd: () => {
+          if (narrationWatchdogTimerRef.current) {
+            clearTimeout(narrationWatchdogTimerRef.current)
+            narrationWatchdogTimerRef.current = null
+          }
           // Authoritative audio completion signal: advance only now
           if (targetSeqId === sequenceIdRef.current) {
             handleNarrationCompleted(targetSeqId)
           }
         },
         onError: (err) => {
+          if (narrationWatchdogTimerRef.current) {
+            clearTimeout(narrationWatchdogTimerRef.current)
+            narrationWatchdogTimerRef.current = null
+          }
           if (targetSeqId !== sequenceIdRef.current) return
           console.warn('Speech synthesis error on landmark:', activeCurrentStop.title, err)
-          setPhase('error')
-          setNarrationError('Voice narration paused or encountered an issue.')
+          // Safe recovery: advance after a brief reading pause rather than freezing the tour
+          setNarrationError('Voice narration paused; continuing visual tour.')
+          readingTimerRef.current = setTimeout(() => {
+            if (targetSeqId === sequenceIdRef.current) {
+              handleNarrationCompleted(targetSeqId)
+            }
+          }, 2200)
         },
       })
     } else {

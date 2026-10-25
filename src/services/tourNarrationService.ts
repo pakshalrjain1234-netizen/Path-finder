@@ -467,7 +467,17 @@ class TourNarrationService implements TourNarrationProvider {
 
   private startHeartbeat() {
     this.clearHeartbeat()
-    // Heartbeat: keeps Chromium speech synthesis alive for long utterances (>15s)
+    // On mobile / Android Chrome, calling pause()/resume() freezes the native TTS engine.
+    // We only perform non-destructive liveness checks and rely on GC retention.
+    const isMobileDevice =
+      typeof window !== 'undefined' &&
+      (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
+
+    if (isMobileDevice) {
+      return
+    }
+
+    // Desktop Chromium 15s utterance keep-alive
     this.heartbeatTimer = setInterval(() => {
       if (this.isSupported() && window.speechSynthesis.speaking) {
         try {
@@ -527,6 +537,11 @@ class TourNarrationService implements TourNarrationProvider {
       utterance.pitch = 1.0
       utterance.volume = 1.0
 
+      // Retain strong global reference to prevent premature V8 garbage collection on Android Chrome
+      if (typeof window !== 'undefined') {
+        ;(window as any).__pathfinderActiveUtterance = utterance
+      }
+
       let hasFinished = false
 
       utterance.onstart = () => {
@@ -540,6 +555,9 @@ class TourNarrationService implements TourNarrationProvider {
         hasFinished = true
         this.clearHeartbeat()
         this.currentUtterance = null
+        if (typeof window !== 'undefined') {
+          delete (window as any).__pathfinderActiveUtterance
+        }
         endCb?.()
       }
 
@@ -548,6 +566,9 @@ class TourNarrationService implements TourNarrationProvider {
         hasFinished = true
         this.clearHeartbeat()
         this.currentUtterance = null
+        if (typeof window !== 'undefined') {
+          delete (window as any).__pathfinderActiveUtterance
+        }
 
         // Cancellation or intentional interruption must NEVER count as completed speech
         if (e.error === 'canceled' || e.error === 'interrupted') {
@@ -564,6 +585,9 @@ class TourNarrationService implements TourNarrationProvider {
     } catch (err) {
       this.clearHeartbeat()
       this.currentUtterance = null
+      if (typeof window !== 'undefined') {
+        delete (window as any).__pathfinderActiveUtterance
+      }
       errorCb?.(err)
     }
   }
@@ -572,12 +596,22 @@ class TourNarrationService implements TourNarrationProvider {
     this.clearHeartbeat()
     if (this.isSupported()) {
       try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume()
+        }
         window.speechSynthesis.cancel()
       } catch {
         // ignore
       }
     }
     this.currentUtterance = null
+    if (typeof window !== 'undefined') {
+      try {
+        delete (window as any).__pathfinderActiveUtterance
+      } catch {
+        // ignore
+      }
+    }
   }
 
   public cancel() {
