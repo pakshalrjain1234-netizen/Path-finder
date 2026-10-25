@@ -887,7 +887,7 @@ export function NavigationScreen() {
               </div>
               <div>
                 <div className="font-semibold text-white flex items-center gap-1.5">
-                  <span>~{totalRouteDistance.toFixed(0)} m (Provisional)</span>
+                  <span>~{totalRouteDistance.toFixed(0)} m</span>
                   <span className="text-[#94A3B8]">•</span>
                   <span>~{estimatedWalkingMinutes} min walk</span>
                 </div>

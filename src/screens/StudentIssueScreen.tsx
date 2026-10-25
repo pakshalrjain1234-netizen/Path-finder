@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Campus3D } from '../components/Campus3D'
 import { EvidenceImageViewer } from '../components/EvidenceImageViewer'
 import { useAuth } from '../context/AuthContext'
@@ -53,7 +54,19 @@ const STATUS_STEPS: IssueStatus[] = [
 
 export function StudentIssueScreen() {
   const { user, role } = useAuth()
-  const [activeTab, setActiveTab] = useState<'report' | 'my-reports'>('report')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<'report' | 'my-reports'>(() => {
+    return location.pathname.includes('/my-reports') ? 'my-reports' : 'report'
+  })
+
+  useEffect(() => {
+    if (location.pathname.includes('/my-reports')) {
+      setActiveTab('my-reports')
+    } else if (location.pathname.includes('/issues')) {
+      setActiveTab('report')
+    }
+  }, [location.pathname])
 
   // Form states
   const [category, setCategory] = useState<IssueCategory>('General maintenance')
@@ -379,10 +392,12 @@ export function StudentIssueScreen() {
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
             <Wrench className="text-[#60A5FA]" size={28} />
-            Campus Issue Passport
+            {activeTab === 'my-reports' ? 'My Campus Reports' : 'Campus Issue Passport'}
           </h1>
           <p className="text-xs text-[#94A3B8] mt-1">
-            Pinpoint maintenance issues on the Stage E3 campus model and attach photographic evidence.
+            {activeTab === 'my-reports'
+              ? 'Track real-time resolution progress, assigned maintenance crews, and review your submitted reports.'
+              : 'Pinpoint maintenance issues on the Stage E3 campus model and attach photographic evidence.'}
           </p>
         </div>
 
@@ -394,6 +409,9 @@ export function StudentIssueScreen() {
             onClick={() => {
               setActiveTab('report')
               setSubmittedReport(null)
+              if (location.pathname !== '/issues') {
+                navigate('/issues', { replace: true })
+              }
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'report'
@@ -410,6 +428,9 @@ export function StudentIssueScreen() {
             onClick={() => {
               setActiveTab('my-reports')
               reloadReports()
+              if (location.pathname !== '/my-reports') {
+                navigate('/my-reports', { replace: true })
+              }
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'my-reports'

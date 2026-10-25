@@ -25,7 +25,7 @@ const FEATURED_CAMPUS_HUBS = [
     category: 'Computing & Laboratories',
     description: 'Home to Information Technology, Computer Science labs, and advanced computing centers.',
     accent: 'from-blue-600 to-indigo-600',
-    tagBg: 'bg-blue-50 text-blue-700 border-blue-200',
+    tagBg: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
   },
   {
     id: 'main-block',
@@ -33,7 +33,7 @@ const FEATURED_CAMPUS_HUBS = [
     category: 'Administration & Academic',
     description: 'Principal office, administrative deans, conference halls, and central student services.',
     accent: 'from-indigo-600 to-purple-600',
-    tagBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    tagBg: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
   },
   {
     id: 'first-year-block',
@@ -41,7 +41,7 @@ const FEATURED_CAMPUS_HUBS = [
     category: 'Foundational Studies',
     description: 'Multi-level lecture halls, science laboratories, and foundational engineering departments.',
     accent: 'from-purple-600 to-pink-600',
-    tagBg: 'bg-purple-50 text-purple-700 border-purple-200',
+    tagBg: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
   },
   {
     id: 'civil-block',
@@ -49,7 +49,7 @@ const FEATURED_CAMPUS_HUBS = [
     category: 'Civil & Environmental',
     description: 'Civil engineering design studios, structural testing facilities, and departmental faculty.',
     accent: 'from-teal-600 to-emerald-600',
-    tagBg: 'bg-teal-50 text-teal-700 border-teal-200',
+    tagBg: 'bg-teal-500/10 text-teal-300 border-teal-500/20',
   },
   {
     id: 'canteen',
@@ -83,8 +83,9 @@ export function WelcomeScreen() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#293A50] bg-[#162235] px-3.5 py-1 text-xs font-bold text-[#60A5FA]">
-                <Compass size={14} className="text-[#60A5FA]" />
-                <span>Misrimal Navajee Munoth Jain Engineering College • Chennai</span>
+                <Compass size={14} className="text-[#60A5FA] shrink-0" />
+                <span className="hidden sm:inline">Misrimal Navajee Munoth Jain Engineering College • Chennai</span>
+                <span className="sm:hidden">MNMJEC • Chennai</span>
               </div>
 
               {/* Role Indicator Badge */}
@@ -339,7 +340,7 @@ export function WelcomeScreen() {
 
       {/* Campus Pillars Showcase */}
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-[#60A5FA]/40">
+        <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-[#60A5FA]/40">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-[#60A5FA] mb-4">
             <Footprints size={22} />
           </div>
@@ -349,7 +350,7 @@ export function WelcomeScreen() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-[#34D399]/40">
+        <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-[#34D399]/40">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-[#34D399] mb-4">
             <RefreshCw size={22} />
           </div>
@@ -359,7 +360,7 @@ export function WelcomeScreen() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-indigo-500/40">
+        <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#192638] p-6 shadow-sm transition-all hover:border-indigo-500/40">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 mb-4">
             <Layers3 size={22} />
           </div>
@@ -446,7 +447,7 @@ export function WelcomeScreen() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
+          <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB] text-white font-black text-sm mb-3">
               01
             </div>
@@ -456,7 +457,7 @@ export function WelcomeScreen() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
+          <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1E3A5F] text-white font-black text-sm mb-3">
               02
             </div>
@@ -466,7 +467,7 @@ export function WelcomeScreen() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
+          <div className="flex flex-col justify-start h-full rounded-2xl border border-[#293A50] bg-[#162235] p-5 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#059669] text-white font-black text-sm mb-3">
               03
             </div>

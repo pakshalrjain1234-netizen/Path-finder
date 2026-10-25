@@ -36,7 +36,7 @@ export function SearchScreen() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 bg-[#101827] text-[#F1F5F9]">
       {/* Search Header Bar */}
-      <div className="rounded-3xl border border-[#293A50] bg-[#192638] shadow-xl">
+      <div className="rounded-2xl border border-[#293A50] bg-[#192638] shadow-xl">
         <div className="border-b border-[#293A50] p-4 md:p-5">
           <div className="flex items-center gap-3 rounded-2xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 focus-within:border-[#60A5FA] focus-within:ring-1 focus-within:ring-[#60A5FA]/30">
             <Search size={18} className="text-[#60A5FA] shrink-0" />
@@ -184,7 +184,7 @@ export function SearchScreen() {
         </div>
       ) : (
         /* Empty Search State */
-        <div className="rounded-3xl border border-[#293A50] bg-[#192638] p-8 text-center shadow-xl">
+        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-8 text-center shadow-xl">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#162235] text-[#94A3B8] border border-[#293A50]">
             <Building2 size={28} />
           </div>

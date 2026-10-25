@@ -322,10 +322,10 @@ export function AppLayout() {
           )}
 
           <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-[#293A50]">
-            <span className="font-medium text-[#94A3B8]">Main Campus</span>
-            <div className="flex items-center gap-1.5">
+            <span className="font-medium text-[#94A3B8] shrink-0">Campus GPS</span>
+            <div className="flex items-center gap-1.5 min-w-0" title={gpsStatusText}>
               <span
-                className={`h-2 w-2 rounded-full ${
+                className={`h-2 w-2 shrink-0 rounded-full ${
                   gpsStatus === 'active'
                     ? 'bg-emerald-400 animate-pulse'
                     : gpsStatus === 'requesting'
@@ -335,7 +335,7 @@ export function AppLayout() {
                         : 'bg-slate-500'
                 }`}
               />
-              <span id="app-sidebar-gps-status" className="text-[#94A3B8] truncate max-w-[120px] font-medium">
+              <span id="app-sidebar-gps-status" className="text-[#94A3B8] truncate max-w-[150px] font-medium">
                 {gpsStatusText}
               </span>
             </div>

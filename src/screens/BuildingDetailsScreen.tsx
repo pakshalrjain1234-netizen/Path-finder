@@ -51,7 +51,7 @@ export function BuildingDetailsScreen() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 text-[#F1F5F9]">
       <div className="grid gap-4 xl:grid-cols-[420px_1fr]">
-        <section className="rounded-3xl border border-[#293A50] bg-[#162235]/90 shadow-2xl backdrop-blur-xl">
+        <section className="rounded-2xl border border-[#293A50] bg-[#162235] shadow-xl">
           <div className="border-b border-[#293A50] p-4 md:p-5">
             <nav className="flex items-center gap-1.5 text-xs text-[#94A3B8]">
               <Link to="/explore" className="hover:text-[#60A5FA] transition-colors">Campus Explorer</Link>
@@ -168,17 +168,25 @@ export function BuildingDetailsScreen() {
         </section>
 
         <section className="space-y-4">
-          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
-            <div className="text-sm font-semibold text-[#F1F5F9]">Floor Directory</div>
-            <div className="mt-3 grid gap-2">
+          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4 shadow-xl md:p-5">
+            <div className="flex items-center justify-between border-b border-[#293A50] pb-3 mb-3">
+              <div>
+                <div className="text-sm font-semibold text-[#F1F5F9]">Floor Level Status</div>
+                <div className="text-xs text-[#94A3B8]">Mapping and accessibility status per level</div>
+              </div>
+              <span className="text-xs text-[#60A5FA] font-medium rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5">
+                {floors.length} {floors.length === 1 ? 'Level' : 'Levels'}
+              </span>
+            </div>
+            <div className="grid gap-2">
               {floors.map((floor) => (
                 <div
                   key={floor}
                   onClick={() => setSelectedFloor(floor)}
-                  className={`rounded-2xl p-3 border transition-all cursor-pointer ${
+                  className={`rounded-xl p-3 border transition-all cursor-pointer ${
                     floor === selectedFloor
                       ? 'border-[#60A5FA]/50 bg-[#60A5FA]/10 text-[#93C5FD]'
-                      : 'border-[#293A50] bg-[#192638]/80 text-[#94A3B8] hover:border-[#60A5FA]/30 hover:text-[#F1F5F9]'
+                      : 'border-[#293A50] bg-[#192638] text-[#94A3B8] hover:border-[#60A5FA]/30 hover:text-[#F1F5F9]'
                   }`}
                 >
                   <div className="text-sm font-medium">{floor}</div>
@@ -190,8 +198,8 @@ export function BuildingDetailsScreen() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
-            <div className="text-sm font-semibold text-[#F1F5F9]">Adjacent Blocks</div>
+          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4 shadow-xl md:p-5">
+            <div className="text-sm font-semibold text-[#F1F5F9]">Adjacent Campus Blocks</div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {buildings
                 .filter((b) => b.id !== building.id && (b.category === building.category || b.category === 'Academic'))
@@ -200,21 +208,21 @@ export function BuildingDetailsScreen() {
                   <Link
                     key={b.id}
                     to={`/building/${b.id}`}
-                    className="rounded-2xl border border-[#293A50] bg-[#192638]/80 p-3 hover:border-[#60A5FA]/40 hover:bg-[#162235] transition-all block"
+                    className="rounded-xl border border-[#293A50] bg-[#192638] p-3 hover:border-[#60A5FA]/40 hover:bg-[#1E2E44] transition-all block"
                   >
                     <div className="text-sm font-medium text-[#F1F5F9] truncate">{b.name}</div>
-                    <div className="text-xs text-[#60A5FA]">{b.floorInfo.label}</div>
+                    <div className="text-xs text-[#60A5FA] mt-0.5">{b.floorInfo.label}</div>
                   </Link>
                 ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 p-4 shadow-xl backdrop-blur-xl md:p-5">
+          <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4 shadow-xl md:p-5">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#60A5FA]/10 text-[#60A5FA] border border-[#60A5FA]/20">
-                <Info size={20} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#60A5FA]/10 text-[#60A5FA] border border-[#60A5FA]/20">
+                <Info size={18} />
               </div>
-              <p className="text-sm text-[#94A3B8]">
+              <p className="text-xs leading-relaxed text-[#94A3B8]">
                 Floor counts and vertical spans provided based on campus 3D model. Detailed room maps remain pending until mapped.
               </p>
             </div>

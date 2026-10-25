@@ -1,33 +1,49 @@
 import { Bookmark, Cloud, Star, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { buildings } from '../data/buildings'
 import { useSavedLocations } from '../hooks/useSavedLocations'
 
 export function SavedLocationsScreen() {
+  const { user, role } = useAuth()
   const { savedIds, remove } = useSavedLocations()
   const savedBuildings = buildings.filter((building) => savedIds.includes(building.id))
 
+  const userDisplayName =
+    role === 'admin'
+      ? 'Campus Administrator'
+      : role === 'student'
+        ? user.name
+        : 'Campus Guest (Visitor)'
+
+  const userSubtitle =
+    role === 'admin'
+      ? 'MNMJEC Digital Campus • System Command'
+      : role === 'student'
+        ? 'MNMJEC Digital Campus • Student Portal'
+        : 'MNMJEC Digital Campus • Guest Explorer'
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 text-[#F1F5F9]">
-      <div className="rounded-3xl border border-[#293A50] bg-[#162235]/90 shadow-2xl backdrop-blur-xl">
+      <div className="rounded-2xl border border-[#293A50] bg-[#162235] shadow-xl">
         <div className="border-b border-[#293A50] p-4 md:p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
                 <User size={20} />
               </div>
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-[#F1F5F9]">Campus Member (Student)</div>
-                <div className="truncate text-xs text-[#94A3B8]">MNMJEC Digital Campus • Student Portal</div>
+                <div className="truncate text-sm font-semibold text-[#F1F5F9]">{userDisplayName}</div>
+                <div className="truncate text-xs text-[#94A3B8]">{userSubtitle}</div>
               </div>
             </div>
-            <div className="rounded-full border border-[#60A5FA]/30 bg-[#60A5FA]/10 px-3 py-1 text-xs font-semibold text-[#93C5FD]">
+            <div className="rounded-full border border-[#60A5FA]/30 bg-[#60A5FA]/10 px-3 py-1 text-xs font-semibold text-[#93C5FD] shrink-0">
               Locally Cached
             </div>
           </div>
           <div className="mt-3 flex items-center gap-2 text-xs text-[#94A3B8]">
-            <Cloud size={16} className="text-[#60A5FA]" />
-            PWA Offline Ready: MNMJEC Map Data
+            <Cloud size={16} className="text-[#60A5FA] shrink-0" />
+            <span>PWA Offline Ready: MNMJEC Map Data</span>
           </div>
         </div>
 
@@ -41,41 +57,41 @@ export function SavedLocationsScreen() {
           </div>
 
           {savedBuildings.length === 0 ? (
-            <div className="rounded-2xl border border-[#293A50] bg-[#192638]/60 p-4 text-sm text-[#94A3B8]">
-              No saved locations yet. Add locations from Destination Search.
+            <div className="rounded-xl border border-[#293A50] bg-[#192638] p-6 text-center text-sm text-[#94A3B8]">
+              No saved locations yet. Add locations from Destination Search or 3D Explorer.
             </div>
           ) : (
             <div className="space-y-3">
               {savedBuildings.map((building) => (
                 <article
                   key={building.id}
-                  className="flex items-center justify-between rounded-2xl border border-[#293A50] bg-[#192638]/80 p-3 hover:border-[#60A5FA]/30 transition-all"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[#293A50] bg-[#192638] p-3.5 hover:border-[#60A5FA]/30 transition-all"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#293A50] bg-[#60A5FA]/10 text-[#60A5FA]">
-                      <Star size={20} />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#293A50] bg-[#60A5FA]/10 text-[#60A5FA]">
+                      <Star size={18} />
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="truncate text-sm font-semibold text-[#F1F5F9]">{building.name}</p>
-                        <span className="rounded-full border border-[#293A50] bg-[#162235] px-2 py-0.5 text-[11px] text-[#94A3B8]">
+                        <span className="rounded-full border border-[#293A50] bg-[#162235] px-2 py-0.5 text-[10px] text-[#94A3B8]">
                           {building.floorInfo.label}
                         </span>
                       </div>
-                      <p className="truncate text-xs text-[#94A3B8]">Quick access bookmark</p>
+                      <p className="truncate text-xs text-[#94A3B8] mt-0.5">Quick access bookmark</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                     <Link
                       to={`/navigation?to=${building.id}`}
-                      className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-all"
+                      className="rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition-all"
                     >
                       Navigate
                     </Link>
                     <button
                       type="button"
                       onClick={() => remove(building.id)}
-                      className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition-all"
+                      className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition-all cursor-pointer"
                     >
                       Remove
                     </button>

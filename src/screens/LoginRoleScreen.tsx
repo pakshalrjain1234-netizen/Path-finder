@@ -204,8 +204,8 @@ export function LoginRoleScreen() {
                 estate maintenance workflows.
               </p>
 
-              {/* Core Platform Capabilities */}
-              <div className="mt-8 space-y-3.5">
+              {/* Core Platform Capabilities (Visible on desktop; collapsed on mobile to bring role options above the fold) */}
+              <div className="hidden lg:block mt-8 space-y-3.5">
                 <div className="flex items-start gap-3 rounded-xl bg-[#192638]/70 border border-[#293A50] p-3 text-xs">
                   <Layers className="text-[#60A5FA] shrink-0 mt-0.5" size={17} />
                   <div>
@@ -315,18 +315,18 @@ export function LoginRoleScreen() {
                     id="btn-choice-student-login"
                     data-testid="btn-choice-student-login"
                     onClick={handleOpenStudentView}
-                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
+                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-4 sm:p-5 transition-all duration-200 group flex items-center justify-between gap-3 sm:gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[#60A5FA] group-hover:scale-105 transition-transform">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-[#60A5FA] group-hover:scale-105 transition-transform shrink-0">
                         <GraduationCap size={24} />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#60A5FA] transition-colors">
                             Student Login
                           </h3>
-                          <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.2 text-[9px] font-bold text-[#60A5FA] uppercase">
+                          <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.2 text-[9px] font-bold text-[#60A5FA] uppercase shrink-0">
                             Passport
                           </span>
                         </div>
@@ -346,18 +346,18 @@ export function LoginRoleScreen() {
                     id="btn-choice-admin-login"
                     data-testid="btn-choice-admin-login"
                     onClick={handleOpenAdminView}
-                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
+                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#60A5FA] hover:bg-[#192638]/90 p-4 sm:p-5 transition-all duration-200 group flex items-center justify-between gap-3 sm:gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-blue-500/10"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:scale-105 transition-transform">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:scale-105 transition-transform shrink-0">
                         <ShieldCheck size={24} />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#60A5FA] transition-colors">
                             Admin Login
                           </h3>
-                          <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.2 text-[9px] font-bold text-purple-300 uppercase">
+                          <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.2 text-[9px] font-bold text-purple-300 uppercase shrink-0">
                             Operations
                           </span>
                         </div>
@@ -377,18 +377,18 @@ export function LoginRoleScreen() {
                     id="btn-continue-as-visitor"
                     data-testid="btn-continue-as-visitor"
                     onClick={handleVisitorEntry}
-                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#34D399] hover:bg-[#192638]/90 p-5 transition-all duration-200 group flex items-center justify-between gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
+                    className="w-full text-left rounded-2xl border border-[#293A50] bg-[#192638] hover:border-[#34D399] hover:bg-[#192638]/90 p-4 sm:p-5 transition-all duration-200 group flex items-center justify-between gap-3 sm:gap-4 cursor-pointer shadow-sm hover:shadow-lg hover:shadow-emerald-500/10"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-[#34D399] group-hover:scale-105 transition-transform">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-[#34D399] group-hover:scale-105 transition-transform shrink-0">
                         <Users size={24} />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <h3 className="text-base font-bold text-[#F1F5F9] group-hover:text-[#34D399] transition-colors">
                             Continue as Visitor
                           </h3>
-                          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 text-[9px] font-bold text-[#34D399] uppercase">
+                          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 text-[9px] font-bold text-[#34D399] uppercase shrink-0">
                             Public
                           </span>
                         </div>

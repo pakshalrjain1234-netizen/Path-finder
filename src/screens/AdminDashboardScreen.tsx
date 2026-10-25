@@ -380,83 +380,141 @@ export function AdminDashboardScreen() {
               No campus issues match your active filter criteria.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#F1F5F9]">
-                <thead className="bg-[#162235] text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider border-b border-[#293A50]">
-                  <tr>
-                    <th className="py-3 px-4">Tracking ID</th>
-                    <th className="py-3 px-4">Category</th>
-                    <th className="py-3 px-4">Location</th>
-                    <th className="py-3 px-4">Reporter</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Assigned Team</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#24364D]/60">
-                  {filteredIssues.map((issue) => (
-                    <tr key={issue.id} className="hover:bg-[#162235]/60 transition">
-                      <td className="py-3.5 px-4 font-mono font-bold text-[#60A5FA] whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <span>{issue.id}</span>
-                          {issue.photoUrl && (
-                            <span
-                              className="rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] border border-blue-500/30 flex items-center gap-0.5"
-                              title="Photographic evidence attached"
-                            >
-                              <Camera size={10} />
-                              <span>Photo</span>
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-semibold text-[#F1F5F9] whitespace-nowrap">
-                        {issue.category}
-                      </td>
-                      <td className="py-3.5 px-4 max-w-[200px] truncate">
-                        <div className="font-medium text-[#F1F5F9]">{issue.locationName}</div>
-                        <div className="text-[10px] text-[#94A3B8] font-mono">
-                          [{issue.modelCoordinates[0]}, {issue.modelCoordinates[2]}]
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <div className="text-[#F1F5F9]">{issue.reporterName}</div>
-                        <div className="text-[10px] text-[#94A3B8] uppercase">{issue.reporterRole}</div>
-                      </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border ${
-                            issue.status === 'RESOLVED'
-                              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30'
-                              : issue.status === 'IN_PROGRESS'
-                                ? 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30'
-                                : issue.status === 'ASSIGNED'
-                                  ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
-                                  : issue.status === 'UNDER_REVIEW'
-                                    ? 'bg-blue-950/60 text-blue-300 border-blue-500/30'
-                                    : 'bg-amber-950/60 text-amber-300 border-amber-500/30'
-                          }`}
-                        >
-                          {issue.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap text-[#94A3B8]">
-                        {issue.assignedTeam || <span className="text-[#94A3B8]/60 italic">Unassigned</span>}
-                      </td>
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenUpdateModal(issue)}
-                          className="px-3 py-1.5 rounded-lg bg-[#60A5FA] hover:bg-blue-400 text-[#0F172A] font-bold text-[11px] shadow-sm transition cursor-pointer"
-                        >
-                          Manage / Update
-                        </button>
-                      </td>
+            <>
+              {/* Mobile Card List (< md) */}
+              <div className="divide-y divide-[#24364D]/60 md:hidden">
+                {filteredIssues.map((issue) => (
+                  <div key={issue.id} className="p-4 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-[#60A5FA]">
+                        <span>{issue.id}</span>
+                        {issue.photoUrl && (
+                          <span
+                            className="rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] border border-blue-500/30 flex items-center gap-0.5"
+                            title="Photographic evidence attached"
+                          >
+                            <Camera size={10} />
+                            <span>Photo</span>
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border shrink-0 ${
+                          issue.status === 'RESOLVED'
+                            ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30'
+                            : issue.status === 'IN_PROGRESS'
+                              ? 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30'
+                              : issue.status === 'ASSIGNED'
+                                ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                : issue.status === 'UNDER_REVIEW'
+                                  ? 'bg-blue-950/60 text-blue-300 border-blue-500/30'
+                                  : 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                        }`}
+                      >
+                        {issue.status.replace('_', ' ')}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="text-xs font-semibold text-[#F1F5F9]">{issue.locationName}</div>
+                      <div className="text-[11px] text-[#94A3B8]">{issue.category} • Reporter: {issue.reporterName}</div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="text-[10px] text-[#94A3B8]">
+                        Team: {issue.assignedTeam || <span className="italic">Unassigned</span>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenUpdateModal(issue)}
+                        className="px-3 py-1.5 rounded-lg bg-[#60A5FA] hover:bg-blue-400 text-[#0F172A] font-bold text-[11px] shadow-sm transition cursor-pointer"
+                      >
+                        Manage
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>= md) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs text-[#F1F5F9]">
+                  <thead className="bg-[#162235] text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider border-b border-[#293A50]">
+                    <tr>
+                      <th className="py-3 px-4">Tracking ID</th>
+                      <th className="py-3 px-4">Category</th>
+                      <th className="py-3 px-4">Location</th>
+                      <th className="py-3 px-4">Reporter</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Assigned Team</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-[#24364D]/60">
+                    {filteredIssues.map((issue) => (
+                      <tr key={issue.id} className="hover:bg-[#162235]/60 transition">
+                        <td className="py-3.5 px-4 font-mono font-bold text-[#60A5FA] whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <span>{issue.id}</span>
+                            {issue.photoUrl && (
+                              <span
+                                className="rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] border border-blue-500/30 flex items-center gap-0.5"
+                                title="Photographic evidence attached"
+                              >
+                                <Camera size={10} />
+                                <span>Photo</span>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 font-semibold text-[#F1F5F9] whitespace-nowrap">
+                          {issue.category}
+                        </td>
+                        <td className="py-3.5 px-4 max-w-[200px] truncate">
+                          <div className="font-medium text-[#F1F5F9]">{issue.locationName}</div>
+                          <div className="text-[10px] text-[#94A3B8] font-mono">
+                            [{issue.modelCoordinates[0]}, {issue.modelCoordinates[2]}]
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="text-[#F1F5F9]">{issue.reporterName}</div>
+                          <div className="text-[10px] text-[#94A3B8] uppercase">{issue.reporterRole}</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border ${
+                              issue.status === 'RESOLVED'
+                                ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30'
+                                : issue.status === 'IN_PROGRESS'
+                                  ? 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30'
+                                  : issue.status === 'ASSIGNED'
+                                    ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                    : issue.status === 'UNDER_REVIEW'
+                                      ? 'bg-blue-950/60 text-blue-300 border-blue-500/30'
+                                      : 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                            }`}
+                          >
+                            {issue.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap text-[#94A3B8]">
+                          {issue.assignedTeam || <span className="text-[#94A3B8]/60 italic">Unassigned</span>}
+                        </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenUpdateModal(issue)}
+                            className="px-3 py-1.5 rounded-lg bg-[#60A5FA] hover:bg-blue-400 text-[#0F172A] font-bold text-[11px] shadow-sm transition cursor-pointer"
+                          >
+                            Manage / Update
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

@@ -444,7 +444,7 @@ export function CampusExplorerScreen() {
 
         {/* Floating Bottom Card / Collapsible Sheet: Selected Building Information */}
         {!tour.isTourActive && selectedBuilding && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-16 z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
+          <div className="pointer-events-none absolute inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
             <div className="pointer-events-auto w-full rounded-3xl border border-[#293A50] bg-[#192638]/95 p-4 shadow-2xl backdrop-blur-xl text-[#F1F5F9]">
               {/* Card Header */}
               <div className="flex items-start justify-between gap-3">
@@ -608,7 +608,7 @@ export function CampusExplorerScreen() {
 
         {/* Floating Bottom Card: Selected Provisional Service POI (Apollo Shine or Xerox Shop) */}
         {!tour.isTourActive && !selectedBuilding && selectedPoi && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-16 z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
+          <div className="pointer-events-none absolute inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 flex justify-center md:inset-x-auto md:left-4 md:bottom-5 md:max-w-md md:w-full">
             <div className="pointer-events-auto w-full rounded-3xl border border-amber-500/30 bg-[#192638]/95 p-4 shadow-2xl backdrop-blur-xl text-[#F1F5F9]">
               {/* Card Header */}
               <div className="flex items-start justify-between gap-3">

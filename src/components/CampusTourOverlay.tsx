@@ -312,7 +312,7 @@ export function CampusTourOverlay({ tour }: CampusTourOverlayProps) {
       </div>
 
       {/* Bottom Cinematic Landmark Information Card & Navigation Controls */}
-      <div className="pointer-events-auto mx-auto w-full max-w-2xl mb-1 sm:mb-0">
+      <div className="pointer-events-auto mx-auto w-full max-w-2xl mb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:mb-0">
         <div className="rounded-2xl sm:rounded-3xl border border-[#293A50] bg-[#192638]/95 p-3 sm:p-4 shadow-2xl backdrop-blur-md text-[#F1F5F9]">
           {/* Animated Phase & Dwell-Time Progress Bar */}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#162235] mb-2 sm:mb-3">
