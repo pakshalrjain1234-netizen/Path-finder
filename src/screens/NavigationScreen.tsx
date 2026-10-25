@@ -624,9 +624,9 @@ export function NavigationScreen() {
   }
 
   // Reusable Route Planning & Navigation Controls
-  const renderPlanningControls = (isMobile: boolean = false) => (
-    <div className="flex flex-col gap-3">
-      {/* Origin & Destination Selectors */}
+  const renderPlanningControls = (isMobile: boolean = false) => {
+    // 1. Origin & Destination Selectors and Overview
+    const selectorsBlock = (
       <div className="space-y-2">
         <div className="grid gap-2">
           {/* From Input */}
@@ -906,28 +906,27 @@ export function NavigationScreen() {
           </div>
         )}
       </div>
+    )
 
-      {/* Main Action Area: Route Preview vs Active Navigation */}
+    // 2. Main Action Area: Route Preview vs Active Turn-by-Turn Guidance
+    const mainActionBlock = (
       <div className="flex-1">
         {routeCalculation.status === 'ok' && route && currentStep && (
           <div className="space-y-3">
             {/* GPS Calibration Safety Notice (When active and uncalibrated) */}
             {isNavigating && showGpsNotice && (
-              <div className="rounded-xl border border-blue-500/30 bg-blue-950/40 p-2.5 text-[11px] text-blue-200 shadow-sm">
-                <div className="flex items-start gap-2">
-                  <ShieldAlert size={15} className="mt-0.5 text-[#60A5FA] flex-shrink-0" />
-                  <div className="space-y-0.5 min-w-0">
-                    <div className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <span>Step-by-Step Guided Navigation</span>
-                      <span className="rounded-full bg-blue-900/50 px-1.5 py-0.2 text-[9px] text-[#60A5FA] font-semibold border border-blue-500/30">
-                        Walkway Guidance
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-[#94A3B8] leading-normal">
-                      Follow the step-by-step guidance along authentic campus walkways.
-                    </p>
-                  </div>
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-blue-500/30 bg-blue-950/40 px-3 py-1.5 text-[10px] text-blue-200 shadow-sm">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <ShieldAlert size={13} className="text-[#60A5FA] shrink-0" />
+                  <span className="truncate text-[#94A3B8]">Guided along authentic campus walkways</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowGpsNotice(false)}
+                  className="text-[9px] font-bold text-[#60A5FA] hover:text-white uppercase shrink-0 cursor-pointer"
+                >
+                  Dismiss
+                </button>
               </div>
             )}
 
@@ -982,9 +981,9 @@ export function NavigationScreen() {
               </div>
             ) : (
               /* ACTIVE GUIDED NAVIGATION STATE (Turn-by-Turn Card) */
-              <div className="space-y-3 rounded-2xl border border-[#293A50] bg-[#192638] p-3.5 shadow-xl">
+              <div className="space-y-3 rounded-2xl border border-[#293A50] bg-[#162235] p-3 sm:p-3.5 shadow-xl">
                 {/* Active Guidance Header */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 pb-2 border-b border-[#293A50]">
                   <div className="flex items-center gap-1.5 font-bold text-[11px] sm:text-xs uppercase tracking-wider text-[#60A5FA] min-w-0">
                     <span className={`h-2 w-2 shrink-0 rounded-full ${isAutoNavActive ? 'bg-[#60A5FA] animate-ping' : 'bg-[#60A5FA] animate-pulse'}`} />
                     <span className="truncate">
@@ -1033,10 +1032,8 @@ export function NavigationScreen() {
                   </div>
                 )}
 
-                {/* Turn-by-Turn Guidance Hero Card */}
-                <div className="rounded-2xl bg-[#162235] p-3.5 border border-[#293A50] space-y-3">
-                  {/* Turn Maneuver Header */}
-                  <div className="flex items-start gap-3">
+                {/* Turn Maneuver Header */}
+                <div className="flex items-start gap-3">
                     <div
                       className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm text-white ${
                         isArrived
@@ -1189,7 +1186,6 @@ export function NavigationScreen() {
                     </button>
                   </div>
                 </div>
-              </div>
             )}
 
             {/* Waypoints Toggle */}
@@ -1449,6 +1445,22 @@ export function NavigationScreen() {
             </div>
           )}
       </div>
+    )
+
+    return (
+      <div className="flex flex-col gap-3">
+        {/* On mobile during active navigation: show the Active Turn Card at the top */}
+        {isMobile && isNavigating ? (
+          <>
+            {mainActionBlock}
+            {selectorsBlock}
+          </>
+        ) : (
+          <>
+            {selectorsBlock}
+            {mainActionBlock}
+          </>
+        )}
 
       {/* Landmarks Traversed */}
       {landmarksPassed.length > 0 && (
@@ -1472,7 +1484,8 @@ export function NavigationScreen() {
         Misrimal Navajee Munoth Jain Engineering College • Campus Wayfinding
       </div>
     </div>
-  )
+    )
+  }
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] p-3 md:p-4 overflow-x-hidden">
@@ -1638,9 +1651,9 @@ export function NavigationScreen() {
         <div
           className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-[#0F172A] shadow-[0_-12px_36px_rgba(0,0,0,0.85)] border-t-2 border-x border-[#293A50] transition-all duration-300 text-[#F1F5F9] ${
             mobileSheetState === 'collapsed'
-              ? 'h-[72px]'
+              ? 'h-[78px]'
               : mobileSheetState === 'half'
-                ? 'h-[62%] min-h-[390px] max-h-[470px]'
+                ? 'h-[68%] min-h-[445px] max-h-[515px]'
                 : 'h-[90%]'
           }`}
         >
@@ -1651,25 +1664,25 @@ export function NavigationScreen() {
                 setMobileSheetState((s) => (s === 'collapsed' ? 'half' : 'collapsed'))
               }
             }}
-            className="flex flex-col bg-[#162235] border-b border-[#293A50] px-3.5 pt-2 pb-2.5 flex-shrink-0 cursor-pointer select-none rounded-t-3xl"
+            className="flex flex-col bg-[#162235] border-b border-[#293A50] px-4 pt-1.5 pb-2.5 flex-shrink-0 cursor-pointer select-none rounded-t-3xl"
           >
             {/* Centered Drag Handle */}
-            <div className="flex justify-center w-full mb-2">
+            <div className="flex justify-center w-full pb-2 pt-0.5">
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
                   setMobileSheetState((s) => (s === 'collapsed' ? 'half' : s === 'half' ? 'expanded' : 'collapsed'))
                 }}
-                className="h-1.5 w-12 rounded-full bg-[#334155] hover:bg-slate-400 transition-colors cursor-grab active:cursor-grabbing"
+                className="h-1.5 w-12 rounded-full bg-[#475569] hover:bg-slate-400 transition-colors cursor-grab active:cursor-grabbing"
                 aria-label="Toggle sheet height"
               />
             </div>
 
             {/* Header Content Row */}
             {mobileSheetState === 'collapsed' ? (
-              <div className="flex w-full items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex w-full items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${
                       isNavigating
@@ -1695,7 +1708,7 @@ export function NavigationScreen() {
                       <Navigation size={18} />
                     )}
                   </div>
-                  <div className="min-w-0 text-left">
+                  <div className="min-w-0 flex-1 text-left">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-wider">
                         {isNavigating
@@ -1719,8 +1732,8 @@ export function NavigationScreen() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  {isNavigating && (
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {isNavigating ? (
                     <>
                       <button
                         type="button"
@@ -1729,11 +1742,11 @@ export function NavigationScreen() {
                           e.stopPropagation()
                           setActiveStepIndex((idx) => Math.max(0, idx - 1))
                         }}
-                        className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white disabled:opacity-30 shadow-sm transition"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] disabled:opacity-30 shadow-sm transition"
                         title="Previous step"
                         aria-label="Previous step"
                       >
-                        <ChevronLeft size={15} />
+                        <ChevronLeft size={16} />
                       </button>
                       <button
                         type="button"
@@ -1742,22 +1755,21 @@ export function NavigationScreen() {
                           e.stopPropagation()
                           setActiveStepIndex((idx) => (route ? Math.min(route.steps.length - 1, idx + 1) : idx))
                         }}
-                        className="rounded-lg bg-[#2563EB] p-2 text-white hover:bg-blue-600 disabled:opacity-30 shadow-sm transition"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#2563EB] text-white hover:bg-blue-600 disabled:opacity-30 shadow-sm shadow-blue-500/20 transition"
                         title="Next step"
                         aria-label="Next step"
                       >
-                        <ChevronRight size={15} />
+                        <ChevronRight size={16} />
                       </button>
                     </>
-                  )}
-                  {!isNavigating && (
+                  ) : (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleReset()
                       }}
-                      className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white shadow-sm transition"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
                       title="Reset"
                       aria-label="Reset route"
                     >
@@ -1770,23 +1782,23 @@ export function NavigationScreen() {
                       e.stopPropagation()
                       setMobileSheetState('half')
                     }}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white shadow-sm transition"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
                     title="Expand details"
                     aria-label="Expand details"
                   >
-                    <ChevronUp size={15} />
+                    <ChevronUp size={16} />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex w-full items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex w-full items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
                     <Navigation size={18} />
                   </div>
                   <div className="text-left min-w-0">
-                    <h2 className="text-xs sm:text-sm font-bold text-white leading-tight truncate">Campus Navigator</h2>
-                    <p className="text-[10px] text-[#94A3B8] truncate">
+                    <h2 className="text-sm font-bold text-white leading-tight truncate">Campus Navigator</h2>
+                    <p className="text-[11px] text-[#94A3B8] truncate">
                       {routeCalculation.status === 'ok'
                         ? isNavigating
                           ? `Instruction ${activeStepIndex + 1} of ${route?.steps.length} • ~${totalRouteDistance.toFixed(0)}m`
@@ -1802,21 +1814,23 @@ export function NavigationScreen() {
                       e.stopPropagation()
                       handleReset()
                     }}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] px-2 py-1.5 text-[11px] font-medium text-[#94A3B8] hover:text-white shadow-sm transition"
-                    title="Reset"
-                    aria-label="Reset"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
+                    title="Reset route"
+                    aria-label="Reset route"
                   >
-                    <RotateCcw size={13} />
+                    <RotateCcw size={14} />
                   </button>
                   {mobileSheetState === 'half' ? (
-                    <div className="flex items-center gap-1">
+                    <>
                       <button
                         type="button"
+                        id="btn-sheet-collapse"
+                        data-testid="btn-sheet-collapse"
                         onClick={(e) => {
                           e.stopPropagation()
                           setMobileSheetState('collapsed')
                         }}
-                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
                         title="Collapse sheet"
                         aria-label="Collapse sheet"
                       >
@@ -1824,25 +1838,29 @@ export function NavigationScreen() {
                       </button>
                       <button
                         type="button"
+                        id="btn-sheet-expand"
+                        data-testid="btn-sheet-expand"
                         onClick={(e) => {
                           e.stopPropagation()
                           setMobileSheetState('expanded')
                         }}
-                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
                         title="Maximize sheet"
                         aria-label="Maximize sheet"
                       >
                         <ChevronUp size={16} />
                       </button>
-                    </div>
+                    </>
                   ) : (
                     <button
                       type="button"
+                      id="btn-sheet-minimize"
+                      data-testid="btn-sheet-minimize"
                       onClick={(e) => {
                         e.stopPropagation()
                         setMobileSheetState('half')
                       }}
-                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#293A50] bg-[#192638] text-[#94A3B8] hover:text-white hover:bg-[#24364D] shadow-sm transition"
                       title="Minimize sheet"
                       aria-label="Minimize sheet"
                     >
@@ -1856,7 +1874,7 @@ export function NavigationScreen() {
 
           {/* Sheet Body (Hidden when collapsed) */}
           {mobileSheetState !== 'collapsed' && (
-            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 pb-16 bg-[#0F172A] space-y-3">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 pb-20 bg-[#0F172A] space-y-3">
               {renderPlanningControls(true)}
             </div>
           )}

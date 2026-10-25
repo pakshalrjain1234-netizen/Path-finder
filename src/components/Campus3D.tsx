@@ -545,7 +545,7 @@ function RouteOverlay({
 
       {/* ENDPOINT MARKER: Verified Nearby Endpoint (Amber #FBBF24) OR Direct Destination (Violet #A78BFA) */}
       {destination && (
-        <group position={[destination[0], destination[1], destination[2]]} name="route-destination-marker">
+        <group position={[destination[0], destination[1], destination[2]]} name={targetDestinationName ? `route-dest-${targetDestinationName}` : 'route-destination-marker'}>
           {isApproachRoute ? (
             /* VERIFIED NEARBY ROUTE ENDPOINT: Warm amber (#FBBF24) with clear "Walking Route Ends Here" indicator */
             <>
@@ -588,15 +588,8 @@ function RouteOverlay({
                 <ringGeometry args={[0, 2.6, 32]} />
                 <meshBasicMaterial color="#A78BFA" opacity={0.12} transparent side={2} depthWrite={false} />
               </mesh>
-              <Html position={[0, 1.9, 0]} center zIndexRange={[45, 0]}>
-                <div
-                  title={targetDestinationName ? `Destination: ${targetDestinationName}` : 'Destination Arrival'}
-                  className="flex items-center gap-1.5 rounded-full border border-violet-400/80 bg-[#162235]/95 px-2.5 py-0.5 text-[11px] font-bold text-violet-200 shadow-2xl backdrop-blur-md pointer-events-none select-none whitespace-nowrap -translate-y-3"
-                >
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
-                  <span>Destination Arrival</span>
-                </div>
-              </Html>
+              {/* 3D Violet Arrival Pin & Concentric Ripple Rings at Ground Walkway */}
+              {/* Note: HTML text badge omitted here to prevent duplicate badge overlap with the building roof landmark pill */}
             </>
           )}
         </group>
