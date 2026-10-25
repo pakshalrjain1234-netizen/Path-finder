@@ -589,9 +589,12 @@ function RouteOverlay({
                 <meshBasicMaterial color="#A78BFA" opacity={0.12} transparent side={2} depthWrite={false} />
               </mesh>
               <Html position={[0, 1.9, 0]} center zIndexRange={[45, 0]}>
-                <div className="flex items-center gap-1.5 rounded-full border-2 border-[#A78BFA] bg-[#2E1065]/95 px-3 py-1 text-xs font-bold text-[#EDE9FE] shadow-2xl backdrop-blur-md pointer-events-none select-none whitespace-nowrap -translate-y-3">
-                  <span className="h-2 w-2 rounded-full bg-[#A78BFA] ring-2 ring-violet-300" />
-                  <span>Destination: {targetDestinationName ?? 'Destination'}</span>
+                <div
+                  title={targetDestinationName ? `Destination: ${targetDestinationName}` : 'Destination Arrival'}
+                  className="flex items-center gap-1.5 rounded-full border border-violet-400/80 bg-[#162235]/95 px-2.5 py-0.5 text-[11px] font-bold text-violet-200 shadow-2xl backdrop-blur-md pointer-events-none select-none whitespace-nowrap -translate-y-3"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
+                  <span>Destination Arrival</span>
                 </div>
               </Html>
             </>

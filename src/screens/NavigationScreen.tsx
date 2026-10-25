@@ -1150,15 +1150,15 @@ export function NavigationScreen() {
 
                   {/* Step Navigation Controls */}
                   <div className="flex items-center justify-between gap-2 border-t border-[#293A50] pt-2.5">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
                       <button
                         id={isMobile ? 'btn-prev-step-mobile' : 'btn-prev-step'}
                         type="button"
                         disabled={activeStepIndex === 0}
                         onClick={() => setActiveStepIndex((idx) => Math.max(0, idx - 1))}
-                        className="flex items-center gap-1 rounded-xl border border-[#293A50] bg-[#192638] px-3 py-1.5 text-xs font-medium text-[#94A3B8] hover:text-white hover:bg-[#24364D] disabled:opacity-40 transition cursor-pointer shadow-sm"
+                        className="flex items-center justify-center gap-1 rounded-xl border border-[#293A50] bg-[#192638] px-3 py-2 text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#24364D] disabled:opacity-30 transition cursor-pointer shadow-sm shrink-0"
                       >
-                        <ChevronLeft size={13} />
+                        <ChevronLeft size={14} />
                         <span>Previous</span>
                       </button>
 
@@ -1167,10 +1167,10 @@ export function NavigationScreen() {
                         type="button"
                         disabled={activeStepIndex >= route.steps.length - 1}
                         onClick={() => setActiveStepIndex((idx) => Math.min(route.steps.length - 1, idx + 1))}
-                        className="flex items-center gap-1 rounded-xl bg-[#2563EB] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-600 disabled:opacity-40 transition cursor-pointer"
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-blue-600 disabled:opacity-30 transition cursor-pointer min-w-0"
                       >
-                        <span>Next Step</span>
-                        <ChevronRight size={13} />
+                        <span className="truncate">Next Step</span>
+                        <ChevronRight size={14} className="shrink-0" />
                       </button>
                     </div>
 
@@ -1181,11 +1181,11 @@ export function NavigationScreen() {
                         setIsCameraFollowing(true)
                         handleRecenterCamera()
                       }}
-                      className="flex items-center gap-1 rounded-xl border border-[#293A50] bg-[#192638] px-2.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-[#60A5FA] hover:text-white transition cursor-pointer shadow-sm"
+                      className="flex items-center justify-center p-2 rounded-xl border border-[#293A50] bg-[#192638] text-slate-300 hover:text-white hover:border-[#60A5FA] transition cursor-pointer shadow-sm shrink-0"
                       title={activeUserPosition ? 'Recenter camera on blue dot location' : 'Recenter camera on current step'}
+                      aria-label="Recenter camera"
                     >
-                      <Crosshair size={13} className="text-[#60A5FA]" />
-                      <span>{activeUserPosition ? 'Recenter on Me' : 'Recenter'}</span>
+                      <Crosshair size={15} className="text-[#60A5FA]" />
                     </button>
                   </div>
                 </div>
@@ -1636,122 +1636,162 @@ export function NavigationScreen() {
 
         {/* Floating Mobile Bottom Sheet with 3 States: collapsed, half, expanded */}
         <div
-          className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-[#162235]/98 shadow-2xl border-t border-x border-[#293A50] backdrop-blur-xl transition-all duration-300 text-[#F1F5F9] ${
+          className={`absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-[#0F172A] shadow-[0_-12px_36px_rgba(0,0,0,0.85)] border-t-2 border-x border-[#293A50] transition-all duration-300 text-[#F1F5F9] ${
             mobileSheetState === 'collapsed'
-              ? isNavigating
-                ? 'h-20'
-                : 'h-16'
+              ? 'h-[72px]'
               : mobileSheetState === 'half'
-                ? 'h-[46%] max-h-[340px]'
-                : 'h-[82%]'
+                ? 'h-[62%] min-h-[390px] max-h-[470px]'
+                : 'h-[90%]'
           }`}
         >
-          {/* Grab Handle & Sheet Header */}
+          {/* Solid Header with Drag Handle */}
           <div
             onClick={(e) => {
               if ((e.target as HTMLElement).tagName !== 'BUTTON' && !(e.target as HTMLElement).closest('button')) {
                 setMobileSheetState((s) => (s === 'collapsed' ? 'half' : 'collapsed'))
               }
             }}
-            className="flex flex-col items-center px-4 pt-2 pb-2 border-b border-[#293A50] flex-shrink-0 cursor-pointer select-none"
+            className="flex flex-col bg-[#162235] border-b border-[#293A50] px-3.5 pt-2 pb-2.5 flex-shrink-0 cursor-pointer select-none rounded-t-3xl"
           >
-            <button
-              type="button"
-              onClick={() => {
-                setMobileSheetState((s) => (s === 'collapsed' ? 'half' : s === 'half' ? 'expanded' : 'collapsed'))
-              }}
-              className="h-1.5 w-12 rounded-full bg-[#24364D] hover:bg-[#34465E] transition-colors mb-2"
-              aria-label="Toggle sheet height"
-            />
-            {isNavigating && currentStep && mobileSheetState === 'collapsed' ? (
+            {/* Centered Drag Handle */}
+            <div className="flex justify-center w-full mb-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setMobileSheetState((s) => (s === 'collapsed' ? 'half' : s === 'half' ? 'expanded' : 'collapsed'))
+                }}
+                className="h-1.5 w-12 rounded-full bg-[#334155] hover:bg-slate-400 transition-colors cursor-grab active:cursor-grabbing"
+                aria-label="Toggle sheet height"
+              />
+            </div>
+
+            {/* Header Content Row */}
+            {mobileSheetState === 'collapsed' ? (
               <div className="flex w-full items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${
-                      isArrived ? 'bg-emerald-600' : 'bg-[#2563EB]'
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ${
+                      isNavigating
+                        ? isArrived
+                          ? 'bg-emerald-600'
+                          : 'bg-[#2563EB]'
+                        : 'bg-[#2563EB]'
                     }`}
                   >
-                    {isArrived ? (
-                      <CheckCircle2 size={16} />
-                    ) : currentStep.title.toLowerCase().includes('right') ? (
-                      <CornerUpRight size={16} />
-                    ) : currentStep.title.toLowerCase().includes('left') ? (
-                      <CornerUpLeft size={16} />
-                    ) : activeStepIndex === 0 ? (
-                      <Compass size={16} />
+                    {isNavigating ? (
+                      isArrived ? (
+                        <CheckCircle2 size={18} />
+                      ) : currentStep?.title.toLowerCase().includes('right') ? (
+                        <CornerUpRight size={18} />
+                      ) : currentStep?.title.toLowerCase().includes('left') ? (
+                        <CornerUpLeft size={18} />
+                      ) : activeStepIndex === 0 ? (
+                        <Compass size={18} />
+                      ) : (
+                        <ArrowUp size={18} />
+                      )
                     ) : (
-                      <ArrowUp size={16} />
+                      <Navigation size={18} />
                     )}
                   </div>
                   <div className="min-w-0 text-left">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-wider">
-                        {isArrived ? 'Arrived' : `Step ${activeStepIndex + 1}/${route?.steps.length}`}
+                        {isNavigating
+                          ? isArrived
+                            ? 'Arrived'
+                            : `Step ${activeStepIndex + 1} of ${route?.steps.length}`
+                          : routeCalculation.status === 'ok'
+                            ? `Route Ready • ~${totalRouteDistance.toFixed(0)}m`
+                            : 'Campus Navigator'}
                       </span>
                     </div>
                     <div className="text-xs font-semibold text-white truncate leading-tight">
-                      {isArrived ? 'Destination Arrived' : currentStep.title}
+                      {isNavigating
+                        ? isArrived
+                          ? 'Destination Arrived'
+                          : currentStep?.title ?? 'Following Walkway'
+                        : routeCalculation.status === 'ok'
+                          ? `To ${targetDestinationName}`
+                          : 'Select Destination'}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    disabled={activeStepIndex === 0}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveStepIndex((idx) => Math.max(0, idx - 1))
-                    }}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white disabled:opacity-30 shadow-sm"
-                    title="Previous step"
-                    aria-label="Previous step"
-                  >
-                    <ChevronLeft size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!route || activeStepIndex >= route.steps.length - 1}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setActiveStepIndex((idx) => (route ? Math.min(route.steps.length - 1, idx + 1) : idx))
-                    }}
-                    className="rounded-lg bg-[#2563EB] p-1.5 text-white hover:bg-blue-600 disabled:opacity-30 shadow-sm"
-                    title="Next step"
-                    aria-label="Next step"
-                  >
-                    <ChevronRight size={14} />
-                  </button>
+                  {isNavigating && (
+                    <>
+                      <button
+                        type="button"
+                        disabled={activeStepIndex === 0}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActiveStepIndex((idx) => Math.max(0, idx - 1))
+                        }}
+                        className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white disabled:opacity-30 shadow-sm transition"
+                        title="Previous step"
+                        aria-label="Previous step"
+                      >
+                        <ChevronLeft size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!route || activeStepIndex >= route.steps.length - 1}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActiveStepIndex((idx) => (route ? Math.min(route.steps.length - 1, idx + 1) : idx))
+                        }}
+                        className="rounded-lg bg-[#2563EB] p-2 text-white hover:bg-blue-600 disabled:opacity-30 shadow-sm transition"
+                        title="Next step"
+                        aria-label="Next step"
+                      >
+                        <ChevronRight size={15} />
+                      </button>
+                    </>
+                  )}
+                  {!isNavigating && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleReset()
+                      }}
+                      className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white shadow-sm transition"
+                      title="Reset"
+                      aria-label="Reset route"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       setMobileSheetState('half')
                     }}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm"
-                    title="Expand sheet"
-                    aria-label="Expand sheet"
+                    className="rounded-lg border border-[#293A50] bg-[#192638] p-2 text-[#94A3B8] hover:text-white shadow-sm transition"
+                    title="Expand details"
+                    aria-label="Expand details"
                   >
-                    <ChevronUp size={14} />
+                    <ChevronUp size={15} />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
-                    <Navigation size={14} />
+              <div className="flex w-full items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-white shadow-sm shadow-blue-500/20">
+                    <Navigation size={18} />
                   </div>
                   <div className="text-left min-w-0">
-                    <h2 className="text-xs font-semibold text-white leading-tight truncate">Campus Navigator</h2>
+                    <h2 className="text-xs sm:text-sm font-bold text-white leading-tight truncate">Campus Navigator</h2>
                     <p className="text-[10px] text-[#94A3B8] truncate">
-                      {mobileSheetState === 'collapsed'
-                        ? routeCalculation.status === 'ok'
-                          ? isNavigating
-                            ? `Step ${activeStepIndex + 1} of ${route?.steps.length}`
-                            : 'Route calculated • Tap to view'
-                          : 'Route unavailable • Tap'
-                        : 'Misrimal Navajee Munoth Jain'}
+                      {routeCalculation.status === 'ok'
+                        ? isNavigating
+                          ? `Instruction ${activeStepIndex + 1} of ${route?.steps.length} • ~${totalRouteDistance.toFixed(0)}m`
+                          : `Route ready • ~${totalRouteDistance.toFixed(0)}m (~${estimatedWalkingMinutes} min walk)`
+                        : 'MNMJEC Chennai • Authentic Walkways'}
                     </p>
                   </div>
                 </div>
@@ -1762,25 +1802,13 @@ export function NavigationScreen() {
                       e.stopPropagation()
                       handleReset()
                     }}
-                    className="rounded-lg border border-[#293A50] bg-[#192638] px-2 py-1 text-[11px] font-medium text-[#94A3B8] hover:text-white shadow-sm"
+                    className="rounded-lg border border-[#293A50] bg-[#192638] px-2 py-1.5 text-[11px] font-medium text-[#94A3B8] hover:text-white shadow-sm transition"
                     title="Reset"
+                    aria-label="Reset"
                   >
-                    <RotateCcw size={12} />
+                    <RotateCcw size={13} />
                   </button>
-                  {mobileSheetState === 'collapsed' ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setMobileSheetState('half')
-                      }}
-                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
-                      title="Expand sheet"
-                      aria-label="Expand sheet"
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-                  ) : mobileSheetState === 'half' ? (
+                  {mobileSheetState === 'half' ? (
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
@@ -1788,7 +1816,7 @@ export function NavigationScreen() {
                           e.stopPropagation()
                           setMobileSheetState('collapsed')
                         }}
-                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
                         title="Collapse sheet"
                         aria-label="Collapse sheet"
                       >
@@ -1800,7 +1828,7 @@ export function NavigationScreen() {
                           e.stopPropagation()
                           setMobileSheetState('expanded')
                         }}
-                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                        className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
                         title="Maximize sheet"
                         aria-label="Maximize sheet"
                       >
@@ -1814,7 +1842,7 @@ export function NavigationScreen() {
                         e.stopPropagation()
                         setMobileSheetState('half')
                       }}
-                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1 text-[#94A3B8] hover:text-white shadow-sm"
+                      className="rounded-lg border border-[#293A50] bg-[#192638] p-1.5 text-[#94A3B8] hover:text-white shadow-sm transition"
                       title="Minimize sheet"
                       aria-label="Minimize sheet"
                     >
@@ -1828,7 +1856,7 @@ export function NavigationScreen() {
 
           {/* Sheet Body (Hidden when collapsed) */}
           {mobileSheetState !== 'collapsed' && (
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 pb-16 bg-[#0F172A] space-y-3">
               {renderPlanningControls(true)}
             </div>
           )}
