@@ -67,6 +67,10 @@ export function CurvedPastelSidebar({
   const dragStartYRef = useRef<number>(0)
   const dragStartOffsetRef = useRef<number>(0)
   const navContainerRef = useRef<HTMLElement>(null)
+  const isPointerDownRef = useRef<boolean>(false)
+  const hasDraggedRef = useRef<boolean>(false)
+  const pointerIdRef = useRef<number | null>(null)
+  const activeTargetRef = useRef<HTMLElement | null>(null)
 
   // Reduced motion preference
   const prefersReducedMotion = useMemo(() => {
@@ -82,32 +86,67 @@ export function CurvedPastelSidebar({
   // Drag interaction handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isCollapsed) return
-    // Allow standard clicks on links by only activating drag after threshold
+    if (e.button !== 0 && e.pointerType === 'mouse') return
+    isPointerDownRef.current = true
+    hasDraggedRef.current = false
     dragStartYRef.current = e.clientY
     dragStartOffsetRef.current = rotationOffset
-    setIsDragging(true)
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    pointerIdRef.current = e.pointerId
+    activeTargetRef.current = e.currentTarget as HTMLElement
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) return
+    if (!isPointerDownRef.current) return
     const deltaY = e.clientY - dragStartYRef.current
-    // 50px drag corresponds to 1 item step on the arc
-    const rawOffset = dragStartOffsetRef.current - deltaY / 52
-    const clamped = Math.max(0, Math.min(navigationItems.length - 1, rawOffset))
-    setRotationOffset(clamped)
+    // Activate drag only after exceeding threshold (6px) to allow standard clicks
+    if (!hasDraggedRef.current && Math.abs(deltaY) > 6) {
+      hasDraggedRef.current = true
+      setIsDragging(true)
+      if (activeTargetRef.current && pointerIdRef.current !== null) {
+        try {
+          activeTargetRef.current.setPointerCapture(pointerIdRef.current)
+        } catch {
+          // safe fallback
+        }
+      }
+    }
+    if (hasDraggedRef.current) {
+      // 52px drag corresponds to 1 item step on the arc
+      const rawOffset = dragStartOffsetRef.current - deltaY / 52
+      const clamped = Math.max(0, Math.min(navigationItems.length - 1, rawOffset))
+      setRotationOffset(clamped)
+    }
   }
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) return
-    setIsDragging(false)
-    try {
-      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
-    } catch {
-      // safe fallback
+  const handlePointerUp = (_e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isPointerDownRef.current) return
+    isPointerDownRef.current = false
+
+    if (hasDraggedRef.current) {
+      setIsDragging(false)
+      if (activeTargetRef.current && pointerIdRef.current !== null) {
+        try {
+          activeTargetRef.current.releasePointerCapture(pointerIdRef.current)
+        } catch {
+          // safe fallback
+        }
+      }
+      // Snap to nearest integer item when gesture ends
+      setRotationOffset((curr) => Math.max(0, Math.min(navigationItems.length - 1, Math.round(curr))))
+      // Keep hasDraggedRef true momentarily so click events from drag release are suppressed
+      setTimeout(() => {
+        hasDraggedRef.current = false
+      }, 50)
     }
-    // Snap to nearest integer item when gesture ends
-    setRotationOffset((curr) => Math.max(0, Math.min(navigationItems.length - 1, Math.round(curr))))
+    pointerIdRef.current = null
+    activeTargetRef.current = null
+  }
+
+  const handleContainerClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (hasDraggedRef.current) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
   }
 
   // Mouse wheel rotation
@@ -399,6 +438,7 @@ export function CurvedPastelSidebar({
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerUp}
+              onClickCapture={handleContainerClickCapture}
               onWheel={handleWheel}
               className={`relative flex-1 min-h-0 overflow-hidden cursor-grab active:cursor-grabbing touch-none select-none rounded-2xl ${
                 isDragging ? 'cursor-grabbing' : ''
