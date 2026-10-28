@@ -31,12 +31,12 @@ export interface CampusModelMappingEntry {
 }
 
 export const CAMPUS_MODEL_CONFIG = {
-  activeModelPath: '/models/MNMJEC_Campus_Stage_E3_Web.glb',
-  rollbackModelPath: '/models/MNMJEC_Campus_Web.glb',
-  activeVersion: 'Stage_E3' as const,
-  modelName: 'MNMJEC_Campus_Stage_E3_Web.glb',
-  fileSizeBytes: 2029316,
-  sha256: 'E00597449DAF26C072F429213FD90F302F1556A9367C985137F4AB52641BDD7D',
+  activeModelPath: '/models/MNMJEC_Campus_Stage_E4_Web.glb',
+  rollbackModelPath: '/models/MNMJEC_Campus_Stage_E3_Web.glb',
+  activeVersion: 'Stage_E4' as const,
+  modelName: 'MNMJEC_Campus_Stage_E4_Web.glb',
+  fileSizeBytes: 2978020,
+  sha256: '37EB84E877D26243ACF465DD2633604905FD5C9AF4BF2E1F091A87B15981373A',
 } as const
 
 export const campusModelMapping: CampusModelMappingEntry[] = [
@@ -105,7 +105,16 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
       G: ['MAIN_BLOCK_FLOOR_G', 'MAIN_BLOCK_FLOOR_G_MESH', 'MAIN_BLOCK_FLOOR_G_MESH_1'],
       1: ['MAIN_BLOCK_FLOOR_1', 'MAIN_BLOCK_FLOOR_1_MESH', 'MAIN_BLOCK_FLOOR_1_MESH_1'],
     },
-    interactionObjects: ['MAIN_BLOCK_ENTRANCE_ANCHOR', 'MAIN_ENTRANCE_MARKER', 'LABEL_MAIN_ENTRANCE', 'C_MAIN_BLOCK_ENTRY_SIGN'],
+    interactionObjects: [
+      'MAIN_BLOCK_ENTRANCE_ANCHOR',
+      'MAIN_ENTRANCE_MARKER',
+      'LABEL_MAIN_ENTRANCE',
+      'C_MAIN_BLOCK_ENTRY_SIGN',
+      'E4_MAIN_COLLEGE_SIGN',
+      'E4_MAIN_FACADE_CENTRAL_PANEL',
+      'E4_MAIN_OPEN_PARAPET_ARCHES',
+      'E4_MAIN_PORTICO_RECESS',
+    ],
     indoorAvailable: true,
   },
   {
@@ -153,6 +162,7 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
       'CIVIL_ACCESS_WEST_UPPER_THRESHOLD',
       'CIVIL_BLOCK_ENTRANCE_PROVISIONAL',
       'C_CIVIL_BLOCK_ENTRY_SIGN',
+      'E4_CIVIL_STRUCTURE_BANDS',
     ],
     indoorAvailable: true,
   },
@@ -176,6 +186,7 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
       'L_SHAPE_ACCESS_INNER_WEST_SIGN',
       'L_SHAPE_BLOCK_ENTRANCE_PROVISIONAL',
       'C_L_SHAPE_BLOCK_ENTRY_SIGN',
+      'E4_L_SHAPE_OAT_FACADE_BANDS',
     ],
     indoorAvailable: true,
   },
@@ -187,7 +198,15 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
     floorObjects: {
       elevated: ['PHYSICS_DEPARTMENT_FLOOR_ELEVATED', 'PHYSICS_DEPARTMENT_FLOOR_ELEVATED_MESH', 'PHYSICS_DEPARTMENT_FLOOR_ELEVATED_MESH_1'],
     },
-    interactionObjects: ['PHYSICS_DEPARTMENT_ENTRANCE_ANCHOR', 'PHYSICS_DEPARTMENT_ENTRANCE_PROVISIONAL', 'C_PHYSICS_DEPARTMENT_ENTRY_SIGN'],
+    interactionObjects: [
+      'PHYSICS_DEPARTMENT_ENTRANCE_ANCHOR',
+      'PHYSICS_DEPARTMENT_ENTRANCE_PROVISIONAL',
+      'C_PHYSICS_DEPARTMENT_ENTRY_SIGN',
+      'E4_PHYSICS_LOWER_FACADE_PANEL',
+      'E4_PHYSICS_ROOF_SHEETING',
+      'E4_PHYSICS_WINDOW_SHADE_GRILLE',
+      'E43_PHYSICS_GROUND_RETURNS',
+    ],
     indoorAvailable: false,
   },
   {
@@ -198,7 +217,14 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
     floorObjects: {
       elevated: ['ENGLISH_DEPARTMENT_FLOOR_ELEVATED', 'ENGLISH_DEPARTMENT_FLOOR_ELEVATED_MESH', 'ENGLISH_DEPARTMENT_FLOOR_ELEVATED_MESH_1'],
     },
-    interactionObjects: ['ENGLISH_DEPARTMENT_ENTRANCE_ANCHOR', 'ENGLISH_DEPARTMENT_ENTRANCE_PROVISIONAL', 'C_ENGLISH_DEPARTMENT_ENTRY_SIGN'],
+    interactionObjects: [
+      'ENGLISH_DEPARTMENT_ENTRANCE_ANCHOR',
+      'ENGLISH_DEPARTMENT_ENTRANCE_PROVISIONAL',
+      'C_ENGLISH_DEPARTMENT_ENTRY_SIGN',
+      'E42_ENGLISH_SHARED_ENTRY_SIGN',
+      'E42_ENGLISH_STAIR_MOUTH',
+      'E43_ENGLISH_GROUND_FRONTAGE',
+    ],
     indoorAvailable: false,
   },
   {
@@ -209,7 +235,13 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
     floorObjects: {
       G: ['MATHS_DEPARTMENT_FLOOR_G', 'MATHS_DEPARTMENT_FLOOR_G_MESH', 'MATHS_DEPARTMENT_FLOOR_G_MESH_1'],
     },
-    interactionObjects: ['MATHS_DEPARTMENT_ENTRANCE_ANCHOR', 'MATHS_DEPARTMENT_ENTRANCE_PROVISIONAL', 'C_MATHS_DEPARTMENT_ENTRY_SIGN'],
+    interactionObjects: [
+      'MATHS_DEPARTMENT_ENTRANCE_ANCHOR',
+      'MATHS_DEPARTMENT_ENTRANCE_PROVISIONAL',
+      'C_MATHS_DEPARTMENT_ENTRY_SIGN',
+      'E42_MATHS_ENTRY_SURROUND',
+      'E43_WALK_MATHS_ENTRY',
+    ],
     indoorAvailable: false,
   },
   {
@@ -231,7 +263,12 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
     floorObjects: {
       G: ['NON_JAIN_MESS_FLOOR_G', 'NON_JAIN_MESS_FLOOR_G_MESH', 'NON_JAIN_MESS_FLOOR_G_MESH_1'],
     },
-    interactionObjects: ['NON_JAIN_MESS_ENTRANCE_ANCHOR', 'NON_JAIN_MESS_ENTRANCE_PROVISIONAL', 'C_NON_JAIN_MESS_ENTRY_SIGN'],
+    interactionObjects: [
+      'NON_JAIN_MESS_ENTRANCE_ANCHOR',
+      'NON_JAIN_MESS_ENTRANCE_PROVISIONAL',
+      'C_NON_JAIN_MESS_ENTRY_SIGN',
+      'E42_NON_JAIN_BLUE_SHEET_FASCIA',
+    ],
     indoorAvailable: false,
   },
   {
@@ -258,7 +295,15 @@ export const campusModelMapping: CampusModelMappingEntry[] = [
     buildingId: 'open-air-theatre',
     displayName: 'Open Air Theatre',
     knownFloorLabel: 'Outdoor Amphitheatre',
-    objectNames: ['OAT_FOOTPRINT', 'C_OAT_STAGE_PROVISIONAL', 'C_OAT_CURVED_SEATING_PROVISIONAL', 'C_OAT_STAGE_STEPS'],
+    objectNames: [
+      'OAT_FOOTPRINT',
+      'C_OAT_STAGE_PROVISIONAL',
+      'C_OAT_CURVED_SEATING_PROVISIONAL',
+      'C_OAT_STAGE_STEPS',
+      'E4_OAT_PROSCENIUM',
+      'E4_OAT_ROOF_SHEET_RIBS',
+      'E4_OAT_STAGE_BACKDROP',
+    ],
     floorObjects: {},
     interactionObjects: ['C_EDGE_WALK_OAT', 'WALK_OAT'],
     indoorAvailable: false,
@@ -292,7 +337,7 @@ export const campusModelMapById: Record<CampusBuildingId, CampusModelMappingEntr
     knownFloorLabel: 'Provisional wellness clinic facility',
     objectNames: ['E2_APOLLO_BUILDING', 'E2_APOLLO_BUILDING_MESH'],
     floorObjects: { G: ['E2_APOLLO_BUILDING'] },
-    interactionObjects: ['E2_APOLLO_BUILDING'],
+    interactionObjects: ['E2_APOLLO_BUILDING', 'E42_APOLLO_GLAZED_FRONTAGE', 'E43_WALK_APOLLO_APPROACH'],
     indoorAvailable: false,
   },
   'xerox-shop': {
@@ -301,7 +346,7 @@ export const campusModelMapById: Record<CampusBuildingId, CampusModelMappingEntr
     knownFloorLabel: 'Provisional reprographics facility',
     objectNames: ['E2_XEROX_SHOP', 'E2_XEROX_SHOP_MESH'],
     floorObjects: { G: ['E2_XEROX_SHOP'] },
-    interactionObjects: ['E2_XEROX_SHOP'],
+    interactionObjects: ['E2_XEROX_SHOP', 'E42_XEROX_GLAZED_FRONTAGE', 'E42_XEROX_FACILITIES_SIGN', 'E43_WALK_XEROX_APPROACH'],
     indoorAvailable: false,
   },
 } as Record<CampusBuildingId, CampusModelMappingEntry>
@@ -319,16 +364,22 @@ export function resolveCampusBuilding(name: string): CampusBuildingId | null {
   // Specific corrected entrance and reconstructed prefix routing
   if (name.startsWith('MECHANICAL_ACCESS_')) return 'mechanical-block'
   if (name.startsWith('IT_ACCESS_')) return 'it-block'
-  if (name.startsWith('CIVIL_ACCESS_')) return 'civil-block'
+  if (name.startsWith('CIVIL_ACCESS_') || name.startsWith('E4_CIVIL_')) return 'civil-block'
   if (name.startsWith('FIRST_YEAR_ACCESS_')) return 'first-year-block'
-  if (name.startsWith('L_SHAPE_ACCESS_')) return 'l-shape-block'
+  if (name.startsWith('L_SHAPE_ACCESS_') || name.startsWith('E4_L_SHAPE_')) return 'l-shape-block'
   if (name.startsWith('CANTEEN_ACCESS_')) return 'canteen'
-  if (name.startsWith('E2_ARCHITECTURE_')) return 'mnm-school-of-architecture'
+  if (name.startsWith('E2_ARCHITECTURE_') || name.startsWith('E44_ARCH_')) return 'mnm-school-of-architecture'
   if (name.startsWith('E2_BOYS_HOSTEL_')) return 'boys-hostel'
   if (name.startsWith('E2_CIVIL_')) return 'civil-block'
   if (name.startsWith('E2_LIBRARY_') || name.startsWith('LIBRARY_') || name.includes('LIBRARY')) return 'library'
   if (name.startsWith('E2_APOLLO_') || name.includes('APOLLO')) return 'apollo-shine'
   if (name.startsWith('E2_XEROX_') || name.includes('XEROX')) return 'xerox-shop'
+  if (name.startsWith('E4_MAIN_')) return 'main-block'
+  if (name.startsWith('E4_PHYSICS_') || name.startsWith('E43_PHYSICS_')) return 'physics-department'
+  if (name.startsWith('E4_OAT_')) return 'open-air-theatre'
+  if (name.startsWith('E42_ENGLISH_') || name.startsWith('E43_ENGLISH_')) return 'english-department'
+  if (name.startsWith('E42_MATHS_')) return 'maths-department'
+  if (name.startsWith('E42_NON_JAIN_')) return 'non-jain-mess'
 
   for (const entry of campusModelMapping) {
     const prefix = entry.buildingId.replaceAll('-', '_').toUpperCase()

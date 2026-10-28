@@ -168,10 +168,11 @@ describe('Phase 8H: Production Fixes Verification', () => {
       assert.strictEqual(PROVISIONAL_CAMPUS_BOUNDARY.metadata.isApprovedForLiveNavigation, false)
     })
 
-    it('preserves Stage E3 campus model configuration and destinations', async () => {
+    it('preserves authoritative campus model configuration and destinations', async () => {
       const { CAMPUS_MODEL_CONFIG } = await import('../../data/campusModelMapping.ts')
-      assert.equal(CAMPUS_MODEL_CONFIG.activeVersion, 'Stage_E3')
-      assert.equal(CAMPUS_MODEL_CONFIG.activeModelPath, '/models/MNMJEC_Campus_Stage_E3_Web.glb')
+      assert.equal(CAMPUS_MODEL_CONFIG.activeVersion, 'Stage_E4')
+      assert.equal(CAMPUS_MODEL_CONFIG.activeModelPath, '/models/MNMJEC_Campus_Stage_E4_Web.glb')
+      assert.equal(CAMPUS_MODEL_CONFIG.rollbackModelPath, '/models/MNMJEC_Campus_Stage_E3_Web.glb')
     })
   })
 })

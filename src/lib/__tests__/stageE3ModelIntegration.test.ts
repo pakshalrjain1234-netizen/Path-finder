@@ -85,31 +85,35 @@ function loadCampusGraphFromSource(): NavigationGraph {
   return { nodes, edges }
 }
 
-describe('Phase 5D: Blender Stage E3 GLB Integration & Verification', () => {
+describe('Phase 5D: Blender Stage E3 & Stage E4 GLB Integration & Verification', () => {
   describe('Authoritative Model Configuration & Rollback Availability', () => {
-    it('configures Stage E3 GLB as active authoritative model', () => {
-      assert.equal(CAMPUS_MODEL_CONFIG.activeModelPath, '/models/MNMJEC_Campus_Stage_E3_Web.glb')
-      assert.equal(CAMPUS_MODEL_CONFIG.activeVersion, 'Stage_E3')
-      assert.equal(CAMPUS_MODEL_CONFIG.modelName, 'MNMJEC_Campus_Stage_E3_Web.glb')
-      assert.equal(CAMPUS_MODEL_CONFIG.fileSizeBytes, 2029316)
+    it('configures Stage E4 GLB as active authoritative model', () => {
+      assert.equal(CAMPUS_MODEL_CONFIG.activeModelPath, '/models/MNMJEC_Campus_Stage_E4_Web.glb')
+      assert.equal(CAMPUS_MODEL_CONFIG.activeVersion, 'Stage_E4')
+      assert.equal(CAMPUS_MODEL_CONFIG.modelName, 'MNMJEC_Campus_Stage_E4_Web.glb')
+      assert.equal(CAMPUS_MODEL_CONFIG.fileSizeBytes, 2978020)
     })
 
-    it('maintains original Stage C GLB as rollback path', () => {
-      assert.equal(CAMPUS_MODEL_CONFIG.rollbackModelPath, '/models/MNMJEC_Campus_Web.glb')
+    it('maintains validated Stage E3 GLB as rollback path', () => {
+      assert.equal(CAMPUS_MODEL_CONFIG.rollbackModelPath, '/models/MNMJEC_Campus_Stage_E3_Web.glb')
     })
 
-    it('confirms both active Stage E3 and rollback Stage C GLB files exist on disk with correct sizes', () => {
-      const activePath = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E3_Web.glb')
+    it('confirms active Stage E4, rollback Stage E3, and baseline Stage C GLB files exist on disk with correct sizes', () => {
+      const activePath = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E4_Web.glb')
+      const e3Path = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E3_Web.glb')
       const rollbackPath = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Web.glb')
 
-      assert.ok(fs.existsSync(activePath), 'Active Stage E3 GLB must exist in public/models/')
+      assert.ok(fs.existsSync(activePath), 'Active Stage E4 GLB must exist in public/models/')
+      assert.ok(fs.existsSync(e3Path), 'Stage E3 rollback GLB must exist in public/models/')
       assert.ok(fs.existsSync(rollbackPath), 'Original rollback GLB must exist in public/models/')
 
       const activeStats = fs.statSync(activePath)
+      const e3Stats = fs.statSync(e3Path)
       const rollbackStats = fs.statSync(rollbackPath)
 
-      assert.equal(activeStats.size, 2029316, 'Active Stage E3 GLB size must match validated 2,029,316 bytes')
-      assert.equal(rollbackStats.size, 2150888, 'Rollback Stage C GLB size must match original 2,150,888 bytes')
+      assert.equal(activeStats.size, 2978020, 'Active Stage E4 GLB size must match validated 2,978,020 bytes')
+      assert.equal(e3Stats.size, 2029316, 'Rollback Stage E3 GLB size must match validated 2,029,316 bytes')
+      assert.equal(rollbackStats.size, 2150888, 'Baseline Stage C GLB size must match original 2,150,888 bytes')
     })
   })
 
@@ -153,9 +157,9 @@ describe('Phase 5D: Blender Stage E3 GLB Integration & Verification', () => {
       assert.ok(canteen.interactionObjects?.includes('CANTEEN_ACCESS_NORTH_DOOR'))
     })
 
-    it('verifies Stage E3 GLB contains corrected entrances and excludes retired provisional entrance meshes', () => {
-      const activePath = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E3_Web.glb')
-      const buf = fs.readFileSync(activePath)
+    it('verifies Stage E3 rollback GLB contains corrected entrances and excludes retired provisional entrance meshes', () => {
+      const e3Path = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E3_Web.glb')
+      const buf = fs.readFileSync(e3Path)
       const chunk0Length = buf.readUInt32LE(12)
       const jsonText = buf.toString('utf8', 20, 20 + chunk0Length)
       const gltf = JSON.parse(jsonText)
@@ -187,6 +191,47 @@ describe('Phase 5D: Blender Stage E3 GLB Integration & Verification', () => {
       assert.ok(!nodeNames.has('L_SHAPE_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired L-Shape provisional entrance must be excluded')
       assert.ok(!nodeNames.has('CANTEEN_ENTRANCE_PROVISIONAL'), 'Retired Canteen provisional entrance must be excluded')
     })
+
+    it('verifies active Stage E4 GLB contains corrected entrances, exclusions, and approved colored finishes', () => {
+      const activePath = path.resolve(process.cwd(), 'public/models/MNMJEC_Campus_Stage_E4_Web.glb')
+      const buf = fs.readFileSync(activePath)
+      const chunk0Length = buf.readUInt32LE(12)
+      const jsonText = buf.toString('utf8', 20, 20 + chunk0Length)
+      const gltf = JSON.parse(jsonText)
+      const nodeNames = new Set((gltf.nodes || []).map((n: { name?: string }) => n.name).filter(Boolean))
+
+      // Preserved entrance anchors in Stage E4
+      assert.ok(nodeNames.has('MECHANICAL_BLOCK_ENTRANCE_ANCHOR'))
+      assert.ok(nodeNames.has('IT_BLOCK_ENTRANCE_ANCHOR'))
+      assert.ok(nodeNames.has('CIVIL_BLOCK_ENTRANCE_ANCHOR'))
+      assert.ok(nodeNames.has('CIVIL_BLOCK_ENTRANCE_ANCHOR_02'))
+      assert.ok(nodeNames.has('FIRST_YEAR_BLOCK_ENTRANCE_ANCHOR'))
+      assert.ok(nodeNames.has('L_SHAPE_BLOCK_ENTRANCE_ANCHOR'))
+      assert.ok(nodeNames.has('CANTEEN_ENTRANCE_ANCHOR'))
+
+      // Corrected entrance assemblies in Stage E4
+      assert.ok(nodeNames.has('MECHANICAL_ACCESS_EAST_CANOPY'))
+      assert.ok(nodeNames.has('IT_ACCESS_NORTH_CANOPY'))
+      assert.ok(nodeNames.has('CIVIL_ACCESS_WEST_LOWER_CANOPY'))
+      assert.ok(nodeNames.has('CIVIL_ACCESS_WEST_UPPER_CANOPY'))
+      assert.ok(nodeNames.has('FIRST_YEAR_ACCESS_EAST_CANOPY'))
+      assert.ok(nodeNames.has('L_SHAPE_ACCESS_INNER_WEST_CANOPY'))
+      assert.ok(nodeNames.has('CANTEEN_ACCESS_NORTH_CANOPY'))
+
+      // Excluded retired provisional entrances
+      assert.ok(!nodeNames.has('MECHANICAL_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired Mech provisional entrance must be excluded')
+      assert.ok(!nodeNames.has('IT_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired IT provisional entrance must be excluded')
+      assert.ok(!nodeNames.has('CIVIL_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired Civil provisional entrance must be excluded')
+      assert.ok(!nodeNames.has('FIRST_YEAR_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired First Year provisional entrance must be excluded')
+      assert.ok(!nodeNames.has('L_SHAPE_BLOCK_ENTRANCE_PROVISIONAL'), 'Retired L-Shape provisional entrance must be excluded')
+      assert.ok(!nodeNames.has('CANTEEN_ENTRANCE_PROVISIONAL'), 'Retired Canteen provisional entrance must be excluded')
+
+      // Stage E4 specific enhancements present
+      assert.ok(nodeNames.has('E4_MAIN_COLLEGE_SIGN'), 'Stage E4 photo-based Main college sign must be present')
+      assert.ok(nodeNames.has('E4_OAT_PROSCENIUM'), 'Stage E4 OAT proscenium must be present')
+      assert.ok(nodeNames.has('E4_CIVIL_STRUCTURE_BANDS'), 'Stage E4 Civil structure bands must be present')
+      assert.ok(nodeNames.has('E44_ARCH_GATE_FORECOURT'), 'Stage E4 Architecture gate forecourt must be present')
+    })
   })
 
   describe('Building Mapping Compatibility & Library Separation', () => {
@@ -201,7 +246,7 @@ describe('Phase 5D: Blender Stage E3 GLB Integration & Verification', () => {
       assert.equal(resolveCampusBuilding('PHYSICS_DEPARTMENT_ROOF'), 'physics-department')
     })
 
-    it('resolves newly introduced Stage E3 entrance assemblies and structures', () => {
+    it('resolves newly introduced Stage E3 & Stage E4 entrance assemblies and structures', () => {
       assert.equal(resolveCampusBuilding('MECHANICAL_ACCESS_EAST_CANOPY'), 'mechanical-block')
       assert.equal(resolveCampusBuilding('IT_ACCESS_NORTH_DOOR'), 'it-block')
       assert.equal(resolveCampusBuilding('CIVIL_ACCESS_WEST_UPPER_CANOPY'), 'civil-block')
@@ -211,6 +256,12 @@ describe('Phase 5D: Blender Stage E3 GLB Integration & Verification', () => {
       assert.equal(resolveCampusBuilding('CANTEEN_ACCESS_NORTH_DOOR'), 'canteen')
       assert.equal(resolveCampusBuilding('E2_ARCHITECTURE_WALL_EAST'), 'mnm-school-of-architecture')
       assert.equal(resolveCampusBuilding('E2_BOYS_HOSTEL_LEVEL_1_SLAB'), 'boys-hostel')
+      assert.equal(resolveCampusBuilding('E4_MAIN_COLLEGE_SIGN'), 'main-block')
+      assert.equal(resolveCampusBuilding('E4_CIVIL_STRUCTURE_BANDS'), 'civil-block')
+      assert.equal(resolveCampusBuilding('E4_L_SHAPE_OAT_FACADE_BANDS'), 'l-shape-block')
+      assert.equal(resolveCampusBuilding('E4_PHYSICS_LOWER_FACADE_PANEL'), 'physics-department')
+      assert.equal(resolveCampusBuilding('E4_OAT_PROSCENIUM'), 'open-air-theatre')
+      assert.equal(resolveCampusBuilding('E44_ARCH_GATE_FORECOURT'), 'mnm-school-of-architecture')
     })
 
     it('ensures Library geometry is isolated and never falsely assigned to Main Block', () => {
