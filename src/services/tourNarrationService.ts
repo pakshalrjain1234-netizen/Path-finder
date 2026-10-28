@@ -450,7 +450,9 @@ class TourNarrationService implements TourNarrationProvider {
   public pause() {
     if (this.isSupported()) {
       try {
-        window.speechSynthesis.pause()
+        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+          window.speechSynthesis.pause()
+        }
       } catch {
         // ignore
       }
@@ -460,7 +462,9 @@ class TourNarrationService implements TourNarrationProvider {
   public resume() {
     if (this.isSupported()) {
       try {
-        window.speechSynthesis.resume()
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume()
+        }
       } catch {
         // ignore
       }
@@ -541,6 +545,14 @@ class TourNarrationService implements TourNarrationProvider {
         // ignore
       }
     })
+
+    // Avoid aggressive full cancellation if we are already speaking the same text
+    if (this.currentUtterance && this.currentUtterance.text === text && window.speechSynthesis.speaking) {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume()
+      }
+      return
+    }
 
     this.cancelInternal()
 
