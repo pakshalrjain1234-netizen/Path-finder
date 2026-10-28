@@ -19,7 +19,11 @@ describe('GPS Accuracy & Position Classification', () => {
     assert.equal(getAccuracyClass(28), 'poor')
     assert.equal(getAccuracyClass(GPS_ACCURACY_THRESHOLDS.maxAcceptableMeters), 'poor')
     assert.equal(getAccuracyClass(35), 'rejected')
+    assert.equal(getAccuracyClass(155), 'rejected')
     assert.equal(getAccuracyClass(-1), 'rejected')
+    assert.equal(getAccuracyClass(NaN), 'rejected')
+    assert.equal(getAccuracyClass(undefined), 'rejected')
+    assert.equal(getAccuracyClass(null), 'rejected')
     assert.equal(getAccuracyClass(Infinity), 'rejected')
   })
 
@@ -47,15 +51,150 @@ describe('GPS Accuracy & Position Classification', () => {
 
     const permDenied = classifyGpsPosition(null, 'permission_denied', uncalibrated)
     assert.equal(permDenied.status, 'permission_denied')
+    assert.equal(permDenied.accuracyClass, 'rejected')
     assert.equal(permDenied.modelPoint, null)
+    assert.ok(permDenied.message.includes('Location access was denied'))
 
     const unavail = classifyGpsPosition(null, 'position_unavailable', uncalibrated)
     assert.equal(unavail.status, 'gps_unavailable')
+    assert.equal(unavail.accuracyClass, 'rejected')
     assert.equal(unavail.modelPoint, null)
+    assert.ok(unavail.message.includes('GPS signal unavailable'))
 
     const timeout = classifyGpsPosition(null, 'timeout', uncalibrated)
     assert.equal(timeout.status, 'timeout')
+    assert.equal(timeout.accuracyClass, 'rejected')
     assert.equal(timeout.modelPoint, null)
+    assert.ok(timeout.message.includes('Location request timed out'))
+
+    const unsupported = classifyGpsPosition(null, 'unsupported', uncalibrated)
+    assert.equal(unsupported.status, 'gps_unavailable')
+    assert.equal(unsupported.accuracyClass, 'rejected')
+    assert.equal(unsupported.modelPoint, null)
+    assert.ok(unsupported.message.includes('Geolocation API is not supported'))
+  })
+
+  it('diagnostic 1: correctly handles valid accuracy such as 15 m', () => {
+    const calibrated = buildCalibrationModel(TEST_MODE_CONTROL_POINTS)
+    const validCoords: GpsCoordinates = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: 15, // 15m is within medium threshold (<= 25m)
+      altitude: 10,
+      altitudeAccuracy: 3,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+
+    assert.equal(getAccuracyClass(15), 'medium')
+
+    const result = classifyGpsPosition(validCoords, 'active', calibrated, true)
+    assert.equal(result.status, 'location_available')
+    assert.equal(result.accuracyClass, 'medium')
+    assert.ok(result.modelPoint !== null)
+    assert.ok(result.rawCoordinates !== null)
+    assert.equal(result.rawCoordinates?.accuracy, 15)
+    assert.ok(result.message.includes('±15m'))
+  })
+
+  it('diagnostic 2: distinguishes valid but poor accuracy (155 m) with explicit numeric accuracy message', () => {
+    const calibrated = buildCalibrationModel(TEST_MODE_CONTROL_POINTS)
+    const poorCoords: GpsCoordinates = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: 155, // 155m exceeds 30m maxAcceptable
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+
+    assert.equal(getAccuracyClass(155), 'rejected')
+
+    const result = classifyGpsPosition(poorCoords, 'active', calibrated)
+    assert.equal(result.status, 'accuracy_insufficient')
+    assert.equal(result.accuracyClass, 'rejected')
+    assert.equal(result.modelPoint, null)
+    assert.ok(result.rawCoordinates !== null)
+    assert.equal(result.rawCoordinates?.accuracy, 155)
+    assert.equal(
+      result.message,
+      'Low GPS accuracy warning: ±155m exceeds 30m threshold for campus positioning.'
+    )
+  })
+
+  it('diagnostic 3: distinguishes missing or invalid accuracy (NaN, undefined, null, negative) with unrecorded warning', () => {
+    const calibrated = buildCalibrationModel(TEST_MODE_CONTROL_POINTS)
+
+    // NaN accuracy
+    const nanCoords: GpsCoordinates = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: NaN,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+    const nanResult = classifyGpsPosition(nanCoords, 'active', calibrated)
+    assert.equal(nanResult.status, 'accuracy_insufficient')
+    assert.equal(nanResult.accuracyClass, 'rejected')
+    assert.equal(nanResult.modelPoint, null)
+    assert.equal(nanResult.message, 'Low GPS accuracy warning: accuracy value not recorded.')
+
+    // undefined accuracy (e.g. from malformed navigator position)
+    const undefinedCoords = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: undefined as unknown as number,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+    const undefinedResult = classifyGpsPosition(undefinedCoords, 'active', calibrated)
+    assert.equal(undefinedResult.status, 'accuracy_insufficient')
+    assert.equal(undefinedResult.accuracyClass, 'rejected')
+    assert.equal(undefinedResult.modelPoint, null)
+    assert.equal(undefinedResult.message, 'Low GPS accuracy warning: accuracy value not recorded.')
+
+    // null accuracy
+    const nullCoords = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: null as unknown as number,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+    const nullResult = classifyGpsPosition(nullCoords, 'active', calibrated)
+    assert.equal(nullResult.status, 'accuracy_insufficient')
+    assert.equal(nullResult.accuracyClass, 'rejected')
+    assert.equal(nullResult.modelPoint, null)
+    assert.equal(nullResult.message, 'Low GPS accuracy warning: accuracy value not recorded.')
+
+    // negative accuracy
+    const negativeCoords: GpsCoordinates = {
+      latitude: 12.945040,
+      longitude: 80.243780,
+      accuracy: -5,
+      altitude: null,
+      altitudeAccuracy: null,
+      heading: null,
+      speed: null,
+      timestamp: Date.now(),
+    }
+    const negativeResult = classifyGpsPosition(negativeCoords, 'active', calibrated)
+    assert.equal(negativeResult.status, 'accuracy_insufficient')
+    assert.equal(negativeResult.accuracyClass, 'rejected')
+    assert.equal(negativeResult.modelPoint, null)
+    assert.equal(negativeResult.message, 'Low GPS accuracy warning: accuracy value not recorded.')
   })
 
   it('rejects coordinates with insufficient accuracy (>30m) without creating 3D point', () => {
@@ -135,7 +274,7 @@ describe('GPS Accuracy & Position Classification', () => {
     assert.equal(result.accuracyClass, 'high')
   })
 
-  it('regression: prevents provisional calibration from placing real blue marker in live mode (!isSimulated)', () => {
+  it('allows provisional calibration to place blue location marker in live mode (!isSimulated) with provisional notice', () => {
     // Model with provisional benchmarks
     const provisionalModel = {
       ...buildCalibrationModel(TEST_MODE_CONTROL_POINTS),
@@ -155,9 +294,9 @@ describe('GPS Accuracy & Position Classification', () => {
 
     // Live mode (isSimulated = false)
     const result = classifyGpsPosition(gateCoords, 'active', provisionalModel, false)
-    assert.equal(result.status, 'calibration_pending')
-    assert.equal(result.modelPoint, null) // Prohibits real blue marker
-    assert.ok(result.message.includes('Real campus positioning is disabled'))
+    assert.equal(result.status, 'location_available')
+    assert.ok(result.modelPoint !== null) // Allows blue dot placement on model
+    assert.ok(result.message.includes('Provisional calibration'))
   })
 
   it('regression: prevents high RMSE calibration (>10m) from placing 3D marker', () => {

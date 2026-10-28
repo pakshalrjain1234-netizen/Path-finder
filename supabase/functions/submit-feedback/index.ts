@@ -8,18 +8,10 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
+// Database Category Whitelist matching public.visitor_feedback.category
+// CHECK constraint: 'Campus 3D experience', 'Navigation experience', 'Campus information',
+// 'Website usability', 'General suggestion'
 const ALLOWED_CATEGORIES = [
-  // Visitor categories (Phase 9D.1 Feature 2)
-  'Campus visit experience',
-  '3D virtual tour experience',
-  'Clarity of college information',
-  'General suggestions',
-  // Student categories (Phase 9D.1 Feature 3)
-  'Campus facilities',
-  'Campus navigation experience',
-  'Student services',
-  'Suggestions for improvement',
-  // Legacy categories (backward compatibility)
   'Campus 3D experience',
   'Navigation experience',
   'Campus information',
@@ -112,16 +104,13 @@ serve(async (req: Request) => {
 
     const { userType, rating, category, name, comments } = body
 
-    // 3. Rating Validation (Optional, but if provided must be integer 1 to 5)
-    let parsedRating: number | null = null
-    if (rating !== undefined && rating !== null) {
-      parsedRating = Number(rating)
-      if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
-        return new Response(
-          JSON.stringify({ error: 'Rating must be an integer between 1 and 5.' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+    // 3. Rating Validation (Integer 1 to 5 required by submit_visitor_feedback)
+    const parsedRating = rating !== undefined && rating !== null ? Number(rating) : 5
+    if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      return new Response(
+        JSON.stringify({ error: 'Rating must be an integer between 1 and 5.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // 4. Category Whitelist Validation
@@ -132,9 +121,9 @@ serve(async (req: Request) => {
       )
     }
 
-    // 5. Comments Bounds Validation
+    // 5. Comments Bounds Validation (Optional, but if provided must be between 5 and 2000 characters)
     const cleanComments = typeof comments === 'string' ? comments.trim().slice(0, 2000) : ''
-    if (cleanComments.length < 5) {
+    if (cleanComments.length > 0 && cleanComments.length < 5) {
       return new Response(
         JSON.stringify({ error: 'Feedback comments must be at least 5 characters.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -220,7 +209,17 @@ serve(async (req: Request) => {
       }
     )
 
-    if (ipRateErr || ipAllowed === false) {
+    if (ipRateErr) {
+      console.error('Rate limit RPC error:', ipRateErr)
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to verify submission rate limit. Please try again later.',
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (ipAllowed === false) {
       return new Response(
         JSON.stringify({
           error: 'Rate limit exceeded: Too many feedback submissions. Please wait 10 minutes.',
@@ -240,7 +239,17 @@ serve(async (req: Request) => {
         }
       )
 
-      if (studentRateErr || studentAllowed === false) {
+      if (studentRateErr) {
+        console.error('Student rate limit RPC error:', studentRateErr)
+        return new Response(
+          JSON.stringify({
+            error: 'Failed to verify student rate limit. Please try again later.',
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      if (studentAllowed === false) {
         return new Response(
           JSON.stringify({
             error: 'Rate limit exceeded: Student submission quota reached. Please wait 10 minutes.',
@@ -250,23 +259,20 @@ serve(async (req: Request) => {
       }
     }
 
-    // 8. Call PostgreSQL Atomic Submission RPC (Service-Role Only)
-    const { data, error } = await supabaseAdmin.rpc('submit_unified_feedback', {
-      p_user_type: sanitizedUserType,
+    // 8. Call PostgreSQL Atomic Visitor Feedback Submission RPC (Service-Role Only)
+    // Calls existing public.submit_visitor_feedback(p_rating, p_category, p_name, p_comments, p_client_ip_hash)
+    const { data, error } = await supabaseAdmin.rpc('submit_visitor_feedback', {
       p_rating: parsedRating,
       p_category: category,
       p_name: sanitizedName,
-      p_student_id: sanitizedStudentId,
-      p_department: sanitizedDepartment,
-      p_comments: cleanComments,
+      p_comments: cleanComments || null,
       p_client_ip_hash: clientHash,
-      p_user_id: sanitizedUserId,
     })
 
     if (error) {
       console.error('Database RPC error:', error)
       return new Response(
-        JSON.stringify({ error: 'Failed to record feedback. Please try again later.' }),
+        JSON.stringify({ error: error.message || 'Failed to record feedback. Please try again later.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }

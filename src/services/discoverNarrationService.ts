@@ -70,6 +70,15 @@ class DiscoverNarrationService {
       return
     }
 
+    // Protection against repeated clicks on already playing content
+    if (
+      this.playbackState === 'playing' &&
+      this.activeCategoryId === categoryId &&
+      this.activeText === text
+    ) {
+      return
+    }
+
     // If currently paused on the exact same text, resume directly
     if (
       this.playbackState === 'paused' &&
@@ -101,17 +110,47 @@ class DiscoverNarrationService {
 
       const utterance = new SpeechSynthesisUtterance(text)
 
-      // Inherit voice configuration from TourNarrationService if available
-      const voiceUri = tourNarrationService.getSelectedVoiceURI()
-      if (voiceUri && 'speechSynthesis' in window) {
+      // Natural English voice selection with robust fallbacks
+      if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices()
-        const matched = voices.find((v) => v.voiceURI === voiceUri)
+        const voiceUri = tourNarrationService.getSelectedVoiceURI()
+        let matched = voiceUri ? voices.find((v) => v.voiceURI === voiceUri) : null
+
+        if (!matched && voices.length > 0) {
+          // Priority 1: Indian English natural/neural voice
+          matched =
+            voices.find(
+              (v) =>
+                v.lang === 'en-IN' &&
+                (v.name.includes('Natural') ||
+                  v.name.includes('Neural') ||
+                  v.name.includes('Google') ||
+                  v.name.includes('Heera') ||
+                  v.name.includes('Veena'))
+            ) ||
+            // Priority 2: Any English Natural / Neural voice
+            voices.find(
+              (v) =>
+                v.lang.startsWith('en') &&
+                (v.name.includes('Natural') ||
+                  v.name.includes('Neural') ||
+                  v.name.includes('Google') ||
+                  v.name.includes('Online'))
+            ) ||
+            // Priority 3: Any Indian English voice
+            voices.find((v) => v.lang === 'en-IN') ||
+            // Priority 4: Any English voice
+            voices.find((v) => v.lang.startsWith('en')) ||
+            // Priority 5: System default
+            voices[0]
+        }
+
         if (matched) {
           utterance.voice = matched
         }
       }
 
-      utterance.rate = tourNarrationService.getRate() || 0.95
+      utterance.rate = 0.95
       utterance.pitch = 1.0
       utterance.volume = 1.0
 

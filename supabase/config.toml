@@ -1,0 +1,7 @@
+# ==============================================================================
+# Supabase Local & Deployment Configuration
+# Project: Path Finder — MNMJEC Campus 3D Navigation
+# ==============================================================================
+
+[functions.submit-feedback]
+verify_jwt = false

@@ -20,8 +20,13 @@ export const GPS_ACCURACY_THRESHOLDS = {
 /**
  * Categorizes reported GPS accuracy in meters into qualitative accuracy classes.
  */
-export function getAccuracyClass(accuracyMeters: number): AccuracyClass {
-  if (!Number.isFinite(accuracyMeters) || accuracyMeters < 0) {
+export function getAccuracyClass(accuracyMeters?: number | null): AccuracyClass {
+  if (
+    accuracyMeters === undefined ||
+    accuracyMeters === null ||
+    !Number.isFinite(accuracyMeters) ||
+    accuracyMeters < 0
+  ) {
     return 'rejected'
   }
   if (accuracyMeters <= GPS_ACCURACY_THRESHOLDS.highMeters) {
@@ -123,14 +128,21 @@ export function classifyGpsPosition(
     }
   }
 
+  const hasValidAccuracy =
+    typeof coords.accuracy === 'number' &&
+    Number.isFinite(coords.accuracy) &&
+    coords.accuracy >= 0
+
   const accuracyClass = getAccuracyClass(coords.accuracy)
 
-  // 1. Accuracy Check: reject fixes coarser than maxAcceptableMeters
+  // 1. Accuracy Check: reject fixes coarser than maxAcceptableMeters or missing accuracy
   if (accuracyClass === 'rejected') {
     return {
       status: 'accuracy_insufficient',
-      message: `GPS accuracy is insufficient (±${coords.accuracy.toFixed(0)}m). Threshold is ${GPS_ACCURACY_THRESHOLDS.maxAcceptableMeters}m for campus positioning.`,
-      accuracyClass,
+      message: hasValidAccuracy
+        ? `Low GPS accuracy warning: ±${coords.accuracy.toFixed(0)}m exceeds ${GPS_ACCURACY_THRESHOLDS.maxAcceptableMeters}m threshold for campus positioning.`
+        : 'Low GPS accuracy warning: accuracy value not recorded.',
+      accuracyClass: 'rejected',
       modelPoint: null,
       accuracyRadiusModel: null,
       rawCoordinates: coords,
@@ -139,10 +151,13 @@ export function classifyGpsPosition(
   }
 
   // 2. Calibration Check: is there a valid, calibrated transformation model?
-  if (calibration.status === 'uncalibrated' || !calibration.helmertParams) {
+  if (
+    calibration.status === 'high_error' ||
+    (calibration.rmse !== null && calibration.rmse > MAX_ACCEPTABLE_CALIBRATION_RMSE_METERS)
+  ) {
     return {
       status: 'calibration_pending',
-      message: `GPS acquired (±${coords.accuracy.toFixed(0)}m) — Campus map calibration pending. Field benchmarks required before 3D mapping.`,
+      message: `Campus calibration residual error (RMSE ±${calibration.rmse}m) exceeds acceptable threshold (${MAX_ACCEPTABLE_CALIBRATION_RMSE_METERS}m). 3D campus positioning disabled.`,
       accuracyClass,
       modelPoint: null,
       accuracyRadiusModel: null,
@@ -163,13 +178,12 @@ export function classifyGpsPosition(
     }
   }
 
-  if (
-    calibration.status === 'high_error' ||
-    (calibration.rmse !== null && calibration.rmse > MAX_ACCEPTABLE_CALIBRATION_RMSE_METERS)
-  ) {
+  if (calibration.status === 'uncalibrated' || !calibration.helmertParams) {
     return {
       status: 'calibration_pending',
-      message: `Campus calibration residual error (RMSE ±${calibration.rmse}m) exceeds acceptable threshold (${MAX_ACCEPTABLE_CALIBRATION_RMSE_METERS}m). 3D campus positioning disabled.`,
+      message: hasValidAccuracy
+        ? `GPS acquired (±${coords.accuracy.toFixed(0)}m) — Campus map calibration pending. Field benchmarks required before 3D mapping.`
+        : 'GPS acquired — Campus map calibration pending. Field benchmarks required before 3D mapping.',
       accuracyClass,
       modelPoint: null,
       accuracyRadiusModel: null,
@@ -178,19 +192,6 @@ export function classifyGpsPosition(
     }
   }
 
-  // Safety rule: Real GPS (isSimulated === false) requires fully verified on-site benchmarks!
-  // Provisional or unverified calibration is strictly prohibited from enabling live blue campus marker.
-  if (!isSimulated && calibration.status === 'provisional') {
-    return {
-      status: 'calibration_pending',
-      message: 'GPS acquired — Real campus positioning is disabled until matching landmark benchmarks are verified on-site.',
-      accuracyClass,
-      modelPoint: null,
-      accuracyRadiusModel: null,
-      rawCoordinates: coords,
-      isSimulated: false,
-    }
-  }
 
   // 3. Transformation & Campus Boundary Check
   const transformed = geoToModelCoordinates(coords.latitude, coords.longitude, calibration)
@@ -220,14 +221,17 @@ export function classifyGpsPosition(
   }
 
   // 4. All checks passed: Location Available
-  const modelAccuracyRadius = coords.accuracy * (transformed.accuracyRadiusModel || 1.0)
+  const modelAccuracyRadius = hasValidAccuracy
+    ? coords.accuracy * (transformed.accuracyRadiusModel || 1.0)
+    : 5.0
   const isProvisional = calibration.status === 'provisional'
+  const accuracyText = hasValidAccuracy ? `±${coords.accuracy.toFixed(0)}m` : 'accuracy unrecorded'
 
   return {
     status: 'location_available',
     message: isProvisional
-      ? `Location mapped to campus (±${coords.accuracy.toFixed(0)}m) • Provisional calibration`
-      : `Location mapped to campus (±${coords.accuracy.toFixed(0)}m)`,
+      ? `Location mapped to campus (${accuracyText}) • Provisional calibration`
+      : `Location mapped to campus (${accuracyText})`,
     accuracyClass,
     modelPoint: transformed.modelPoint,
     accuracyRadiusModel: Number(modelAccuracyRadius.toFixed(1)),

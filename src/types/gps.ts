@@ -87,6 +87,7 @@ export interface HelmertParameters {
   scale: number
   rotationDeg: number
   translation: [number, number]
+  isReflected?: boolean
 }
 
 export type CalibrationStatus =

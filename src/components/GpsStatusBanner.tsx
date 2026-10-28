@@ -83,15 +83,27 @@ export function GpsStatusBanner({
       icon = <Compass size={15} className="text-[#60A5FA] shrink-0" />
       break
 
-    case 'accuracy_insufficient':
+    case 'accuracy_insufficient': {
       // State 6: Low GPS Accuracy
-      friendlyTitle = 'Low GPS Accuracy'
-      friendlySubtext = `Reported accuracy is ±${rawCoordinates ? rawCoordinates.accuracy.toFixed(0) : '—'}m (exceeds threshold). Please move outdoors away from tall walls.`
+      const hasNumericAcc =
+        rawCoordinates !== null &&
+        rawCoordinates !== undefined &&
+        typeof rawCoordinates.accuracy === 'number' &&
+        Number.isFinite(rawCoordinates.accuracy) &&
+        rawCoordinates.accuracy >= 0
+
+      friendlyTitle = hasNumericAcc
+        ? `Low GPS Accuracy ±${rawCoordinates.accuracy.toFixed(0)}m`
+        : 'Low GPS Accuracy Warning'
+      friendlySubtext = hasNumericAcc
+        ? `Reported accuracy is ±${rawCoordinates.accuracy.toFixed(0)}m (exceeds threshold). Please move outdoors away from tall walls.`
+        : 'Low GPS accuracy warning: accuracy value not recorded. Please check your device location settings.'
       statusBadgeLabel = 'Low Accuracy'
       badgeStyle = 'bg-amber-500/20 text-amber-300 border-amber-500/30'
       dotColor = 'bg-amber-400'
       icon = <AlertTriangle size={15} className="text-amber-400 shrink-0" />
       break
+    }
 
     case 'outside_campus':
       friendlyTitle = 'Outside Campus Perimeter'
@@ -133,7 +145,14 @@ export function GpsStatusBanner({
       break
   }
 
-  const accuracyBadgeText = rawCoordinates
+  const hasValidAcc =
+    rawCoordinates !== null &&
+    rawCoordinates !== undefined &&
+    typeof rawCoordinates.accuracy === 'number' &&
+    Number.isFinite(rawCoordinates.accuracy) &&
+    rawCoordinates.accuracy >= 0
+
+  const accuracyBadgeText = hasValidAcc
     ? `±${rawCoordinates.accuracy.toFixed(0)}m`
     : null
 
@@ -210,9 +229,14 @@ export function GpsStatusBanner({
         <span className={`h-2 w-2 rounded-full ${dotColor}`} />
         <div className="flex items-center gap-1.5 font-semibold text-slate-100">
           <span>{friendlyTitle}</span>
-          {accuracyBadgeText && (
+          {accuracyBadgeText && status !== 'accuracy_insufficient' && (
             <span className="rounded-md bg-[#101827] px-1.5 py-0.2 text-[10px] font-mono text-[#60A5FA] border border-[#293A50]">
               {accuracyBadgeText}
+            </span>
+          )}
+          {!hasValidAcc && status === 'accuracy_insufficient' && (
+            <span className="rounded-md bg-amber-950/60 px-1.5 py-0.2 text-[10px] font-mono text-amber-300 border border-amber-500/40">
+              Not Recorded
             </span>
           )}
         </div>
@@ -359,7 +383,9 @@ export function GpsStatusBanner({
                           ? 'text-cyan-400'
                           : 'text-amber-400'
                     }`}>
-                      ±{rawCoordinates.accuracy.toFixed(1)}m ({accuracyClass})
+                      {hasValidAcc && rawCoordinates
+                        ? `±${rawCoordinates.accuracy.toFixed(1)}m (${accuracyClass})`
+                        : `Accuracy value not recorded (${accuracyClass})`}
                     </span>
                   </div>
 

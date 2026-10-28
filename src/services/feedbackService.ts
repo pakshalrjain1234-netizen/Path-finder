@@ -291,6 +291,10 @@ class FeedbackService {
         (typeof process !== 'undefined' && process.env) ||
         {}
       const baseUrl = env.VITE_SUPABASE_URL || 'https://lqqqrqajeqzdtvkfvrnp.supabase.co'
+      const publicKey =
+        env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+        env.VITE_SUPABASE_ANON_KEY ||
+        ''
       const edgeFunctionUrl = `${baseUrl}/functions/v1/submit-feedback`
       const session = authService.getSession()
       const authToken = session?.token
@@ -299,6 +303,9 @@ class FeedbackService {
         try {
           const headers: Record<string, string> = {
             'Content-Type': 'application/json',
+          }
+          if (publicKey) {
+            headers['apikey'] = publicKey
           }
           if (authToken) {
             headers['Authorization'] = `Bearer ${authToken}`
@@ -309,7 +316,7 @@ class FeedbackService {
             headers,
             body: JSON.stringify({
               userType: determinedUserType,
-              rating: input.rating ? Math.round(input.rating) : undefined,
+              rating: input.rating ? Math.round(input.rating) : 5,
               category: input.category,
               name: authoritativeName,
               studentId: authoritativeStudentId,

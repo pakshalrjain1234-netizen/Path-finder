@@ -116,8 +116,10 @@ export function fitHelmertTransformation(
 
   // Compute denominator and cross-products with centered coordinates
   let denom = 0
-  let crossA = 0
-  let crossB = 0
+  let crossADir = 0
+  let crossBDir = 0
+  let crossARefl = 0
+  let crossBRefl = 0
 
   for (const lp of localPoints) {
     const uPrime = lp.u - meanU
@@ -126,8 +128,12 @@ export function fitHelmertTransformation(
     const zPrime = lp.Z - meanZ
 
     denom += uPrime * uPrime + vPrime * vPrime
-    crossA += uPrime * xPrime + vPrime * zPrime
-    crossB += uPrime * zPrime - vPrime * xPrime
+    // Direct orientation (det > 0: +X ~ East, +Z ~ North)
+    crossADir += uPrime * xPrime + vPrime * zPrime
+    crossBDir += uPrime * zPrime - vPrime * xPrime
+    // Reflected orientation (det < 0: +X ~ West, +Z ~ North)
+    crossARefl += uPrime * xPrime - vPrime * zPrime
+    crossBRefl += vPrime * xPrime + uPrime * zPrime
   }
 
   // Degeneracy check: points are coincident or geometrically collapsed
@@ -141,13 +147,66 @@ export function fitHelmertTransformation(
     }
   }
 
-  const a = crossA / denom
-  const b = crossB / denom
-  const scale = Math.sqrt(a * a + b * b)
-  const rotationRad = Math.atan2(b, a)
-  const rotationDeg = (rotationRad * 180) / Math.PI
+  // 1. Direct model candidate
+  const aDir = crossADir / denom
+  const bDir = crossBDir / denom
+  const scaleDir = Math.sqrt(aDir * aDir + bDir * bDir)
+  const rotDir = (Math.atan2(bDir, aDir) * 180) / Math.PI
+  const txDir = meanX - (aDir * meanU - bDir * meanV)
+  const tzDir = meanZ - (bDir * meanU + aDir * meanV)
 
-  // Scale feasibility check: Blender model units should be near meters (scale between 0.2 and 5.0)
+  let sumSqErrDir = 0
+  const residualsDir: ControlPointResidual[] = localPoints.map((lp) => {
+    const predX = aDir * lp.u - bDir * lp.v + txDir
+    const predZ = bDir * lp.u + aDir * lp.v + tzDir
+    const errX = lp.X - predX
+    const errZ = lp.Z - predZ
+    const errorMeters = Math.sqrt(errX * errX + errZ * errZ)
+    sumSqErrDir += errorMeters * errorMeters
+    return {
+      pointId: lp.id,
+      pointName: lp.name,
+      errorMeters: Number(errorMeters.toFixed(2)),
+    }
+  })
+  const rmseDir = Number(Math.sqrt(sumSqErrDir / n).toFixed(2))
+
+  // 2. Reflected model candidate
+  const aRefl = crossARefl / denom
+  const bRefl = crossBRefl / denom
+  const scaleRefl = Math.sqrt(aRefl * aRefl + bRefl * bRefl)
+  const rotRefl = (Math.atan2(bRefl, aRefl) * 180) / Math.PI
+  const txRefl = meanX - (aRefl * meanU + bRefl * meanV)
+  const tzRefl = meanZ - (bRefl * meanU - aRefl * meanV)
+
+  let sumSqErrRefl = 0
+  const residualsRefl: ControlPointResidual[] = localPoints.map((lp) => {
+    const predX = aRefl * lp.u + bRefl * lp.v + txRefl
+    const predZ = bRefl * lp.u - aRefl * lp.v + tzRefl
+    const errX = lp.X - predX
+    const errZ = lp.Z - predZ
+    const errorMeters = Math.sqrt(errX * errX + errZ * errZ)
+    sumSqErrRefl += errorMeters * errorMeters
+    return {
+      pointId: lp.id,
+      pointName: lp.name,
+      errorMeters: Number(errorMeters.toFixed(2)),
+    }
+  })
+  const rmseRefl = Number(Math.sqrt(sumSqErrRefl / n).toFixed(2))
+
+  // Select orientation with minimal residual error
+  const isReflected = rmseRefl < rmseDir
+  const a = isReflected ? aRefl : aDir
+  const b = isReflected ? bRefl : bDir
+  const tx = isReflected ? txRefl : txDir
+  const tz = isReflected ? tzRefl : tzDir
+  const scale = isReflected ? scaleRefl : scaleDir
+  const rotationDeg = isReflected ? rotRefl : rotDir
+  const rmse = isReflected ? rmseRefl : rmseDir
+  const residuals = isReflected ? residualsRefl : residualsDir
+
+  // Scale feasibility check: Blender model units should be near meters (scale between 0.05 and 20.0)
   if (scale < 0.05 || scale > 20.0 || !Number.isFinite(scale)) {
     return {
       status: 'degenerate',
@@ -158,9 +217,6 @@ export function fitHelmertTransformation(
     }
   }
 
-  const tx = meanX - (a * meanU - b * meanV)
-  const tz = meanZ - (b * meanU + a * meanV)
-
   const helmertParams: HelmertParameters = {
     a,
     b,
@@ -169,25 +225,8 @@ export function fitHelmertTransformation(
     scale,
     rotationDeg,
     translation: [tx, tz],
+    isReflected,
   }
-
-  // Compute individual residuals and RMSE
-  let sumSqErr = 0
-  const residuals: ControlPointResidual[] = localPoints.map((lp) => {
-    const predX = a * lp.u - b * lp.v + tx
-    const predZ = b * lp.u + a * lp.v + tz
-    const errX = lp.X - predX
-    const errZ = lp.Z - predZ
-    const errorMeters = Math.sqrt(errX * errX + errZ * errZ)
-    sumSqErr += errorMeters * errorMeters
-    return {
-      pointId: lp.id,
-      pointName: lp.name,
-      errorMeters: Number(errorMeters.toFixed(2)),
-    }
-  })
-
-  const rmse = Number(Math.sqrt(sumSqErr / n).toFixed(2))
 
   // High RMSE Error check: if residual errors exceed allowable threshold, reject calibration
   if (rmse > MAX_ACCEPTABLE_CALIBRATION_RMSE_METERS) {
@@ -272,12 +311,12 @@ export function geoToModelCoordinates(
     return null
   }
 
-  const { a, b, tx, tz, scale } = calibration.helmertParams
+  const { a, b, tx, tz, scale, isReflected } = calibration.helmertParams
   const { u, v } = geoToLocalMeters(latitude, longitude, calibration.referenceOrigin)
 
-  const X = a * u - b * v + tx
+  const X = isReflected ? a * u + b * v + tx : a * u - b * v + tx
   const Y = 0.25 // Standard campus ground elevation in model space
-  const Z = b * u + a * v + tz
+  const Z = isReflected ? b * u - a * v + tz : b * u + a * v + tz
 
   return {
     modelPoint: [Number(X.toFixed(2)), Y, Number(Z.toFixed(2))],
@@ -300,7 +339,7 @@ export function modelToGeoCoordinates(
     return null
   }
 
-  const { a, b, tx, tz } = calibration.helmertParams
+  const { a, b, tx, tz, isReflected } = calibration.helmertParams
   const deltaX = modelPoint[0] - tx
   const deltaZ = modelPoint[2] - tz
   const det = a * a + b * b
@@ -310,7 +349,7 @@ export function modelToGeoCoordinates(
   }
 
   const u = (a * deltaX + b * deltaZ) / det
-  const v = (-b * deltaX + a * deltaZ) / det
+  const v = isReflected ? (b * deltaX - a * deltaZ) / det : (-b * deltaX + a * deltaZ) / det
 
   return localMetersToGeo(u, v, calibration.referenceOrigin)
 }

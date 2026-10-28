@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DEFAULT_CAMPUS_CONTROL_POINTS,
+  PROVISIONAL_CAMPUS_CONTROL_POINTS,
   TEST_MODE_CONTROL_POINTS,
 } from '../data/campusCalibrationData'
 import { buildCalibrationModel } from '../lib/campusCalibration'
@@ -19,6 +20,11 @@ import type {
   PositionClassification,
 } from '../types/gps'
 import type { GeofenceEvaluation } from '../types/geofence'
+
+const LIVE_FALLBACK_CONTROL_POINTS =
+  DEFAULT_CAMPUS_CONTROL_POINTS.length > 0
+    ? DEFAULT_CAMPUS_CONTROL_POINTS
+    : PROVISIONAL_CAMPUS_CONTROL_POINTS
 
 export interface UseGpsLocationResult {
   isTracking: boolean
@@ -40,7 +46,7 @@ export function useGpsLocation(): UseGpsLocationResult {
   const [isTestMode, setIsTestMode] = useState<boolean>(false)
   const [serviceStatus, setServiceStatus] = useState<GpsServiceStatus>('idle')
   const [coords, setCoords] = useState<GpsCoordinates | null>(null)
-  const [controlPoints, setControlPoints] = useState<GroundControlPoint[]>(DEFAULT_CAMPUS_CONTROL_POINTS)
+  const [controlPoints, setControlPoints] = useState<GroundControlPoint[]>(LIVE_FALLBACK_CONTROL_POINTS)
 
   const mockProviderRef = useRef<MockGeolocationProvider | null>(null)
 
@@ -110,8 +116,8 @@ export function useGpsLocation(): UseGpsLocationResult {
       } else {
         const browserProvider = createBrowserGeolocationProvider()
         defaultGpsService.setProvider(browserProvider)
-        // Revert to uncalibrated default in live mode
-        setControlPoints(DEFAULT_CAMPUS_CONTROL_POINTS)
+        // Revert to calibrated benchmarks in live mode
+        setControlPoints(LIVE_FALLBACK_CONTROL_POINTS)
         setCoords(null)
         setServiceStatus('idle')
       }
@@ -139,7 +145,7 @@ export function useGpsLocation(): UseGpsLocationResult {
 
   // Reset to default
   const resetToDefaultCalibration = useCallback(() => {
-    setControlPoints(isTestMode ? TEST_MODE_CONTROL_POINTS : DEFAULT_CAMPUS_CONTROL_POINTS)
+    setControlPoints(isTestMode ? TEST_MODE_CONTROL_POINTS : LIVE_FALLBACK_CONTROL_POINTS)
   }, [isTestMode])
 
   const isTracking = serviceStatus === 'active' || serviceStatus === 'requesting'

@@ -1,7 +1,7 @@
 import type { CampusBuildingId } from '../data/campusModelMapping.ts'
 import type { Point3 } from './navigation.ts'
 
-export type DiscoverCategoryId = 'courses' | 'scholarships' | 'placements'
+export type DiscoverCategoryId = 'courses' | 'scholarships' | 'placements' | 'companies'
 
 export type DiscoverContentStatus = 'official' | 'pending_official'
 
@@ -28,6 +28,51 @@ export interface DiscoverOfficialContact {
   recommendedContactMethod: string
 }
 
+export interface CourseProgram {
+  id: string
+  name: string
+  degree: 'B.E.' | 'B.Tech' | 'M.E.' | 'MBA'
+  level: 'UG' | 'PG'
+  abbreviation: string
+  department: string
+  officialUrl: string
+  buildingId?: CampusBuildingId
+  buildingName?: string
+  description: string
+  narrationScript?: string
+}
+
+export interface ScholarshipScheme {
+  id: string
+  name: string
+  group: 'SC/ST' | 'JITO' | 'Central Government' | 'PM/PS'
+  administeredBy: string
+  officialUrl?: string
+  verificationStatus: 'verified' | 'unverified'
+  description: string
+  eligibilitySummary?: string
+  verificationNotice: string
+  narrationScript?: string
+}
+
+export interface VerifiedCompany {
+  id: string
+  name: string
+  category: 'IT & Software' | 'Core Engineering' | 'Consulting & Services' | 'Accredited Partner'
+  verificationSource: string
+  officialUrl: string
+  notes?: string
+  narrationScript?: string
+}
+
+export interface PlacementBatchRecord {
+  year: string
+  recordLabel: string
+  documentUrl: string
+  topPlacementsImageUrl?: string
+  isNew?: boolean
+}
+
 export interface DiscoverCategoryData {
   id: DiscoverCategoryId
   title: string
@@ -43,6 +88,16 @@ export interface DiscoverCategoryData {
   previewTopics: DiscoverPreviewTopic[]
   associatedBuildings: AcademicDepartmentLink[]
   officialContact: DiscoverOfficialContact
+  courses?: {
+    ug: CourseProgram[]
+    pg: CourseProgram[]
+  }
+  scholarships?: ScholarshipScheme[]
+  companies?: {
+    recruiters: VerifiedCompany[]
+    batchRecords: PlacementBatchRecord[]
+  }
 }
 
 export type NarrationPlaybackState = 'idle' | 'playing' | 'paused' | 'ended'
+

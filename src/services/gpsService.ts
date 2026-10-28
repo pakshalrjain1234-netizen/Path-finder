@@ -67,8 +67,9 @@ export class MockGeolocationProvider implements GeolocationProvider {
   /**
    * Test helper: inject position update to all active watchers.
    */
-  emitPosition(lat: number, lon: number, accuracy: number = 8): void {
-    const pos = this.createMockPosition(lat, lon, accuracy)
+  emitPosition(lat: number, lon: number, accuracy?: number): void {
+    const safeAccuracy = accuracy !== undefined ? accuracy : 8
+    const pos = this.createMockPosition(lat, lon, safeAccuracy)
     this.watchers.forEach((cb) => cb(pos))
   }
 
@@ -231,13 +232,12 @@ export class GpsLocationService {
   }
 
   private handlePositionSuccess(position: GeolocationPosition): void {
-    // Reject invalid coordinate numbers
+    // Reject invalid coordinates: latitude and longitude must be finite numbers
     if (
+      !position ||
       !position.coords ||
       !Number.isFinite(position.coords.latitude) ||
-      !Number.isFinite(position.coords.longitude) ||
-      !Number.isFinite(position.coords.accuracy) ||
-      position.coords.accuracy < 0
+      !Number.isFinite(position.coords.longitude)
     ) {
       return
     }
@@ -249,14 +249,19 @@ export class GpsLocationService {
     }
 
     this.currentStatus = 'active'
+    const hasAccuracy =
+      typeof position.coords.accuracy === 'number' &&
+      Number.isFinite(position.coords.accuracy) &&
+      position.coords.accuracy >= 0
+
     const coords: GpsCoordinates = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
-      accuracy: position.coords.accuracy,
-      altitude: position.coords.altitude,
-      altitudeAccuracy: position.coords.altitudeAccuracy,
-      heading: position.coords.heading,
-      speed: position.coords.speed,
+      accuracy: hasAccuracy ? position.coords.accuracy : (NaN as unknown as number),
+      altitude: position.coords.altitude ?? null,
+      altitudeAccuracy: position.coords.altitudeAccuracy ?? null,
+      heading: position.coords.heading ?? null,
+      speed: position.coords.speed ?? null,
       timestamp: position.timestamp || now,
     }
 

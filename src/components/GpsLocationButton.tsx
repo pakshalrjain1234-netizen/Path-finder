@@ -39,6 +39,7 @@ export function GpsLocationButton({
   if (isTracking) {
     const isCalibrated = positionStatus === 'location_available'
     const isPending = positionStatus === 'calibration_pending'
+    const isLowAccuracy = positionStatus === 'accuracy_insufficient'
 
     return (
       <button
@@ -52,11 +53,13 @@ export function GpsLocationButton({
               ? 'border-emerald-500/40 bg-emerald-950/50 text-emerald-300 hover:bg-emerald-900/50'
               : isPending
                 ? 'border-blue-500/40 bg-blue-950/50 text-blue-300 hover:bg-blue-900/50'
-                : 'border-[#293A50] bg-[#162235] text-[#F1F5F9] hover:bg-[#24364D]'
+                : isLowAccuracy
+                  ? 'border-amber-500/40 bg-amber-950/40 text-amber-200 hover:bg-amber-900/40'
+                  : 'border-[#293A50] bg-[#162235] text-[#F1F5F9] hover:bg-[#24364D]'
         } ${className}`}
-        title="Stop GPS tracking"
+        title={isLowAccuracy ? 'Low GPS accuracy — click to stop tracking' : 'Stop GPS tracking'}
       >
-        <LocateFixed size={15} className={isTestMode ? 'text-amber-400 animate-pulse' : 'text-[#60A5FA] animate-pulse'} />
+        <LocateFixed size={15} className={isTestMode || isLowAccuracy ? 'text-amber-400 animate-pulse' : 'text-[#60A5FA] animate-pulse'} />
         <span>{compact ? 'Tracking' : isTestMode ? 'Test GPS Active (Stop)' : 'Live GPS Active (Stop)'}</span>
       </button>
     )

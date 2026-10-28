@@ -2,7 +2,6 @@ import {
   Info,
   Pause,
   Play,
-  RotateCcw,
   Sparkles,
   Square,
   Volume2,
@@ -61,10 +60,6 @@ export function DiscoverNarrationPlayer({
 
   const handleResume = () => {
     discoverNarrationService.resume()
-  }
-
-  const handleReplay = () => {
-    discoverNarrationService.replay(narrationText, categoryId)
   }
 
   const handleStop = () => {
@@ -145,76 +140,83 @@ export function DiscoverNarrationPlayer({
         </div>
       )}
 
-      {/* Playback Controls Toolbar */}
+      {/* Playback Controls Toolbar: Explicit Listen, Pause, Resume, Stop */}
       <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {/* Main Action: Play / Pause / Resume */}
-          {playbackState === 'playing' ? (
-            <button
-              type="button"
-              onClick={handlePause}
-              disabled={!isSupported}
-              id={`btn-pause-narration-${categoryId}`}
-              aria-label={`Pause ${categoryTitle} narration`}
-              className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#E8C8B9] border border-[#D9B4A3] hover:bg-[#DFC0B1] text-[#352A47] px-4 py-2.5 text-xs font-heading font-bold transition shadow-xs active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47]"
-            >
-              <Pause size={15} className="fill-current" />
-              <span>Pause</span>
-            </button>
-          ) : playbackState === 'paused' ? (
-            <button
-              type="button"
-              onClick={handleResume}
-              disabled={!isSupported}
-              id={`btn-resume-narration-${categoryId}`}
-              aria-label={`Resume ${categoryTitle} narration`}
-              className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#352A47] hover:bg-[#231B30] text-white px-4 py-2.5 text-xs font-heading font-bold transition shadow-dream-soft active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47]"
-            >
-              <Play size={15} className="fill-current" />
-              <span>Resume</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handlePlay}
-              disabled={!isSupported}
-              id={`btn-play-narration-${categoryId}`}
-              aria-label={`Play ${categoryTitle} narration`}
-              className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#352A47] hover:bg-[#231B30] text-white px-4 py-2.5 text-xs font-heading font-bold transition shadow-dream-soft active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47]"
-            >
-              <Play size={15} className="fill-current" />
-              <span>{playbackState === 'ended' ? 'Play Again' : 'Listen Overview'}</span>
-            </button>
-          )}
-
-          {/* Replay Button */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* 1. Listen Button */}
           <button
             type="button"
-            onClick={handleReplay}
+            onClick={handlePlay}
             disabled={!isSupported}
-            id={`btn-replay-narration-${categoryId}`}
-            aria-label={`Replay ${categoryTitle} narration from beginning`}
-            title="Replay from beginning"
-            className="flex min-h-[44px] items-center gap-1.5 rounded-2xl border border-[#C9B6DF] bg-[#E8DDF2] hover:bg-[#D2BEE7] text-[#352A47] px-3.5 py-2.5 text-xs font-heading font-bold transition active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47]"
+            id={`btn-listen-narration-${categoryId}`}
+            aria-label={`Listen to ${categoryTitle} narration from beginning`}
+            title="Listen from beginning"
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-2xl px-4 py-2 text-xs font-heading font-bold transition shadow-dream-soft active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47] focus-visible:ring-offset-2 ${
+              playbackState === 'playing'
+                ? 'bg-[#352A47] text-white ring-2 ring-[#7A4465]'
+                : 'bg-[#352A47] hover:bg-[#231B30] text-white'
+            }`}
           >
-            <RotateCcw size={14} />
-            <span className="hidden sm:inline">Replay</span>
+            <Play size={14} className="fill-current" />
+            <span>Listen</span>
           </button>
 
-          {/* Stop Button */}
-          {(playbackState === 'playing' || playbackState === 'paused') && (
-            <button
-              type="button"
-              onClick={handleStop}
-              id={`btn-stop-narration-${categoryId}`}
-              aria-label={`Stop ${categoryTitle} narration`}
-              title="Stop audio"
-              className="flex min-h-[44px] items-center gap-1.5 rounded-2xl border border-[#D7A894] bg-[#E8C8B9]/30 hover:bg-[#E8C8B9]/50 text-[#9E563A] px-3.5 py-2.5 text-xs font-heading font-bold transition active:scale-95 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9E563A]"
-            >
-              <Square size={13} className="fill-current" />
-              <span className="hidden sm:inline">Stop</span>
-            </button>
-          )}
+          {/* 2. Pause Button */}
+          <button
+            type="button"
+            onClick={handlePause}
+            disabled={!isSupported || playbackState !== 'playing'}
+            id={`btn-pause-narration-${categoryId}`}
+            aria-label={`Pause ${categoryTitle} narration`}
+            aria-disabled={!isSupported || playbackState !== 'playing'}
+            title="Pause narration"
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-2xl border px-3.5 py-2 text-xs font-heading font-bold transition active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9E563A] focus-visible:ring-offset-2 ${
+              playbackState === 'playing'
+                ? 'bg-[#E8C8B9] border-[#D7A894] hover:bg-[#DFC0B1] text-[#352A47] cursor-pointer shadow-xs'
+                : 'bg-[#E8C8B9]/40 border-[#D7A894]/50 text-[#352A47]/40 cursor-not-allowed'
+            }`}
+          >
+            <Pause size={14} className="fill-current" />
+            <span>Pause</span>
+          </button>
+
+          {/* 3. Resume Button */}
+          <button
+            type="button"
+            onClick={handleResume}
+            disabled={!isSupported || playbackState !== 'paused'}
+            id={`btn-resume-narration-${categoryId}`}
+            aria-label={`Resume ${categoryTitle} narration`}
+            aria-disabled={!isSupported || playbackState !== 'paused'}
+            title="Resume paused narration"
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-2xl border px-3.5 py-2 text-xs font-heading font-bold transition active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#352A47] focus-visible:ring-offset-2 ${
+              playbackState === 'paused'
+                ? 'bg-[#DFD1EC] border-[#C9B6DF] hover:bg-[#D2BEE7] text-[#352A47] cursor-pointer shadow-dream-soft ring-2 ring-[#7A4465]'
+                : 'bg-[#DFD1EC]/40 border-[#C9B6DF]/50 text-[#352A47]/40 cursor-not-allowed'
+            }`}
+          >
+            <Play size={14} className="fill-current" />
+            <span>Resume</span>
+          </button>
+
+          {/* 4. Stop Button */}
+          <button
+            type="button"
+            onClick={handleStop}
+            disabled={!isSupported || playbackState === 'idle'}
+            id={`btn-stop-narration-${categoryId}`}
+            aria-label={`Stop ${categoryTitle} narration`}
+            aria-disabled={!isSupported || playbackState === 'idle'}
+            title="Stop audio playback"
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-2xl border px-3.5 py-2 text-xs font-heading font-bold transition active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9E563A] focus-visible:ring-offset-2 ${
+              playbackState !== 'idle'
+                ? 'bg-[#E8C8B9]/30 border-[#D7A894] hover:bg-[#E8C8B9]/60 text-[#9E563A] cursor-pointer shadow-xs'
+                : 'bg-[#E8C8B9]/20 border-[#D7A894]/40 text-[#9E563A]/40 cursor-not-allowed'
+            }`}
+          >
+            <Square size={13} className="fill-current" />
+            <span>Stop</span>
+          </button>
         </div>
 
         {/* Toggle Transcript View Button */}
@@ -248,7 +250,7 @@ export function DiscoverNarrationPlayer({
             )}
           </div>
           <p className="text-[12px] sm:text-[13px] text-[#352A47] leading-relaxed italic border-l-2 border-[#352A47] pl-3 py-0.5 font-sans">
-            &ldquo;{narrationText}&rdquo;
+            &ldquo;{isThisCategoryActive && narrationState.activeText ? narrationState.activeText : narrationText}&rdquo;
           </p>
         </div>
       )}
