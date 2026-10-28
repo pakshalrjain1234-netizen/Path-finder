@@ -40,12 +40,50 @@ export function createRoutePlan(graph: NavigationGraph, startId: string, destina
     return { status: 'no-route', message: 'No route could be confirmed with the current campus graph.' }
   }
 
+function computeTurnTitle(
+  node: NavigationNode,
+  index: number,
+  totalNodes: number,
+  prevNode?: NavigationNode,
+  nextNode?: NavigationNode,
+): string {
+  if (index === 0) {
+    return `Start at ${node.label}`
+  }
+  if (index === totalNodes - 1) {
+    return `Arrive at ${node.label}`
+  }
+  if (prevNode && nextNode) {
+    // Vector in (from previous node to current node)
+    const v1x = node.position[0] - prevNode.position[0]
+    const v1z = node.position[2] - prevNode.position[2]
+    // Vector out (from current node to next node)
+    const v2x = nextNode.position[0] - node.position[0]
+    const v2z = nextNode.position[2] - node.position[2]
+
+    const cross = v1x * v2z - v1z * v2x
+    const dot = v1x * v2x + v1z * v2z
+    const angleDeg = Math.atan2(cross, dot) * (180 / Math.PI)
+
+    // Positive angle in right-handed Three.js (+X East, +Z South) corresponds to turning right
+    if (angleDeg >= 25 && angleDeg <= 155) {
+      return `Turn right towards ${node.label}`
+    }
+    if (angleDeg <= -25 && angleDeg >= -155) {
+      return `Turn left towards ${node.label}`
+    }
+  }
+  return `Continue to ${node.label}`
+}
+
   const steps = route.nodeIds.map((nodeId, index) => {
     const node = nodes.get(nodeId)
     if (!node) {
       throw new Error(`Route reconstruction failed for node ${nodeId}`)
     }
-    const title = index === 0 ? `Start at ${node.label}` : index === route.nodeIds.length - 1 ? `Arrive at ${node.label}` : `Continue to ${node.label}`
+    const prevNode = index > 0 ? nodes.get(route.nodeIds[index - 1]) : undefined
+    const nextNode = index < route.nodeIds.length - 1 ? nodes.get(route.nodeIds[index + 1]) : undefined
+    const title = computeTurnTitle(node, index, route.nodeIds.length, prevNode, nextNode)
     return {
       nodeId,
       title,

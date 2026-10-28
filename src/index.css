@@ -3,81 +3,161 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: #F1F5F9;
-  background-color: #101827;
-  color-scheme: dark;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #352A47;
+  background-color: #E8DDF2;
+  color-scheme: light;
 }
 
 * {
   box-sizing: border-box;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-editorial {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+::selection {
+  background-color: #D2BEE7;
+  color: #352A47;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #101827;
-  color: #F1F5F9;
+  background-color: #E8DDF2;
+  color: #352A47;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: 100vh;
-  background-color: #101827;
+  background-color: #E8DDF2;
 }
 
-/* Polished Dark University Card & Surface Utilities */
-.uni-card {
-  background-color: #192638;
-  border: 1px solid #293A50;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+/* =========================================================================
+   Dreamscape Pastel: Atmospheric Surfaces & Sculptural Wells
+   ========================================================================= */
+.dream-canvas {
+  background-color: #E8DDF2;
+  color: #352A47;
 }
 
-.uni-card-hover {
-  background-color: #192638;
-  border: 1px solid #293A50;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.dream-card {
+  background-color: #FBF8FD;
+  border: 1px solid #C9B6DF;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px -6px rgba(53, 42, 71, 0.08), 0 2px 6px -2px rgba(53, 42, 71, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.uni-card-hover:hover {
-  border-color: #60A5FA;
-  box-shadow: 0 10px 25px -4px rgba(96, 165, 250, 0.15);
-  transform: translateY(-1px);
+.dream-card:hover {
+  border-color: #B39FCB;
+  box-shadow: 0 16px 40px -8px rgba(53, 42, 71, 0.12);
+  transform: translateY(-2px);
 }
 
-.uni-panel-floating {
-  background-color: rgba(25, 38, 56, 0.95);
+.dream-surface-lilac {
+  background-color: #D2BEE7;
+  border: 1px solid #C9B6DF;
+}
+
+.dream-surface-peach {
+  background-color: #E8C8B9;
+  border: 1px solid #D7A894;
+}
+
+.dream-surface-powder {
+  background-color: #C6DCE4;
+  border: 1px solid #9FBECB;
+}
+
+.dream-surface-sage {
+  background-color: #BCD8C9;
+  border: 1px solid #94BCA7;
+}
+
+.dream-floating-bar {
+  background-color: rgba(251, 248, 253, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(41, 58, 80, 0.8);
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.4);
+  border: 1px solid #C9B6DF;
+  box-shadow: 0 16px 40px -8px rgba(53, 42, 71, 0.14);
 }
 
-/* Modern Subtle Scrollbar */
+/* Backward compatibility aliases remapped to Dreamscape Pastel */
+.obsidian-canvas,
+.ivory-canvas,
+.pastel-canvas {
+  background-color: #E8DDF2;
+  color: #352A47;
+}
+
+.obsidian-hud-panel,
+.obsidian-card,
+.ivory-slab,
+.uni-card,
+.atlas-card,
+.pastel-card {
+  background-color: #FBF8FD;
+  border: 1px solid #C9B6DF;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px -4px rgba(53, 42, 71, 0.08);
+}
+
+.obsidian-floating-bar,
+.ivory-floating-bar,
+.pastel-floating-bar {
+  background-color: rgba(251, 248, 253, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #C9B6DF;
+  box-shadow: 0 16px 40px -8px rgba(53, 42, 71, 0.14);
+}
+
+/* Accessible Interactive Touch Target (Minimum 44x44px for Mobile) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Focus Ring Utility for Keyboard Navigation (WCAG AA/AAA) */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #E8DDF2, 0 0 0 4px #352A47;
+}
+
+/* Subtle Dreamscape Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #C9B6DF;
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #B39FCB;
 }
 
-/* Safe Area Insets for Mobile Excellence */
+/* Safe Area Insets for Mobile */
 .pb-safe {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }

@@ -35,6 +35,7 @@ export interface TourNarrationProvider {
   cancel(): void
   pause(): void
   resume(): void
+  onBeforeSpeak?(hook: () => void): () => void
 }
 
 // Female voice identification markers across Windows, Android, iOS, macOS, Chrome, Edge
@@ -132,6 +133,7 @@ class TourNarrationService implements TourNarrationProvider {
   private heartbeatTimer: NodeJS.Timeout | null = null
   private voices: SpeechSynthesisVoice[] = []
   private voiceListeners: Array<(voices: NarrationVoiceOption[]) => void> = []
+  private preSpeakHooks: Array<() => void> = []
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -306,6 +308,13 @@ class TourNarrationService implements TourNarrationProvider {
     listener(this.getAvailableVoices())
     return () => {
       this.voiceListeners = this.voiceListeners.filter((l) => l !== listener)
+    }
+  }
+
+  public onBeforeSpeak(hook: () => void): () => void {
+    this.preSpeakHooks.push(hook)
+    return () => {
+      this.preSpeakHooks = this.preSpeakHooks.filter((h) => h !== hook)
     }
   }
 
@@ -523,6 +532,15 @@ class TourNarrationService implements TourNarrationProvider {
 
     // Sequence token invalidates all prior speech events
     const currentSeq = ++this.sequenceCounter
+
+    // Notify external services (e.g. DiscoverNarrationService) to halt speech immediately
+    this.preSpeakHooks.forEach((hook) => {
+      try {
+        hook()
+      } catch {
+        // ignore
+      }
+    })
 
     this.cancelInternal()
 

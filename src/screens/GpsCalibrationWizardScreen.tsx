@@ -351,18 +351,18 @@ export function GpsCalibrationWizardScreen() {
   // Security gate
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen bg-[#101827] text-[#F1F5F9] flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-rose-500/30 bg-[#192638] p-6 text-center shadow-lg">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-950/60 text-rose-400 mx-auto mb-4 border border-rose-500/30">
+      <div className="min-h-screen bg-[#E8DDF2] text-[#352A47] flex items-center justify-center p-4 font-sans">
+        <div className="w-full max-w-md rounded-2xl border border-rose-300 bg-[#FAF8FC] p-6 text-center shadow-lg">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 mx-auto mb-4 border border-rose-200">
             <ShieldAlert size={36} />
           </div>
-          <h2 className="text-xl font-bold text-[#F1F5F9] mb-2">Developer Access Required</h2>
-          <p className="text-xs text-[#94A3B8] mb-6 leading-relaxed">
+          <h2 className="text-xl font-editorial font-medium text-[#352A47] mb-2">Developer Access Required</h2>
+          <p className="text-xs text-[#51465F] mb-6 leading-relaxed">
             The GPS Calibration Wizard is restricted to authorized field surveyors and administrators to ensure real-world positional safety.
           </p>
           <Link
             to="/welcome"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#60A5FA] hover:bg-blue-400 px-6 py-2.5 text-xs font-bold text-[#0F172A] transition shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#352A47] hover:bg-[#231A32] px-6 py-2.5 text-xs font-heading font-bold text-[#FAF8FC] transition shadow-sm"
           >
             <ChevronLeft size={16} />
             <span>Return to Welcome</span>
@@ -373,26 +373,26 @@ export function GpsCalibrationWizardScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-[#101827] text-[#F1F5F9] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#E8DDF2] text-[#352A47] flex flex-col font-sans">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-[#293A50] bg-[#101827]/95 px-4 py-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-[#352A47]/10 bg-[#FAF8FC]/95 px-4 py-3 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <Link
               to="/welcome"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#293A50] bg-[#162235] text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#24364D] transition"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#352A47]/15 bg-white text-[#51465F] hover:text-[#352A47] hover:bg-[#FAF8FC] transition shadow-sm"
               title="Return to Welcome"
             >
               <ChevronLeft size={18} />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold text-[#F1F5F9]">Campus Location Setup</h1>
-                <span className="rounded bg-[#162235] px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] uppercase border border-[#293A50]">
+                <h1 className="text-sm font-heading font-bold text-[#352A47]">Campus Location Setup</h1>
+                <span className="rounded bg-[#D2BEE7]/60 px-1.5 py-0.5 text-[9px] font-heading font-bold text-[#352A47] uppercase border border-[#352A47]/15">
                   Field Calibration
                 </span>
               </div>
-              <p className="text-[11px] text-[#94A3B8]">
+              <p className="text-[11px] text-[#51465F]">
                 Campus Location Setup • Stage E3 Model Alignment
               </p>
             </div>

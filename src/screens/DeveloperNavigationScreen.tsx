@@ -208,23 +208,23 @@ function DeveloperNavigationScreenInner() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] p-3 md:p-4 overflow-x-hidden">
+    <div className="relative min-h-[calc(100vh-4rem)] p-3 md:p-4 overflow-x-hidden bg-[#E8DDF2] text-[#352A47] font-sans">
       {/* Prominent Developer Warning Banner */}
-      <div className="mb-3 rounded-2xl border border-amber-500/30 bg-amber-950/40 p-3 shadow-lg backdrop-blur-xl">
+      <div className="mb-3 rounded-2xl border border-amber-300 bg-amber-50 p-3 shadow-sm backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-200">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-xs font-heading font-bold uppercase tracking-wider text-amber-950">
               SIMULATION MODE — DEVELOPER NAVIGATION TEST UTILITY
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-amber-300/80">
+            <span className="text-[11px] text-amber-800">
               Isolated testing tool for GPS mock observations, virtual walks &amp; rerouting
             </span>
             <Link
               to="/navigation"
-              className="rounded-xl border border-amber-500/40 bg-amber-500/20 px-2.5 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/30 transition"
+              className="rounded-xl border border-amber-400/40 bg-amber-100 px-2.5 py-1 text-xs font-heading font-bold text-amber-950 hover:bg-amber-200 transition"
             >
               Exit to Student Navigation
             </Link>
@@ -236,7 +236,7 @@ function DeveloperNavigationScreenInner() {
       <div className="flex flex-col md:flex-row h-[calc(100vh-10rem)] min-h-[580px] w-full gap-4">
         {/* Left Column: Developer Controls Sidebar */}
         <aside
-          className={`flex flex-col h-full bg-[#0B1220]/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-300 relative flex-shrink-0 ${isSidebarCollapsed ? 'w-14 items-center' : 'w-full md:w-[380px] xl:w-[420px]'
+          className={`flex flex-col h-full bg-[#FAF8FC] backdrop-blur-xl rounded-3xl border border-[#352A47]/10 shadow-lg overflow-hidden transition-all duration-300 relative flex-shrink-0 ${isSidebarCollapsed ? 'w-14 items-center' : 'w-full md:w-[380px] xl:w-[420px]'
             }`}
         >
           {isSidebarCollapsed ? (
@@ -244,17 +244,19 @@ function DeveloperNavigationScreenInner() {
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8DDF2] border border-[#352A47]/15 text-[#352A47] hover:bg-[#D2BEE7] transition-colors cursor-pointer"
                 title="Expand Developer Panel"
+                aria-label="Expand Developer Panel"
               >
                 <PanelLeftOpen size={18} />
               </button>
-              <div className="h-px w-8 bg-white/10" />
+              <div className="h-px w-8 bg-[#352A47]/10" />
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#352A47] transition-colors cursor-pointer"
                 title="Reset route"
+                aria-label="Reset route"
               >
                 <RotateCcw size={16} />
               </button>
@@ -262,21 +264,21 @@ function DeveloperNavigationScreenInner() {
           ) : (
             <div className="flex flex-col h-full p-4 overflow-y-auto space-y-3">
               {/* Sidebar Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-indigo-600 text-white shadow-sm shadow-amber-500/20">
+              <div className="flex items-center justify-between border-b border-[#352A47]/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#D2BEE7]/60 border border-[#352A47]/15 text-[#352A47]">
                     <FlaskConical size={16} />
                   </div>
                   <div>
-                    <h1 className="text-sm font-semibold text-slate-100 leading-tight">Developer Navigation Test</h1>
-                    <p className="text-[10px] text-slate-400">Phase 4B/4C Architecture Validation</p>
+                    <h1 className="text-sm font-heading font-bold text-[#352A47] leading-tight">Developer Navigation Test</h1>
+                    <p className="text-[11px] text-[#51465F]">Phase 4B/4C Architecture Validation</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex h-8 items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-2 text-xs font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                    className="flex h-8 items-center gap-1 rounded-xl border border-[#352A47]/15 bg-white px-2.5 text-xs font-heading font-semibold text-[#51465F] hover:bg-[#FAF8FC] hover:text-[#352A47] transition-colors cursor-pointer shadow-sm"
                     title="Reset to default route"
                   >
                     <RotateCcw size={12} />
@@ -285,8 +287,9 @@ function DeveloperNavigationScreenInner() {
                   <button
                     type="button"
                     onClick={() => setIsSidebarCollapsed(true)}
-                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#352A47]/15 bg-white text-[#51465F] hover:bg-[#FAF8FC] hover:text-[#352A47] transition-colors cursor-pointer shadow-sm"
                     title="Collapse sidebar"
+                    aria-label="Collapse sidebar"
                   >
                     <PanelLeftClose size={14} />
                   </button>
@@ -294,14 +297,14 @@ function DeveloperNavigationScreenInner() {
               </div>
 
               {/* Origin & Destination Selectors */}
-              <div className="space-y-2 rounded-2xl border border-white/10 bg-[#111827]/80 p-3">
+              <div className="space-y-2 rounded-2xl border border-[#352A47]/10 bg-[#E8DDF2]/30 p-3">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Origin</span>
+                  <span className="h-2 w-2 rounded-full bg-[#825A9E]" />
+                  <span className="text-[11px] font-heading font-bold uppercase tracking-wider text-[#51465F]">Origin</span>
                   <select
                     value={fromId}
                     onChange={(e) => setFromId(e.target.value)}
-                    className="w-full bg-[#162033] rounded-lg border border-white/10 px-2 py-1 text-xs text-white outline-none"
+                    className="w-full bg-white rounded-xl border border-[#352A47]/15 px-2.5 py-1.5 text-xs text-[#352A47] outline-none shadow-sm cursor-pointer"
                   >
                     {locationOptions.map((opt) => (
                       <option key={`dev-from-${opt.id}`} value={opt.id}>
@@ -315,20 +318,20 @@ function DeveloperNavigationScreenInner() {
                   <button
                     type="button"
                     onClick={handleSwap}
-                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#162033] text-slate-300 hover:border-cyan-400 hover:text-cyan-400 transition"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#352A47]/15 bg-white text-[#51465F] hover:border-[#825A9E] hover:text-[#352A47] transition cursor-pointer shadow-sm touch-target"
                     title="Swap start & destination"
                   >
-                    <ArrowLeftRight size={12} />
+                    <ArrowLeftRight size={13} />
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-rose-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Destination</span>
+                  <span className="text-[11px] font-heading font-bold uppercase tracking-wider text-[#51465F]">Destination</span>
                   <select
                     value={toId}
                     onChange={(e) => setToId(e.target.value)}
-                    className="w-full bg-[#162033] rounded-lg border border-white/10 px-2 py-1 text-xs text-white outline-none"
+                    className="w-full bg-white rounded-xl border border-[#352A47]/15 px-2.5 py-1.5 text-xs text-[#352A47] outline-none shadow-sm cursor-pointer"
                   >
                     {locationOptions.map((opt) => (
                       <option key={`dev-to-${opt.id}`} value={opt.id}>
@@ -340,19 +343,19 @@ function DeveloperNavigationScreenInner() {
               </div>
 
               {/* Test Mode Selector Tabs */}
-              <div className="flex rounded-xl bg-[#111827]/90 border border-white/10 p-1 text-xs">
+              <div className="flex rounded-xl bg-[#DFD1EC] border border-[#352A47]/10 p-1 text-xs">
                 <button
                   type="button"
                   onClick={() => {
                     setDevTab('scenarios')
                     setIsPlaying(false)
                   }}
-                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'scenarios'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                  className={`flex-1 rounded-lg py-1.5 font-heading font-bold transition cursor-pointer ${devTab === 'scenarios'
+                      ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                      : 'text-[#51465F] hover:text-[#352A47]'
                     }`}
                 >
-                  GPS Scenarios (Phase 4B/4C)
+                  GPS Scenarios
                 </button>
                 <button
                   type="button"
@@ -360,12 +363,12 @@ function DeveloperNavigationScreenInner() {
                     setDevTab('virtual_walk')
                     stopLiveNav()
                   }}
-                  className={`flex-1 rounded-lg py-1.5 font-bold transition ${devTab === 'virtual_walk'
-                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                  className={`flex-1 rounded-lg py-1.5 font-heading font-bold transition cursor-pointer ${devTab === 'virtual_walk'
+                      ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                      : 'text-[#51465F] hover:text-[#352A47]'
                     }`}
                 >
-                  Virtual Walk (Phase 3.5)
+                  Virtual Walk
                 </button>
               </div>
 
@@ -373,30 +376,30 @@ function DeveloperNavigationScreenInner() {
               {devTab === 'scenarios' ? (
                 <div className="space-y-3">
                   {/* Status Indicator */}
-                  <div className="rounded-xl border border-white/10 bg-[#162033]/80 p-3 space-y-1.5">
+                  <div className="rounded-xl border border-[#352A47]/10 bg-[#E8DDF2]/30 p-3 space-y-1.5">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-bold uppercase tracking-wider text-cyan-300">
+                      <span className="font-heading font-bold uppercase tracking-wider text-[#352A47]">
                         {activeScenario ? activeScenario.name : 'Ready for scenario selection'}
                       </span>
-                      <span className="rounded-full bg-cyan-950/80 px-2 py-0.5 border border-cyan-500/30 text-cyan-300 font-semibold">
+                      <span className="rounded-full bg-[#D2BEE7]/60 px-2 py-0.5 border border-[#352A47]/15 text-[#352A47] font-heading font-semibold text-[11px]">
                         Obs {scenarioStepIndex + 1}/{activeScenario ? activeScenario.observations.length : 0}
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-300">
+                    <p className="text-xs text-[#51465F]">
                       {activeScenario ? activeScenario.description : 'Select a pre-programmed navigation test scenario below.'}
                     </p>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-400 pt-1">
-                      <span>Status: <strong className="text-white uppercase">{navState.status}</strong></span>
-                      <span>Confidence: <strong className="text-cyan-300 uppercase">{navState.confidence}</strong></span>
+                    <div className="flex items-center gap-2 text-xs text-[#51465F] pt-1">
+                      <span>Status: <strong className="text-[#352A47] uppercase">{navState.status}</strong></span>
+                      <span>Confidence: <strong className="text-[#825A9E] uppercase">{navState.confidence}</strong></span>
                       {navState.rerouteCount > 0 && (
-                        <span className="text-emerald-400 font-bold">Reroutes: {navState.rerouteCount}</span>
+                        <span className="text-emerald-700 font-bold">Reroutes: {navState.rerouteCount}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Scenario Dropdown & Runner */}
-                  <div className="space-y-2 rounded-2xl border border-white/10 bg-[#111827]/90 p-3">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  <div className="space-y-2 rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-3 shadow-sm">
+                    <label className="text-[11px] font-heading font-bold uppercase tracking-wider text-[#51465F] block">
                       Choose Deterministic Scenario
                     </label>
                     <select
@@ -406,7 +409,7 @@ function DeveloperNavigationScreenInner() {
                         setSelectedScenarioId(scId)
                         handleRunScenario(scId)
                       }}
-                      className="w-full rounded-xl border border-white/10 bg-[#162033] px-3 py-2 text-xs font-semibold text-white outline-none"
+                      className="w-full rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs font-semibold text-[#352A47] outline-none shadow-sm cursor-pointer"
                     >
                       {NAVIGATION_SCENARIOS.map((sc) => (
                         <option key={sc.id} value={sc.id}>
@@ -419,20 +422,21 @@ function DeveloperNavigationScreenInner() {
                       <button
                         type="button"
                         onClick={() => handleRunScenario(selectedScenarioId)}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2 text-xs font-bold text-white shadow-lg shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transition"
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#352A47] hover:bg-[#231A32] py-2.5 text-xs font-heading font-bold text-[#FAF8FC] shadow-md shadow-[#352A47]/20 transition cursor-pointer min-h-[44px]"
                       >
-                        <Play size={13} />
+                        <Play size={14} />
                         <span>Run Test Scenario</span>
                       </button>
 
                       {activeScenario && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             disabled={scenarioStepIndex === 0}
                             onClick={() => stepScenario('prev')}
-                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white disabled:opacity-40"
+                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#352A47]/15 bg-white text-[#51465F] hover:bg-[#FAF8FC] hover:text-[#352A47] transition-colors disabled:opacity-40 cursor-pointer shadow-sm"
                             title="Step backward"
+                            aria-label="Step backward"
                           >
                             <ChevronLeft size={14} />
                           </button>
@@ -440,16 +444,18 @@ function DeveloperNavigationScreenInner() {
                             type="button"
                             disabled={scenarioStepIndex >= activeScenario.observations.length - 1}
                             onClick={() => stepScenario('next')}
-                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-[#162033] text-slate-300 hover:bg-[#1B2540] hover:text-white disabled:opacity-40"
+                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#352A47]/15 bg-white text-[#51465F] hover:bg-[#FAF8FC] hover:text-[#352A47] transition-colors disabled:opacity-40 cursor-pointer shadow-sm"
                             title="Step forward"
+                            aria-label="Step forward"
                           >
                             <ChevronRight size={14} />
                           </button>
                           <button
                             type="button"
                             onClick={() => setCameraRevision((r) => r + 1)}
-                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-[#162033] text-cyan-400 hover:bg-[#1B2540] hover:text-cyan-300"
+                            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#352A47]/15 bg-white text-[#352A47] hover:bg-[#FAF8FC] transition-colors cursor-pointer shadow-sm"
                             title="Recenter camera"
+                            aria-label="Recenter camera"
                           >
                             <Crosshair size={14} />
                           </button>
@@ -459,9 +465,9 @@ function DeveloperNavigationScreenInner() {
                   </div>
 
                   {/* Turn Guidance Live Preview */}
-                  <div className="rounded-2xl border border-white/10 bg-[#111827]/90 p-3.5 space-y-2.5">
+                  <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-3.5 space-y-2.5 shadow-sm">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white shadow-md">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#352A47] text-[#FAF8FC] shadow-md shadow-[#352A47]/20">
                         {navState.status === 'arrived' ? (
                           <CheckCircle2 size={20} />
                         ) : navState.isOffRoute ? (
@@ -471,12 +477,12 @@ function DeveloperNavigationScreenInner() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-slate-100">
+                        <div className="text-xs font-heading font-bold text-[#352A47]">
                           {navState.status === 'arrived'
                             ? 'Destination Arrived'
                             : `In ${navState.distanceToNextTurn.toFixed(0)} m`}
                         </div>
-                        <div className="text-[11px] text-slate-300 mt-0.5">
+                        <div className="text-xs text-[#51465F] mt-0.5">
                           {navState.currentStep?.title ?? 'Follow walkway route'}
                         </div>
                       </div>
@@ -484,13 +490,13 @@ function DeveloperNavigationScreenInner() {
 
                     {/* Progress Bar */}
                     <div className="space-y-1 pt-1">
-                      <div className="flex justify-between text-[10px] text-slate-400">
+                      <div className="flex justify-between text-xs text-[#51465F]">
                         <span>{navState.remainingDistance.toFixed(0)}m remaining</span>
                         <span>{(navState.progressRatio * 100).toFixed(0)}%</span>
                       </div>
-                      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+                      <div className="h-1.5 w-full rounded-full bg-[#DFD1EC] overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-300"
+                          className="h-full bg-[#352A47] transition-all duration-300"
                           style={{ width: `${Math.min(100, Math.max(0, navState.progressRatio * 100))}%` }}
                         />
                       </div>
@@ -500,7 +506,7 @@ function DeveloperNavigationScreenInner() {
               ) : (
                 /* VIRTUAL WALK SIMULATION */
                 <div className="space-y-3">
-                  <div className="rounded-2xl border border-cyan-500/30 bg-[#0B1220]/90 p-3.5 space-y-2.5">
+                  <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-3.5 space-y-2.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <button
@@ -513,7 +519,7 @@ function DeveloperNavigationScreenInner() {
                               setIsPlaying((p) => !p)
                             }
                           }}
-                          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:from-blue-500 hover:to-cyan-400 transition"
+                          className="flex items-center gap-1.5 rounded-xl bg-[#352A47] hover:bg-[#231A32] px-3.5 py-2 text-xs font-heading font-bold text-[#FAF8FC] shadow-sm transition cursor-pointer min-h-[36px]"
                         >
                           {isPlaying ? <Pause size={14} /> : <Play size={14} />}
                           <span>{isPlaying ? 'Pause' : simProgress.isFinished ? 'Replay' : 'Play Walk'}</span>
@@ -524,7 +530,7 @@ function DeveloperNavigationScreenInner() {
                             setIsPlaying(false)
                             setSimulatedDistance(0)
                           }}
-                          className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
+                          className="flex items-center gap-1.5 rounded-xl border border-[#352A47]/15 bg-white px-2.5 py-2 text-xs font-heading font-medium text-[#51465F] hover:bg-[#FAF8FC] hover:text-[#352A47] transition cursor-pointer min-h-[36px] shadow-sm"
                         >
                           <RotateCcw size={13} />
                           <span>Reset</span>
@@ -532,15 +538,15 @@ function DeveloperNavigationScreenInner() {
                       </div>
 
                       {/* Speed */}
-                      <div className="flex items-center gap-0.5 rounded-lg bg-black/40 border border-white/10 p-0.5 text-[10px]">
+                      <div className="flex items-center gap-0.5 rounded-lg bg-[#DFD1EC] border border-[#352A47]/10 p-0.5 text-[11px]">
                         {[1.5, 3.0, 6.0].map((speed) => (
                           <button
                             key={speed}
                             type="button"
                             onClick={() => setSimSpeed(speed)}
-                            className={`rounded-md px-1.5 py-0.5 font-semibold transition ${simSpeed === speed
-                              ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40'
-                              : 'text-slate-400 hover:text-slate-200'
+                            className={`rounded-md px-1.5 py-0.5 font-heading font-bold transition cursor-pointer ${simSpeed === speed
+                                ? 'bg-[#352A47] text-[#FAF8FC]'
+                                : 'text-[#51465F] hover:text-[#352A47]'
                               }`}
                           >
                             {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}
@@ -551,9 +557,9 @@ function DeveloperNavigationScreenInner() {
 
                     {/* Scrubber */}
                     <div className="space-y-1">
-                      <div className="flex justify-between text-[11px] text-slate-400">
+                      <div className="flex justify-between text-xs text-[#51465F]">
                         <span>Distance</span>
-                        <span className="font-semibold text-slate-200">
+                        <span className="font-heading font-semibold text-[#352A47]">
                           {simulatedDistance.toFixed(1)}m / {totalRouteDistance.toFixed(1)}m
                         </span>
                       </div>
@@ -564,7 +570,7 @@ function DeveloperNavigationScreenInner() {
                         step={0.2}
                         value={simulatedDistance}
                         onChange={(e) => setSimulatedDistance(parseFloat(e.target.value))}
-                        className="w-full accent-cyan-400 cursor-pointer bg-slate-800"
+                        className="w-full accent-[#352A47] cursor-pointer bg-[#DFD1EC]"
                       />
                     </div>
                   </div>
@@ -575,7 +581,7 @@ function DeveloperNavigationScreenInner() {
         </aside>
 
         {/* Right Column: Dedicated 3D Viewport */}
-        <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-white/10 bg-[#0B1220] overflow-hidden shadow-2xl">
+        <main className="flex-1 min-w-0 h-full relative rounded-3xl border border-[#352A47]/15 bg-[#E8DDF2] overflow-hidden shadow-2xl">
           <Campus3D
             key={`dev-campus-3d-${cameraRevision}`}
             routePoints={liveRoutePoints}
@@ -611,8 +617,8 @@ function DeveloperNavigationScreenInner() {
           />
 
           <div className="pointer-events-none absolute bottom-4 left-4 z-10">
-            <div className="pointer-events-auto rounded-full bg-[#0B1220]/80 border border-white/10 px-3.5 py-1.5 text-[11px] font-medium text-slate-300 shadow-xl backdrop-blur-xl">
-              Developer View: Model highlights remaining path in cyan &amp; completed path in slate
+            <div className="pointer-events-auto rounded-full bg-[#FAF8FC]/90 border border-[#352A47]/15 px-3.5 py-1.5 text-xs font-medium text-[#51465F] shadow-sm backdrop-blur-xl">
+              Developer View: Model highlights remaining path in deep plum &amp; completed path in muted lilac
             </div>
           </div>
         </main>

@@ -17,10 +17,11 @@ ON CONFLICT (id) DO UPDATE SET
     file_size_limit = 5242880,
     allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp'];
 
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Note: Row Level Security is enabled by default on storage.objects by Supabase Storage.
+-- Explicit ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY is restricted to supabase_storage_admin and is redundant.
 
 -- Storage Policy 1: Upload (Authenticated Students/Admins into their own folder: <uid>/<filename>)
+DROP POLICY IF EXISTS "issue_photos_upload_policy" ON storage.objects;
 CREATE POLICY "issue_photos_upload_policy"
     ON storage.objects FOR INSERT
     TO authenticated
@@ -30,6 +31,7 @@ CREATE POLICY "issue_photos_upload_policy"
     );
 
 -- Storage Policy 2: Student Read (Can only read photos they uploaded)
+DROP POLICY IF EXISTS "issue_photos_student_read" ON storage.objects;
 CREATE POLICY "issue_photos_student_read"
     ON storage.objects FOR SELECT
     TO authenticated
@@ -39,6 +41,7 @@ CREATE POLICY "issue_photos_student_read"
     );
 
 -- Storage Policy 3: Admin Read (Can read all issue photos across the campus)
+DROP POLICY IF EXISTS "issue_photos_admin_read" ON storage.objects;
 CREATE POLICY "issue_photos_admin_read"
     ON storage.objects FOR SELECT
     TO authenticated
@@ -48,6 +51,7 @@ CREATE POLICY "issue_photos_admin_read"
     );
 
 -- Storage Policy 4: Admin Delete (Can delete evidence when issue is purged)
+DROP POLICY IF EXISTS "issue_photos_admin_delete" ON storage.objects;
 CREATE POLICY "issue_photos_admin_delete"
     ON storage.objects FOR DELETE
     TO authenticated

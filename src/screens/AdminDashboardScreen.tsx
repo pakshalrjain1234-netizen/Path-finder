@@ -129,30 +129,30 @@ export function AdminDashboardScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-[#101827] text-[#F1F5F9] p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#E8DDF2] text-[#352A47] p-4 md:p-6 lg:p-8 font-sans">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#293A50] pb-5">
+      <div className="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#352A47]/10 pb-5">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#60A5FA] mb-1">
-            <span className="rounded-md bg-[#162235] px-2 py-0.5 border border-[#293A50] text-[10px] uppercase font-bold tracking-wider text-[#60A5FA]">
+          <div className="flex items-center gap-2 text-xs font-heading font-semibold text-[#51465F] mb-1">
+            <span className="rounded-md bg-[#D2BEE7]/60 px-2 py-0.5 border border-[#352A47]/15 text-[10px] font-heading uppercase font-bold tracking-wider text-[#352A47]">
               Estate Operations
             </span>
-            <span className="text-[#94A3B8]">MNM Jain Engineering College</span>
+            <span className="text-[#51465F]">MNM Jain Engineering College</span>
             <span
-              className={`rounded-md text-[9px] uppercase px-1.5 py-0.5 font-bold ${
+              className={`rounded-md text-[9px] uppercase px-1.5 py-0.5 font-heading font-bold ${
                 isSupabaseConfigured
-                  ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-amber-950/60 text-amber-400 border border-amber-500/30'
+                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                  : 'bg-amber-100 text-amber-800 border border-amber-300'
               }`}
             >
               {isSupabaseConfigured ? 'CONNECTED TO SUPABASE' : 'DEMO DATA'}
             </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#F1F5F9] tracking-tight flex items-center gap-2.5">
-            <Shield className="text-[#60A5FA]" size={28} />
-            Campus Issue Command Center
+          <h1 className="text-2xl md:text-3xl font-editorial font-medium text-[#352A47] tracking-tight flex items-center gap-2.5">
+            <Shield className="text-[#825A9E]" size={28} />
+            <span>Campus Issue <em className="italic font-normal">Command Center</em></span>
           </h1>
-          <p className="text-xs text-[#94A3B8] mt-1">
+          <p className="text-xs font-sans text-[#51465F] mt-1">
             Review reported campus hazards, dispatch maintenance teams, and visualize pins on the 3D model.
           </p>
         </div>
@@ -172,22 +172,22 @@ export function AdminDashboardScreen() {
               reload()
               setIsRefreshing(false)
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#293A50] bg-[#162235] text-[11px] font-semibold text-[#F1F5F9] hover:bg-[#24364D] transition disabled:opacity-50 shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#352A47]/15 bg-white text-[11px] font-heading font-semibold text-[#352A47] hover:bg-[#FAF8FC] transition disabled:opacity-50 shadow-sm cursor-pointer"
             title={isSupabaseConfigured ? 'Refresh live issue records from Supabase' : 'Reset to default seed issues'}
           >
-            <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-[#60A5FA]' : 'text-[#60A5FA]'} />
+            <RefreshCw size={13} className={isRefreshing ? 'animate-spin text-[#825A9E]' : 'text-[#825A9E]'} />
             <span>{isSupabaseConfigured ? (isRefreshing ? 'Refreshing...' : 'Sync Supabase') : 'Reset Seed Data'}</span>
           </button>
 
-          <div className="flex rounded-xl bg-[#162235] p-1 border border-[#293A50] shadow-sm">
+          <div className="flex rounded-xl bg-[#DFD1EC] p-1 border border-[#352A47]/10 shadow-sm">
             <button
               type="button"
               data-testid="btn-view-table"
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-heading font-bold transition cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-[#60A5FA] text-[#0F172A] shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F1F5F9]'
+                  ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                  : 'text-[#51465F] hover:text-[#352A47]'
               }`}
             >
               Operations List
@@ -196,10 +196,10 @@ export function AdminDashboardScreen() {
               type="button"
               data-testid="btn-view-3d"
               onClick={() => setViewMode('3d')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-heading font-bold transition cursor-pointer ${
                 viewMode === '3d'
-                  ? 'bg-[#60A5FA] text-[#0F172A] shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F1F5F9]'
+                  ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                  : 'text-[#51465F] hover:text-[#352A47]'
               }`}
             >
               <Layers size={14} />
@@ -213,63 +213,63 @@ export function AdminDashboardScreen() {
         {/* KPI Metrics Banner */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-[#94A3B8]">Total Reports</div>
-              <div className="text-2xl font-extrabold text-[#F1F5F9] mt-0.5">{stats.total}</div>
-              <div className="text-[10px] text-[#94A3B8]/70 mt-1">Campus-wide</div>
+            <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-[#51465F]">Total Reports</div>
+              <div className="text-2xl font-editorial font-medium text-[#352A47] mt-0.5">{stats.total}</div>
+              <div className="text-[11px] text-[#8C7E9C] mt-1">Campus-wide</div>
             </div>
 
-            <div className="rounded-2xl border border-amber-500/30 bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-amber-400">Submitted</div>
-              <div className="text-2xl font-extrabold text-amber-300 mt-0.5">{stats.submitted}</div>
-              <div className="text-[10px] text-amber-400/70 mt-1">Pending review</div>
+            <div className="rounded-2xl border border-amber-300/40 bg-amber-50/60 p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-amber-900">Submitted</div>
+              <div className="text-2xl font-editorial font-medium text-amber-800 mt-0.5">{stats.submitted}</div>
+              <div className="text-[11px] text-amber-700/80 mt-1">Pending review</div>
             </div>
 
-            <div className="rounded-2xl border border-blue-500/30 bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-blue-400">Under Review</div>
-              <div className="text-2xl font-extrabold text-blue-300 mt-0.5">{stats.underReview}</div>
-              <div className="text-[10px] text-blue-400/70 mt-1">In verification</div>
+            <div className="rounded-2xl border border-[#C6DCE4] bg-[#EEF5F8] p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-[#2C5766]">Under Review</div>
+              <div className="text-2xl font-editorial font-medium text-[#1E3F4B] mt-0.5">{stats.underReview}</div>
+              <div className="text-[11px] text-[#557887] mt-1">In verification</div>
             </div>
 
-            <div className="rounded-2xl border border-purple-500/30 bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-purple-400">Assigned</div>
-              <div className="text-2xl font-extrabold text-purple-300 mt-0.5">{stats.assigned}</div>
-              <div className="text-[10px] text-purple-400/70 mt-1">Dispatched to crew</div>
+            <div className="rounded-2xl border border-[#D2BEE7]/60 bg-[#F5EFFB] p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-[#5D3F75]">Assigned</div>
+              <div className="text-2xl font-editorial font-medium text-[#412854] mt-0.5">{stats.assigned}</div>
+              <div className="text-[11px] text-[#7A608F] mt-1">Dispatched to crew</div>
             </div>
 
-            <div className="rounded-2xl border border-indigo-500/30 bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-indigo-400">In Progress</div>
-              <div className="text-2xl font-extrabold text-indigo-300 mt-0.5">{stats.inProgress}</div>
-              <div className="text-[10px] text-indigo-400/70 mt-1">Active repair</div>
+            <div className="rounded-2xl border border-[#E8C8B9] bg-[#FAF2ED] p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-[#8C5E47]">In Progress</div>
+              <div className="text-2xl font-editorial font-medium text-[#6B422F] mt-0.5">{stats.inProgress}</div>
+              <div className="text-[11px] text-[#A67E6A] mt-1">Active repair</div>
             </div>
 
-            <div className="rounded-2xl border border-emerald-500/30 bg-[#192638] p-3.5 shadow-sm">
-              <div className="text-[11px] font-semibold text-emerald-400">Resolved</div>
-              <div className="text-2xl font-extrabold text-emerald-300 mt-0.5">{stats.resolved}</div>
-              <div className="text-[10px] text-emerald-400/70 mt-1">Closed successfully</div>
+            <div className="rounded-2xl border border-emerald-300/50 bg-emerald-50/60 p-3.5 shadow-sm">
+              <div className="text-xs font-heading font-semibold text-emerald-900">Resolved</div>
+              <div className="text-2xl font-editorial font-medium text-emerald-800 mt-0.5">{stats.resolved}</div>
+              <div className="text-[11px] text-emerald-700/80 mt-1">Closed successfully</div>
             </div>
           </div>
         )}
 
         {/* View Mode: 3D Visualization */}
         {viewMode === '3d' && (
-          <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-4 shadow-sm">
+          <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-4 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
               <div>
-                <h2 className="text-sm font-bold text-[#F1F5F9] flex items-center gap-2">
-                  <MapPin size={16} className="text-[#60A5FA]" />
+                <h2 className="text-sm font-heading font-bold text-[#352A47] flex items-center gap-2">
+                  <MapPin size={16} className="text-[#825A9E]" />
                   Real 3D Model Issue Pins &amp; Spatial Clustering
                 </h2>
-                <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                <p className="text-[11px] text-[#51465F] mt-0.5">
                   Click any pin to inspect the report, view the reporter, or update resolution progress.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-[#94A3B8]">Showing {filteredIssues.length} pin(s) on model</span>
+                <span className="text-[#51465F] font-medium">Showing {filteredIssues.length} pin(s) on model</span>
               </div>
             </div>
 
-            <div className="relative h-[480px] w-full rounded-xl overflow-hidden border border-[#293A50] bg-[#101827]">
+            <div className="relative h-[480px] w-full rounded-xl overflow-hidden border border-[#352A47]/15 bg-[#E8DDF2]">
               <Campus3D
                 className="h-full w-full"
                 selectedBuildingId={selectedIssue?.buildingId}
@@ -288,19 +288,19 @@ export function AdminDashboardScreen() {
         )}
 
         {/* Filters Bar */}
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-4 shadow-sm flex flex-col md:flex-row items-center gap-3">
+        <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] p-4 shadow-sm flex flex-col md:flex-row items-center gap-3">
           {/* Search */}
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-[#162235] px-3 py-2 border border-[#293A50] w-full md:w-auto">
-            <Search size={15} className="text-[#94A3B8] shrink-0" />
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-white px-3 py-2 border border-[#352A47]/15 w-full md:w-auto shadow-sm">
+            <Search size={15} className="text-[#8C7E9C] shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search reports by ID, location, description..."
-              className="w-full bg-transparent text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:outline-none"
+              className="w-full bg-transparent text-xs text-[#352A47] placeholder:text-[#8C7E9C] focus:outline-none"
             />
             {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery('')} className="text-[#94A3B8] hover:text-[#F1F5F9]">
+              <button type="button" onClick={() => setSearchQuery('')} className="text-[#8C7E9C] hover:text-[#352A47]">
                 <X size={14} />
               </button>
             )}
@@ -308,15 +308,15 @@ export function AdminDashboardScreen() {
 
           {/* Status Filter */}
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Filter size={14} className="text-[#94A3B8] shrink-0" />
+            <Filter size={14} className="text-[#8C7E9C] shrink-0" />
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
+              className="rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
             >
-              <option value="All" className="bg-[#162235] text-[#F1F5F9]">All Statuses</option>
+              <option value="All">All Statuses</option>
               {ALL_STATUSES.map((s) => (
-                <option key={s} value={s} className="bg-[#162235] text-[#F1F5F9]">
+                <option key={s} value={s}>
                   {s.replace('_', ' ')}
                 </option>
               ))}
@@ -327,12 +327,12 @@ export function AdminDashboardScreen() {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
+            className="rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
           >
-            <option value="All" className="bg-[#162235] text-[#F1F5F9]">All Categories</option>
+            <option value="All">All Categories</option>
             {stats &&
               Object.keys(stats.byCategory).map((cat) => (
-                <option key={cat} value={cat} className="bg-[#162235] text-[#F1F5F9]">
+                <option key={cat} value={cat}>
                   {cat} ({stats.byCategory[cat as IssueCategory]})
                 </option>
               ))}
@@ -342,11 +342,11 @@ export function AdminDashboardScreen() {
           <select
             value={filterBuilding}
             onChange={(e) => setFilterBuilding(e.target.value)}
-            className="rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
+            className="rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] focus:outline-none w-full md:w-auto shadow-sm cursor-pointer"
           >
-            <option value="All" className="bg-[#162235] text-[#F1F5F9]">All Buildings / Grounds</option>
+            <option value="All">All Buildings / Grounds</option>
             {CAMPUS_LANDMARKS.map((lm) => (
-              <option key={lm.id} value={lm.id} className="bg-[#162235] text-[#F1F5F9]">
+              <option key={lm.id} value={lm.id}>
                 {lm.label}
               </option>
             ))}
@@ -354,43 +354,43 @@ export function AdminDashboardScreen() {
         </div>
 
         {/* Reports Table / Card List */}
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-[#293A50] flex items-center justify-between">
-            <div className="text-xs font-bold text-[#F1F5F9] flex items-center gap-2">
-              <Wrench size={16} className="text-[#60A5FA]" />
+        <div className="rounded-2xl border border-[#352A47]/10 bg-[#FAF8FC] shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-[#352A47]/10 flex items-center justify-between bg-[#F4EDF8]">
+            <div className="text-xs font-heading font-bold text-[#352A47] flex items-center gap-2">
+              <Wrench size={16} className="text-[#825A9E]" />
               Operational Reports ({filteredIssues.length})
             </div>
-            <div className="text-[11px] text-[#94A3B8]">
+            <div className="text-[11px] text-[#51465F]">
               Showing active student reports logged in Stage E3 coordinates
             </div>
           </div>
 
           {issues.length === 0 ? (
-            <div className="p-12 text-center text-[#94A3B8] text-xs space-y-2">
-              <Shield size={32} className="mx-auto text-[#94A3B8]/60 mb-2" />
-              <div className="font-bold text-[#F1F5F9] text-sm">No Campus Issues Currently Reported</div>
-              <p className="text-[#94A3B8] max-w-sm mx-auto">
+            <div className="p-12 text-center text-[#51465F] text-xs space-y-2">
+              <Shield size={32} className="mx-auto text-[#8C7E9C] mb-2" />
+              <div className="font-heading font-bold text-[#352A47] text-sm">No Campus Issues Currently Reported</div>
+              <p className="text-[#51465F] max-w-sm mx-auto">
                 {isSupabaseConfigured
                   ? 'The database contains zero reported campus hazards or maintenance requests at this time.'
                   : 'No issues recorded in local session.'}
               </p>
             </div>
           ) : filteredIssues.length === 0 ? (
-            <div className="p-12 text-center text-[#94A3B8] text-xs">
+            <div className="p-12 text-center text-[#51465F] text-xs">
               No campus issues match your active filter criteria.
             </div>
           ) : (
             <>
               {/* Mobile Card List (< md) */}
-              <div className="divide-y divide-[#24364D]/60 md:hidden">
+              <div className="divide-y divide-[#352A47]/10 md:hidden">
                 {filteredIssues.map((issue) => (
                   <div key={issue.id} className="p-4 space-y-2.5">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-[#60A5FA]">
+                      <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-[#352A47]">
                         <span>{issue.id}</span>
                         {issue.photoUrl && (
                           <span
-                            className="rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] border border-blue-500/30 flex items-center gap-0.5"
+                            className="rounded-full bg-[#D2BEE7]/60 px-1.5 py-0.5 text-[9px] font-heading font-bold text-[#352A47] border border-[#352A47]/15 flex items-center gap-0.5"
                             title="Photographic evidence attached"
                           >
                             <Camera size={10} />
@@ -399,16 +399,16 @@ export function AdminDashboardScreen() {
                         )}
                       </div>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border shrink-0 ${
+                        className={`rounded-full px-2 py-0.5 text-[9px] font-heading font-bold uppercase tracking-wider border shrink-0 ${
                           issue.status === 'RESOLVED'
-                            ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30'
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                             : issue.status === 'IN_PROGRESS'
-                              ? 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30'
+                              ? 'bg-[#FAF2ED] text-[#8C5E47] border-[#E8C8B9]'
                               : issue.status === 'ASSIGNED'
-                                ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                ? 'bg-[#F5EFFB] text-[#5D3F75] border-[#D2BEE7]'
                                 : issue.status === 'UNDER_REVIEW'
-                                  ? 'bg-blue-950/60 text-blue-300 border-blue-500/30'
-                                  : 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                                  ? 'bg-[#EEF5F8] text-[#2C5766] border-[#C6DCE4]'
+                                  : 'bg-amber-100 text-amber-800 border-amber-300'
                         }`}
                       >
                         {issue.status.replace('_', ' ')}
@@ -416,18 +416,18 @@ export function AdminDashboardScreen() {
                     </div>
 
                     <div>
-                      <div className="text-xs font-semibold text-[#F1F5F9]">{issue.locationName}</div>
-                      <div className="text-[11px] text-[#94A3B8]">{issue.category} • Reporter: {issue.reporterName}</div>
+                      <div className="text-xs font-heading font-bold text-[#352A47]">{issue.locationName}</div>
+                      <div className="text-[11px] text-[#51465F]">{issue.category} • Reporter: {issue.reporterName}</div>
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
-                      <div className="text-[10px] text-[#94A3B8]">
+                      <div className="text-[10px] text-[#51465F]">
                         Team: {issue.assignedTeam || <span className="italic">Unassigned</span>}
                       </div>
                       <button
                         type="button"
                         onClick={() => handleOpenUpdateModal(issue)}
-                        className="px-3 py-1.5 rounded-lg bg-[#60A5FA] hover:bg-blue-400 text-[#0F172A] font-bold text-[11px] shadow-sm transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#352A47] hover:bg-[#231A32] text-[#FAF8FC] font-heading font-bold text-[11px] shadow-sm transition cursor-pointer"
                       >
                         Manage
                       </button>
@@ -438,8 +438,8 @@ export function AdminDashboardScreen() {
 
               {/* Desktop Table (>= md) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs text-[#F1F5F9]">
-                  <thead className="bg-[#162235] text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider border-b border-[#293A50]">
+                <table className="w-full text-left text-xs text-[#352A47]">
+                  <thead className="bg-[#E8DDF2]/60 text-[11px] font-heading font-bold text-[#51465F] uppercase tracking-wider border-b border-[#352A47]/10">
                     <tr>
                       <th className="py-3 px-4">Tracking ID</th>
                       <th className="py-3 px-4">Category</th>
@@ -450,15 +450,15 @@ export function AdminDashboardScreen() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#24364D]/60">
+                  <tbody className="divide-y divide-[#352A47]/10">
                     {filteredIssues.map((issue) => (
-                      <tr key={issue.id} className="hover:bg-[#162235]/60 transition">
-                        <td className="py-3.5 px-4 font-mono font-bold text-[#60A5FA] whitespace-nowrap">
+                      <tr key={issue.id} className="hover:bg-[#E8DDF2]/30 transition">
+                        <td className="py-3.5 px-4 font-mono font-bold text-[#352A47] whitespace-nowrap">
                           <div className="flex items-center gap-1.5">
                             <span>{issue.id}</span>
                             {issue.photoUrl && (
                               <span
-                                className="rounded-full bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-bold text-[#60A5FA] border border-blue-500/30 flex items-center gap-0.5"
+                                className="rounded-full bg-[#D2BEE7]/60 px-1.5 py-0.5 text-[9px] font-heading font-bold text-[#352A47] border border-[#352A47]/15 flex items-center gap-0.5"
                                 title="Photographic evidence attached"
                               >
                                 <Camera size={10} />
@@ -467,44 +467,44 @@ export function AdminDashboardScreen() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 font-semibold text-[#F1F5F9] whitespace-nowrap">
+                        <td className="py-3.5 px-4 font-semibold text-[#352A47] whitespace-nowrap">
                           {issue.category}
                         </td>
                         <td className="py-3.5 px-4 max-w-[200px] truncate">
-                          <div className="font-medium text-[#F1F5F9]">{issue.locationName}</div>
-                          <div className="text-[10px] text-[#94A3B8] font-mono">
+                          <div className="font-medium text-[#352A47]">{issue.locationName}</div>
+                          <div className="text-[10px] text-[#8C7E9C] font-mono">
                             [{issue.modelCoordinates[0]}, {issue.modelCoordinates[2]}]
                           </div>
                         </td>
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <div className="text-[#F1F5F9]">{issue.reporterName}</div>
-                          <div className="text-[10px] text-[#94A3B8] uppercase">{issue.reporterRole}</div>
+                          <div className="text-[#352A47]">{issue.reporterName}</div>
+                          <div className="text-[10px] text-[#8C7E9C] uppercase">{issue.reporterRole}</div>
                         </td>
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           <span
-                            className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border ${
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-heading font-bold uppercase tracking-wider border ${
                               issue.status === 'RESOLVED'
-                                ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/30'
+                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                                 : issue.status === 'IN_PROGRESS'
-                                  ? 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30'
+                                  ? 'bg-[#FAF2ED] text-[#8C5E47] border-[#E8C8B9]'
                                   : issue.status === 'ASSIGNED'
-                                    ? 'bg-purple-950/60 text-purple-300 border-purple-500/30'
+                                    ? 'bg-[#F5EFFB] text-[#5D3F75] border-[#D2BEE7]'
                                     : issue.status === 'UNDER_REVIEW'
-                                      ? 'bg-blue-950/60 text-blue-300 border-blue-500/30'
-                                      : 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                                      ? 'bg-[#EEF5F8] text-[#2C5766] border-[#C6DCE4]'
+                                      : 'bg-amber-100 text-amber-800 border-amber-300'
                             }`}
                           >
                             {issue.status.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap text-[#94A3B8]">
-                          {issue.assignedTeam || <span className="text-[#94A3B8]/60 italic">Unassigned</span>}
+                        <td className="py-3.5 px-4 whitespace-nowrap text-[#51465F]">
+                          {issue.assignedTeam || <span className="text-[#8C7E9C] italic">Unassigned</span>}
                         </td>
                         <td className="py-3.5 px-4 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => handleOpenUpdateModal(issue)}
-                            className="px-3 py-1.5 rounded-lg bg-[#60A5FA] hover:bg-blue-400 text-[#0F172A] font-bold text-[11px] shadow-sm transition cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg bg-[#352A47] hover:bg-[#231A32] text-[#FAF8FC] font-heading font-bold text-[11px] shadow-sm transition cursor-pointer"
                           >
                             Manage / Update
                           </button>
@@ -521,47 +521,47 @@ export function AdminDashboardScreen() {
 
       {/* Admin Action & Status Update Modal */}
       {isUpdating && selectedIssue && (
-        <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl rounded-3xl border border-[#293A50] bg-[#192638] p-6 text-[#F1F5F9] shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center p-4 bg-[#352A47]/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-2xl rounded-3xl border border-[#352A47]/15 bg-[#FAF8FC] p-6 text-[#352A47] shadow-2xl max-h-[90vh] overflow-y-auto">
             {/* Close */}
             <button
               type="button"
               onClick={() => setIsUpdating(false)}
-              className="absolute right-4 top-4 rounded-xl p-2 text-[#94A3B8] hover:bg-[#162235] hover:text-[#F1F5F9] transition cursor-pointer"
+              className="absolute right-4 top-4 rounded-xl p-2 text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#352A47] transition cursor-pointer"
             >
               <X size={20} />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#162235] border border-[#293A50] text-[#60A5FA]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D2BEE7]/60 border border-[#352A47]/15 text-[#352A47]">
                 <Wrench size={22} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm font-bold text-[#60A5FA]">{selectedIssue.id}</span>
-                  <span className="text-xs text-[#94A3B8]/60">•</span>
-                  <span className="text-xs text-[#94A3B8]">{selectedIssue.category}</span>
+                  <span className="font-mono text-sm font-bold text-[#352A47]">{selectedIssue.id}</span>
+                  <span className="text-xs text-[#8C7E9C]">•</span>
+                  <span className="text-xs text-[#51465F]">{selectedIssue.category}</span>
                 </div>
-                <h3 className="text-base font-bold text-[#F1F5F9] mt-0.5">{selectedIssue.locationName}</h3>
+                <h3 className="text-base font-editorial font-medium text-[#352A47] mt-0.5">{selectedIssue.locationName}</h3>
               </div>
             </div>
 
             {/* Description & Details */}
-            <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4 mb-4 space-y-2 text-xs">
-              <div className="text-[#94A3B8] font-medium">Reported Problem:</div>
-              <p className="text-[#F1F5F9] leading-relaxed">{selectedIssue.description}</p>
-              <div className="pt-2 flex flex-wrap gap-4 text-[11px] text-[#94A3B8] border-t border-[#293A50]">
-                <div>Reporter: <strong className="text-[#F1F5F9]">{selectedIssue.reporterName}</strong></div>
-                <div>Submitted: <strong className="text-[#F1F5F9]">{new Date(selectedIssue.createdAt).toLocaleString()}</strong></div>
-                <div>3D Pin: <strong className="text-[#60A5FA] font-mono">[{selectedIssue.modelCoordinates.join(', ')}]</strong></div>
+            <div className="rounded-2xl border border-[#352A47]/10 bg-[#E8DDF2]/30 p-4 mb-4 space-y-2 text-xs">
+              <div className="text-[#51465F] font-heading font-bold">Reported Problem:</div>
+              <p className="text-[#352A47] leading-relaxed">{selectedIssue.description}</p>
+              <div className="pt-2 flex flex-wrap gap-4 text-[11px] text-[#51465F] border-t border-[#352A47]/10">
+                <div>Reporter: <strong className="text-[#352A47]">{selectedIssue.reporterName}</strong></div>
+                <div>Submitted: <strong className="text-[#352A47]">{new Date(selectedIssue.createdAt).toLocaleString()}</strong></div>
+                <div>3D Pin: <strong className="text-[#352A47] font-mono">[{selectedIssue.modelCoordinates.join(', ')}]</strong></div>
               </div>
             </div>
 
             {/* Photographic Evidence Attachment in Modal */}
             {selectedIssue.photoUrl && (
-              <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4 mb-4 space-y-2">
-                <span className="text-[11px] font-bold text-[#F1F5F9] flex items-center gap-1.5 mb-1">
-                  <Camera size={14} className="text-[#60A5FA]" />
+              <div className="rounded-2xl border border-[#352A47]/10 bg-[#E8DDF2]/30 p-4 mb-4 space-y-2">
+                <span className="text-[11px] font-heading font-bold text-[#352A47] flex items-center gap-1.5 mb-1">
+                  <Camera size={14} className="text-[#825A9E]" />
                   <span>Attached Photographic Evidence</span>
                 </span>
                 <EvidenceImageViewer
@@ -576,17 +576,17 @@ export function AdminDashboardScreen() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Update Status */}
                 <div>
-                  <label htmlFor="modal-status" className="block text-xs font-semibold text-[#F1F5F9] mb-1.5">
+                  <label htmlFor="modal-status" className="block text-xs font-heading font-semibold text-[#352A47] mb-1.5">
                     Operational Status *
                   </label>
                   <select
                     id="modal-status"
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as IssueStatus)}
-                    className="w-full rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] focus:border-[#60A5FA] focus:outline-none shadow-sm cursor-pointer"
+                    className="w-full rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] focus:border-[#825A9E] focus:outline-none shadow-sm cursor-pointer"
                   >
                     {ALL_STATUSES.map((s) => (
-                      <option key={s} value={s} className="bg-[#162235] text-[#F1F5F9]">
+                      <option key={s} value={s}>
                         {s.replace('_', ' ')}
                       </option>
                     ))}
@@ -595,18 +595,18 @@ export function AdminDashboardScreen() {
 
                 {/* Assign Team */}
                 <div>
-                  <label htmlFor="modal-team" className="block text-xs font-semibold text-[#F1F5F9] mb-1.5">
+                  <label htmlFor="modal-team" className="block text-xs font-heading font-semibold text-[#352A47] mb-1.5">
                     Assign Maintenance Team
                   </label>
                   <select
                     id="modal-team"
                     value={selectedTeam}
                     onChange={(e) => setSelectedTeam(e.target.value)}
-                    className="w-full rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] focus:border-[#60A5FA] focus:outline-none shadow-sm cursor-pointer"
+                    className="w-full rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] focus:border-[#825A9E] focus:outline-none shadow-sm cursor-pointer"
                   >
-                    <option value="" className="bg-[#162235] text-[#94A3B8]">-- No Team Assigned --</option>
+                    <option value="">-- No Team Assigned --</option>
                     {MAINTENANCE_TEAMS.map((team) => (
-                      <option key={team} value={team} className="bg-[#162235] text-[#F1F5F9]">
+                      <option key={team} value={team}>
                         {team}
                       </option>
                     ))}
@@ -616,7 +616,7 @@ export function AdminDashboardScreen() {
 
               {/* Admin Remarks / Resolution Notes */}
               <div>
-                <label htmlFor="modal-notes" className="block text-xs font-semibold text-[#F1F5F9] mb-1.5">
+                <label htmlFor="modal-notes" className="block text-xs font-heading font-semibold text-[#352A47] mb-1.5">
                   Internal Remarks / Work Order Notes
                 </label>
                 <textarea
@@ -625,29 +625,29 @@ export function AdminDashboardScreen() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="e.g. Dispatched plumber with valve parts. Work scheduled for completion today."
-                  className="w-full rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-xs text-[#F1F5F9] placeholder:text-[#94A3B8]/60 focus:border-[#60A5FA] focus:outline-none resize-none shadow-sm"
+                  className="w-full rounded-xl border border-[#352A47]/15 bg-white px-3 py-2 text-xs text-[#352A47] placeholder:text-[#8C7E9C] focus:border-[#825A9E] focus:outline-none resize-none shadow-sm"
                 />
               </div>
 
               {updateError && (
-                <div className="rounded-xl border border-rose-500/40 bg-rose-950/60 p-2 text-xs text-rose-300">
+                <div className="rounded-xl border border-rose-300 bg-rose-50 p-2.5 text-xs text-rose-700">
                   {updateError}
                 </div>
               )}
 
               {/* Audit Trail Log in Modal */}
-              <div className="rounded-xl border border-[#293A50] bg-[#162235] p-3">
-                <div className="text-[11px] font-bold text-[#F1F5F9] mb-2 flex items-center gap-1.5">
-                  <History size={13} className="text-[#60A5FA]" />
+              <div className="rounded-xl border border-[#352A47]/10 bg-[#E8DDF2]/30 p-3">
+                <div className="text-[11px] font-heading font-bold text-[#352A47] mb-2 flex items-center gap-1.5">
+                  <History size={13} className="text-[#825A9E]" />
                   Administrative Audit Trail ({selectedIssue.history.length} records)
                 </div>
-                <div className="space-y-1.5 max-h-32 overflow-y-auto text-[10px] text-[#94A3B8] pr-1">
+                <div className="space-y-1.5 max-h-32 overflow-y-auto text-[10px] text-[#51465F] pr-1">
                   {selectedIssue.history.map((h, i) => (
-                    <div key={i} className="flex justify-between border-b border-[#293A50] pb-1">
+                    <div key={i} className="flex justify-between border-b border-[#352A47]/10 pb-1">
                       <div>
-                        <strong className="text-[#F1F5F9]">{h.status}</strong> by {h.actorName}: {h.notes}
+                        <strong className="text-[#352A47]">{h.status}</strong> by {h.actorName}: {h.notes}
                       </div>
-                      <div className="text-[#94A3B8]/80 shrink-0 ml-2">
+                      <div className="text-[#8C7E9C] shrink-0 ml-2">
                         {new Date(h.timestamp).toLocaleDateString()}
                       </div>
                     </div>
@@ -660,14 +660,14 @@ export function AdminDashboardScreen() {
                 <button
                   type="button"
                   onClick={() => setIsUpdating(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#94A3B8] hover:text-[#F1F5F9] transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-heading font-semibold text-[#51465F] hover:text-[#352A47] transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingUpdate}
-                  className="flex items-center gap-2 rounded-xl bg-[#60A5FA] hover:bg-blue-400 px-5 py-2 text-xs font-bold text-[#0F172A] transition shadow-sm disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 rounded-xl bg-[#352A47] hover:bg-[#231A32] px-5 py-2 text-xs font-heading font-bold text-[#FAF8FC] transition shadow-sm disabled:opacity-50 cursor-pointer"
                 >
                   <CheckCircle2 size={15} />
                   <span>{isSubmittingUpdate ? 'Updating Status...' : 'Commit Status Change'}</span>
@@ -680,7 +680,7 @@ export function AdminDashboardScreen() {
 
       {/* Enlarged Photo Evidence Modal Viewer */}
       {enlargedPhotoUrl && (
-        <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[9999] isolate flex items-center justify-center p-4 bg-[#352A47]/85 backdrop-blur-md animate-in fade-in duration-200">
           <div className="relative max-w-4xl w-full flex flex-col items-center">
             <button
               type="button"
@@ -690,14 +690,14 @@ export function AdminDashboardScreen() {
             >
               <X size={22} />
             </button>
-            <div className="rounded-3xl overflow-hidden border border-[#293A50] bg-[#101827] shadow-2xl max-h-[80vh] flex items-center justify-center">
+            <div className="rounded-3xl overflow-hidden border border-white/20 bg-black shadow-2xl max-h-[80vh] flex items-center justify-center">
               <img
                 src={enlargedPhotoUrl}
                 alt="Enlarged Campus Maintenance Evidence"
                 className="max-h-[80vh] w-auto max-w-full object-contain"
               />
             </div>
-            <p className="mt-3 text-xs text-[#94A3B8] text-center">
+            <p className="mt-3 text-xs text-white/80 text-center font-sans">
               Estate Operations Evidence Inspection • Tap outside or Close to exit
             </p>
           </div>

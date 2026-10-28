@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle2, MessageSquare, Send, Star, X } from 'lucide-react'
 import { useState } from 'react'
-import { feedbackService } from '../services/feedbackService'
-import type { FeedbackCategory } from '../types/feedback'
+import { feedbackService } from '../services/feedbackService.ts'
+import type { FeedbackCategory } from '../types/feedback.ts'
 
 interface VisitorFeedbackModalProps {
   isOpen: boolean

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T17:30:00.000Z",
+  "title": "Design System: PATH FINDER (Dreamscape Pastel)",
+  "extensions": {
+    "colorMeta": {
+      "dream-lavender": {
+        "role": "neutral",
+        "displayName": "Soft Lavender Canvas",
+        "canonical": "#E8DDF2",
+        "tonalRamp": ["#FBF8FD", "#F3ECF8", "#E8DDF2", "#DFD0EF", "#D2BEE7", "#C9B6DF", "#B39FCB"]
+      },
+      "dream-lilac": {
+        "role": "primary",
+        "displayName": "Ethereal Lilac Surface",
+        "canonical": "#D2BEE7",
+        "tonalRamp": ["#F3ECF8", "#E8DDF2", "#D2BEE7", "#B99FD5", "#9E81C0", "#7E60A3"]
+      },
+      "dream-peach": {
+        "role": "secondary",
+        "displayName": "Dusty Peach",
+        "canonical": "#E8C8B9",
+        "tonalRamp": ["#FAF2EE", "#F5E6DF", "#E8C8B9", "#D7A894", "#B87E67", "#9E563A"]
+      },
+      "dream-powder": {
+        "role": "secondary",
+        "displayName": "Powder Blue",
+        "canonical": "#C6DCE4",
+        "tonalRamp": ["#F1F6F8", "#E4EFF3", "#C6DCE4", "#9FBECB", "#749CAE", "#265A6E"]
+      },
+      "dream-sage": {
+        "role": "secondary",
+        "displayName": "Muted Sage",
+        "canonical": "#BCD8C9",
+        "tonalRamp": ["#EFF6F2", "#DFEDE5", "#BCD8C9", "#94BCA7", "#689A81", "#1E583F"]
+      },
+      "deep-plum": {
+        "role": "neutral",
+        "displayName": "Deep Plum Typography",
+        "canonical": "#352A47",
+        "tonalRamp": ["#352A47", "#51465F", "#6E6280", "#8C809E", "#B0A5BF", "#D8D0E3"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Major editorial headings (Space Grotesk Bold)"
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Screen titles and card headers (Space Grotesk SemiBold)"
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles and architectural labels (Space Grotesk Medium)"
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions, walkway guides, and notes (DM Sans Regular)"
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pills, tags, buttons, and navigation (DM Sans Medium/SemiBold)"
+      }
+    },
+    "shadows": [
+      {
+        "name": "dream-soft",
+        "value": "0 4px 20px -4px rgba(53, 42, 71, 0.08), 0 2px 6px -2px rgba(53, 42, 71, 0.04)",
+        "purpose": "Resting elevation on lavender canvas"
+      },
+      {
+        "name": "dream-card",
+        "value": "0 10px 30px -6px rgba(53, 42, 71, 0.1), 0 4px 12px -2px rgba(53, 42, 71, 0.06)",
+        "purpose": "Standard interactive card elevation"
+      },
+      {
+        "name": "dream-elevated",
+        "value": "0 20px 48px -10px rgba(53, 42, 71, 0.14), 0 6px 16px -4px rgba(53, 42, 71, 0.08)",
+        "purpose": "Elevated 3D showcase and dialog containers"
+      }
+    ]
+  }
+}

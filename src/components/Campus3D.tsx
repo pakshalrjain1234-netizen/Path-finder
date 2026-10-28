@@ -6,16 +6,21 @@ import {
   BookOpen,
   Box,
   Building2,
+  ChevronDown,
+  ChevronUp,
   Compass as CompassIcon,
   Focus,
   GraduationCap,
   HeartPulse,
+  Layers,
   Loader2,
   MapPin,
   Maximize2,
   Navigation,
   Printer,
   RefreshCcw,
+  RotateCcw,
+  RotateCw,
   Target,
   Utensils,
   ZoomIn,
@@ -253,9 +258,16 @@ function buildFrameFromBuilding(scene: Object3D, buildingId: string): ModelFrame
 function toFloorKey(value?: string): FloorKey | undefined {
   if (!value) return undefined
   const normalized = value.trim().toUpperCase()
-  if (normalized === 'GROUND' || normalized === 'G') return 'G'
-  if (normalized === 'ELEVATED' || normalized === 'ELEVATED LEVEL') return 'elevated'
-  if (normalized === '1' || normalized === '2' || normalized === '3') return normalized as FloorKey
+  if (normalized === 'ALL' || normalized === 'OVERVIEW' || normalized === 'NONE') return undefined
+  if (normalized === 'GROUND' || normalized === 'G' || normalized === 'FLOOR G' || normalized === 'GROUND FLOOR') return 'G'
+  if (normalized === 'ELEVATED' || normalized === 'ELEVATED LEVEL' || normalized === 'FLOOR ELEVATED') return 'elevated'
+  if (normalized === '1' || normalized === '1 FLOOR' || normalized === 'FLOOR 1' || normalized === '1ST FLOOR') return '1'
+  if (normalized === '2' || normalized === '2 FLOOR' || normalized === 'FLOOR 2' || normalized === '2ND FLOOR') return '2'
+  if (normalized === '3' || normalized === '3 FLOOR' || normalized === 'FLOOR 3' || normalized === '3RD FLOOR') return '3'
+
+  const digitMatch = normalized.match(/\b([123])\b/)
+  if (digitMatch) return digitMatch[1] as FloorKey
+
   return undefined
 }
 
@@ -407,18 +419,18 @@ function Hud({
   const floorLabel = entry && key && entry.floorObjects[key] ? ` • Floor ${selectedFloor}` : ''
 
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[calc(100%-8rem)] rounded-2xl border border-white/10 bg-[#0B1220]/90 p-3.5 shadow-2xl backdrop-blur-xl md:left-4 md:top-4">
+    <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[calc(100%-8rem)] rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-3.5 shadow-xl backdrop-blur-xl md:left-4 md:top-4 text-[#2A1D3B]">
       <div className="flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase text-cyan-300 border border-cyan-500/30">
-          <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          3D Interactive
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EDE4F9] px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase text-[#6C5CE7] border border-[#C9B6DF]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#6C5CE7] animate-pulse" />
+          3D Digital Twin
         </span>
-        <span className="text-[11px] font-medium text-slate-400">
+        <span className="text-[11px] font-medium text-[#645378]">
           {routePoints && routePoints.length > 0 ? `Route active (${routePoints.length} waypoints)` : 'MNMJEC Campus'}
         </span>
       </div>
-      <div className="mt-1.5 text-sm font-bold text-white tracking-tight">{buildingLabel}</div>
-      <div className="mt-0.5 text-[11px] font-medium text-slate-400">
+      <div className="mt-1.5 text-sm font-bold text-[#2A1D3B] tracking-tight">{buildingLabel}</div>
+      <div className="mt-0.5 text-[11px] font-medium text-[#645378]">
         {floorCount > 0
           ? `${floorCount} known floor(s)`
           : entry?.knownFloorLabel ?? (routePoints && routePoints.length > 0 ? 'Outdoor Walkway Navigation' : 'Tap any building to inspect details')}
@@ -1119,24 +1131,24 @@ function CampusScene({
                   aria-label={`Select ${landmark.label}`}
                   className={`group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-xl backdrop-blur-xl transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
                     isSelected
-                      ? 'bg-gradient-to-r from-violet-950 via-purple-900 to-violet-950 text-white border-2 border-[#A78BFA] ring-4 ring-[#A78BFA]/30 shadow-violet-500/50 scale-110 z-50'
+                      ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white border-2 border-white ring-4 ring-[#7C5CBF]/30 shadow-[0_8px_24px_rgba(124,92,191,0.45)] scale-110 z-50'
                       : isHovered
-                        ? 'bg-[#192638] text-[#93C5FD] border border-[#60A5FA] shadow-md scale-105 z-30'
-                        : 'bg-[#162235]/92 text-[#E2E8F0] border border-[#293A50]/80 hover:border-[#60A5FA] hover:text-white hover:scale-105 shadow-md z-10'
+                        ? 'bg-white text-[#2A1D3B] border border-[#7C5CBF] ring-2 ring-[#7C5CBF]/20 shadow-[0_6px_20px_rgba(124,92,191,0.22)] scale-105 z-30'
+                        : 'bg-[#FAF6FD]/95 text-[#2A1D3B] border border-[#C9B6DF]/80 hover:border-[#7C5CBF] hover:scale-105 shadow-[0_4px_14px_rgba(108,92,231,0.12)] z-10'
                   }`}
                 >
                   {/* Category Icon */}
                   <span
-                    className={`flex items-center justify-center shrink-0 ${
+                    className={`flex items-center justify-center shrink-0 rounded-lg p-0.5 ${
                       isSelected
-                        ? 'text-violet-200'
+                        ? 'text-white bg-white/20'
                         : isHovered
-                          ? 'text-cyan-300'
+                          ? 'text-[#6C5CE7] bg-[#EDE4F9]'
                           : landmark.type === 'entrance'
-                            ? 'text-emerald-400'
+                            ? 'text-[#059669] bg-[#ECFDF5]'
                             : landmark.type === 'facility'
-                              ? 'text-amber-400'
-                              : 'text-cyan-400'
+                              ? 'text-[#D97706] bg-[#FFFBEB]'
+                              : 'text-[#6C5CE7] bg-[#FAF5FF]'
                     }`}
                   >
                     {landmark.type === 'entrance' && <Navigation className="h-3.5 w-3.5 rotate-45" />}
@@ -1153,14 +1165,14 @@ function CampusScene({
                   </span>
 
                   {/* Building Name */}
-                  <span className={`tracking-tight max-w-[125px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-200'}`}>
+                  <span className={`tracking-tight max-w-[125px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-[#2A1D3B]'}`}>
                     {landmark.label}
                   </span>
 
-                  {/* Selected Indicator Badge in Elegant Violet (Suppressed if route destination marker already rendered) */}
+                  {/* Selected Indicator Badge in Glowing Pearl Pill */}
                   {isSelected && (!routePoints || routePoints.length === 0) && (
-                    <span className="flex items-center gap-1 rounded-full bg-violet-400/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-violet-200 border border-violet-300/40 shrink-0">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
+                    <span className="flex items-center gap-1 rounded-full bg-white/25 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-white border border-white/35 shrink-0">
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                       Destination
                     </span>
                   )}
@@ -1179,17 +1191,17 @@ function CampusScene({
                       y1={0}
                       x2={0}
                       y2={stemHeightPx}
-                      stroke={isSelected ? '#A78BFA' : isHovered ? '#22d3ee' : 'rgba(255,255,255,0.45)'}
+                      stroke={isSelected ? '#7C5CBF' : isHovered ? '#9333EA' : '#B39FCB'}
                       strokeWidth={isSelected ? '2' : '1.5'}
                     />
                   </svg>
                   <div
                     className={`rounded-full transition-all duration-200 -mt-0.5 ${
                       isSelected
-                        ? 'h-2 w-2 bg-[#A78BFA] ring-2 ring-violet-400/60 shadow-[0_0_8px_#A78BFA]'
+                        ? 'h-2 w-2 bg-[#7C5CBF] ring-2 ring-[#7C5CBF]/40 shadow-[0_0_8px_#7C5CBF]'
                         : isHovered
-                          ? 'h-1.5 w-1.5 bg-cyan-300'
-                          : 'h-1.5 w-1.5 bg-white/70'
+                          ? 'h-1.5 w-1.5 bg-[#9333EA]'
+                          : 'h-1.5 w-1.5 bg-[#B39FCB]'
                     }`}
                   />
                 </div>
@@ -1250,27 +1262,27 @@ function CampusScene({
                   aria-label={`Select ${poi.name}`}
                   className={`group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-xl backdrop-blur-xl transition-all duration-200 cursor-pointer select-none whitespace-nowrap ${
                     isSelected
-                      ? 'bg-gradient-to-r from-violet-950 via-purple-900 to-violet-950 text-white border-2 border-[#A78BFA] ring-4 ring-[#A78BFA]/30 shadow-violet-500/50 scale-110 z-50'
+                      ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white border-2 border-white ring-4 ring-[#7C5CBF]/30 shadow-[0_8px_24px_rgba(124,92,191,0.45)] scale-110 z-50'
                       : isHovered
-                        ? 'bg-[#0F172A]/95 text-cyan-200 border border-cyan-400/80 shadow-cyan-500/30 scale-105 z-30'
-                        : 'bg-[#0B1220]/95 text-slate-100 border border-white/20 hover:border-cyan-400/80 hover:text-white hover:scale-105 shadow-black/80 z-10'
+                        ? 'bg-white text-[#9E563A] border border-[#EA580C] ring-2 ring-[#EA580C]/20 shadow-md scale-105 z-30'
+                        : 'bg-[#FAF6FD]/95 text-[#9E563A] border border-[#FED7AA] hover:border-[#EA580C] hover:scale-105 shadow-[0_4px_14px_rgba(234,88,12,0.12)] z-10'
                   }`}
                 >
                   <span
-                    className={`flex items-center justify-center shrink-0 ${
-                      isSelected ? 'text-violet-200' : isHovered ? 'text-cyan-300' : 'text-amber-400'
+                    className={`flex items-center justify-center shrink-0 rounded-lg p-0.5 ${
+                      isSelected ? 'text-white bg-white/20' : isHovered ? 'text-[#EA580C] bg-[#FFF7ED]' : 'text-[#EA580C] bg-[#FFF7ED]'
                     }`}
                   >
                     {isApollo ? <HeartPulse className="h-3.5 w-3.5" /> : <Printer className="h-3.5 w-3.5" />}
                   </span>
-                  <span className={`tracking-tight max-w-[145px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-medium text-slate-100'}`}>
+                  <span className={`tracking-tight max-w-[145px] sm:max-w-[210px] truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-[#9E563A]'}`}>
                     {poi.name}
                   </span>
                   {(!isSelected || !routePoints || routePoints.length === 0) && (
-                    <span className={`rounded px-1 py-0.5 text-[8px] font-bold border shrink-0 ${
+                    <span className={`rounded-full px-1.5 py-0.2 text-[8px] font-bold border shrink-0 ${
                       isSelected
-                        ? 'bg-violet-500/30 text-violet-200 border-violet-400/40'
-                        : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+                        ? 'bg-white/20 text-white border-white/30'
+                        : 'bg-[#FFF7ED] text-[#EA580C] border-[#FED7AA]'
                     }`}>
                       {isSelected ? 'Destination' : 'Provisional'}
                     </span>
@@ -1283,17 +1295,17 @@ function CampusScene({
                       y1={0}
                       x2={0}
                       y2={stemHeightPx}
-                      stroke={isSelected ? '#A78BFA' : isHovered ? '#22d3ee' : 'rgba(255,255,255,0.45)'}
+                      stroke={isSelected ? '#7C5CBF' : isHovered ? '#EA580C' : '#FDBA74'}
                       strokeWidth={isSelected ? '2' : '1.5'}
                     />
                   </svg>
                   <div
                     className={`rounded-full transition-all duration-200 -mt-0.5 ${
                       isSelected
-                        ? 'h-2 w-2 bg-[#A78BFA] ring-2 ring-violet-400/60 shadow-[0_0_8px_#A78BFA]'
+                        ? 'h-2 w-2 bg-[#7C5CBF] ring-2 ring-[#7C5CBF]/40 shadow-[0_0_8px_#7C5CBF]'
                         : isHovered
-                          ? 'h-1.5 w-1.5 bg-cyan-300'
-                          : 'h-1.5 w-1.5 bg-white/70'
+                          ? 'h-1.5 w-1.5 bg-[#EA580C]'
+                          : 'h-1.5 w-1.5 bg-[#FDBA74]'
                     }`}
                   />
                 </div>
@@ -1689,6 +1701,7 @@ function ControlsLayer({
   onFocusBuilding,
   touchRotateMode,
   onToggleTouchRotate,
+  onBuildingSelect,
 }: {
   preset: CameraPreset
   setPreset: (preset: CameraPreset) => void
@@ -1702,7 +1715,13 @@ function ControlsLayer({
   onFocusBuilding?: () => void
   touchRotateMode?: boolean
   onToggleTouchRotate?: () => void
+  onBuildingSelect?: (buildingId: string) => void
 }) {
+  const [isOverviewExpanded, setIsOverviewExpanded] = useState<boolean>(false)
+  const [isDialDragging, setIsDialDragging] = useState<boolean>(false)
+  const dialStartXRef = useRef<number>(0)
+
+  // Zoom control
   const zoom = useCallback(
     (factor: number) => {
       const controls = controlsRef.current
@@ -1715,13 +1734,75 @@ function ControlsLayer({
     [controlsRef],
   )
 
+  // Circular Orbit Rotation (left/right rotation around center)
+  const rotateOrbit = useCallback(
+    (angleRad: number) => {
+      const controls = controlsRef.current
+      if (!controls) return
+      const offset = controls.object.position.clone().sub(controls.target)
+      offset.applyAxisAngle(new Vector3(0, 1, 0), angleRad)
+      controls.object.position.copy(controls.target).add(offset)
+      controls.update()
+    },
+    [controlsRef],
+  )
+
+  // True North Orientation Reset
+  const alignNorth = useCallback(() => {
+    const controls = controlsRef.current
+    if (!controls) return
+    const offset = controls.object.position.clone().sub(controls.target)
+    const horizDist = Math.max(Math.sqrt(offset.x * offset.x + offset.z * offset.z), 40)
+    controls.object.position.set(controls.target.x, controls.object.position.y, controls.target.z + horizDist)
+    controls.update()
+  }, [controlsRef])
+
+  // Drag-to-orbit pointer handlers for circular turntable dial
+  const handleDialPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    dialStartXRef.current = e.clientX
+    setIsDialDragging(true)
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const handleDialPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDialDragging) return
+    const dx = e.clientX - dialStartXRef.current
+    dialStartXRef.current = e.clientX
+    // 1px drag = ~0.015 radians orbit
+    rotateOrbit(-dx * 0.015)
+  }
+
+  const handleDialPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDialDragging) return
+    setIsDialDragging(false)
+    try {
+      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {
+      // safe fallback
+    }
+  }
+
+  // Key campus landmarks for overview minimap card
+  const KEY_CAMPUS_ZONES = [
+    { id: 'main-gate', name: 'Main Gate', label: 'Entrance' },
+    { id: 'main-block', name: 'Main Block', label: 'Admin / Academic' },
+    { id: 'first-year-block', name: 'First Year Block', label: 'Academic' },
+    { id: 'civil-block', name: 'Civil Block', label: 'Department' },
+    { id: 'mechanical-block', name: 'Mech Block', label: 'Department' },
+    { id: 'it-block', name: 'IT Block', label: 'Tech / CS' },
+    { id: 'canteen', name: 'Campus Canteen', label: 'Dining' },
+    { id: 'boys-hostel', name: 'Boys Hostel', label: 'Residence' },
+  ]
+
   return (
     <div className="pointer-events-none absolute inset-0 z-20">
-      {/* Top-Right Camera Modes, Tools & Label Visibility Toggle */}
+      {/* ============================================================== */}
+      {/* 1. TOP-RIGHT CAMERA MODES, TOOLS & LABEL VISIBILITY TOGGLE     */}
+      {/* ============================================================== */}
       <div className="pointer-events-none absolute right-2.5 top-3 z-20 flex flex-col items-end gap-1.5 md:right-4 md:top-4">
-        {/* Compact Label Visibility Segmented Control */}
-        <div className="pointer-events-auto flex items-center rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1 shadow-2xl backdrop-blur-xl gap-0.5">
-          <span className="px-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase hidden sm:inline">
+        {/* Compact Label Visibility Segmented Control in Dreamscape Pastel */}
+        <div className="pointer-events-auto flex items-center rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-1 shadow-xl backdrop-blur-xl gap-0.5">
+          <span className="px-2 text-[10px] font-bold tracking-wider text-[#645378] uppercase hidden sm:inline">
             Labels
           </span>
           <button
@@ -1730,8 +1811,8 @@ function ControlsLayer({
             onClick={() => onLabelVisibilityModeChange('major')}
             className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'major'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
-                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white shadow-sm border border-purple-300/40'
+                : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
             }`}
             title="Major Blocks (Default decluttered view)"
           >
@@ -1743,8 +1824,8 @@ function ControlsLayer({
             onClick={() => onLabelVisibilityModeChange('all')}
             className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'all'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
-                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white shadow-sm border border-purple-300/40'
+                : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
             }`}
             title="All Places (Display all known campus labels)"
           >
@@ -1756,8 +1837,8 @@ function ControlsLayer({
             onClick={() => onLabelVisibilityModeChange('selected')}
             className={`rounded-xl px-2 py-1 sm:px-2.5 text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
               labelVisibilityMode === 'selected'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
-                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white shadow-sm border border-purple-300/40'
+                : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
             }`}
             title="Selected Only (Show only currently selected building label)"
           >
@@ -1766,14 +1847,14 @@ function ControlsLayer({
         </div>
 
         {/* Primary Camera Navigation Controls Card */}
-        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1.5 shadow-2xl backdrop-blur-xl">
+        <div className="pointer-events-auto flex flex-col items-center gap-1.5 rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-1.5 shadow-xl backdrop-blur-xl">
           {/* Recenter Campus Overview */}
           <button
             type="button"
             id="btn-camera-recenter-campus"
             data-testid="btn-camera-fit-campus"
             onClick={onFitCampus}
-            className="btn-camera-fit-campus flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+            className="btn-camera-fit-campus flex h-9 w-9 items-center justify-center rounded-xl text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B] transition cursor-pointer"
             aria-label="Recenter Campus Overview"
             title="Recenter Campus (Default full-campus overview)"
           >
@@ -1788,8 +1869,8 @@ function ControlsLayer({
             disabled={!hasSelectedBuilding}
             className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
               hasSelectedBuilding
-                ? 'text-cyan-300 hover:bg-cyan-950/60 hover:text-cyan-200 cursor-pointer'
-                : 'text-slate-600 cursor-not-allowed opacity-40'
+                ? 'text-[#6C5CE7] hover:bg-[#EDE4F9] hover:text-[#5B3E9E] cursor-pointer'
+                : 'text-slate-400 cursor-not-allowed opacity-40'
             }`}
             aria-label="Focus Selected Building"
             title={hasSelectedBuilding ? 'Focus Selected Building' : 'Select a building to focus'}
@@ -1802,16 +1883,16 @@ function ControlsLayer({
               type="button"
               id="btn-camera-fit-route"
               onClick={onFitRoute}
-              className="flex h-9 items-center gap-1.5 rounded-xl bg-cyan-950/70 px-2.5 text-[11px] font-bold text-cyan-300 hover:bg-cyan-900/80 transition border border-cyan-500/40 cursor-pointer"
+              className="flex h-9 items-center gap-1.5 rounded-xl bg-[#EDE4F9] px-2.5 text-[11px] font-bold text-[#6C5CE7] hover:bg-[#DFD0EF] transition border border-[#C9B6DF] cursor-pointer shadow-2xs"
               aria-label="Fit entire route"
               title="Fit entire route within view"
             >
-              <Maximize2 size={13} className="text-cyan-400" />
+              <Maximize2 size={13} className="text-[#6C5CE7]" />
               <span>Fit Route</span>
             </button>
           )}
 
-          <div className="h-px w-6 bg-white/10" />
+          <div className="h-px w-6 bg-[#C9B6DF]/50" />
 
           {/* 3D Isometric View */}
           <button
@@ -1820,8 +1901,8 @@ function ControlsLayer({
             onClick={() => setPreset('isometric')}
             className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition cursor-pointer ${
               preset === 'isometric' || preset === 'framed'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/40 border border-blue-400/40'
-                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white shadow-sm border border-purple-300/40'
+                : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
             }`}
             aria-label="Isometric view"
             title="3D Isometric perspective"
@@ -1837,8 +1918,8 @@ function ControlsLayer({
             onClick={() => setPreset('top-down')}
             className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition cursor-pointer ${
               preset === 'top-down'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/40 border border-indigo-400/40'
-                : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-[#7C5CBF] to-[#5B3E9E] text-white shadow-sm border border-purple-300/40'
+                : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
             }`}
             aria-label="Top-down view"
             title="Top-down 2D perspective"
@@ -1856,8 +1937,8 @@ function ControlsLayer({
               onClick={onToggleTouchRotate}
               className={`flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-bold transition cursor-pointer ${
                 touchRotateMode
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/40 border border-amber-300/50'
-                  : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#E09067] to-[#D97706] text-white shadow-sm border border-amber-300/50'
+                  : 'text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B]'
               }`}
               aria-label="Toggle 1-finger rotate mode"
               title={
@@ -1866,41 +1947,152 @@ function ControlsLayer({
                   : 'Map Pan Active (Tap to enable 1-Finger Orbit)'
               }
             >
-              <RefreshCcw size={13} className={touchRotateMode ? 'text-amber-100 rotate-45' : 'text-slate-400'} />
+              <RefreshCcw size={13} className={touchRotateMode ? 'text-amber-100 rotate-45' : 'text-[#6C5CE7]'} />
               <span>{touchRotateMode ? 'Orbit' : 'Pan'}</span>
             </button>
           )}
         </div>
 
-        {/* North Compass Indicator */}
-        <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/10 bg-[#0B1220]/90 px-2.5 py-1 text-[10px] font-bold text-slate-300 shadow-xl backdrop-blur-md">
-          <CompassIcon size={12} className="text-rose-400" />
+        {/* North Compass Indicator with Click-to-Align */}
+        <button
+          type="button"
+          id="btn-camera-north-orientation"
+          onClick={alignNorth}
+          className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-[#C9B6DF] bg-[#FBF8FD]/95 px-3 py-1.5 text-[10px] font-bold text-[#2A1D3B] shadow-lg backdrop-blur-md hover:bg-white hover:scale-105 transition cursor-pointer"
+          title="Click to reset orientation to True North"
+        >
+          <CompassIcon size={13} className="text-rose-500 animate-pulse" />
           <span>NORTH</span>
-        </div>
+        </button>
       </div>
 
-      {/* Bottom-Right Zoom Controls */}
-      <div className="pointer-events-none absolute bottom-20 md:bottom-4 right-3 md:right-4 z-20 flex flex-col gap-1.5">
-        <div className="pointer-events-auto flex flex-col rounded-2xl border border-[#293A50] bg-[#162235]/95 p-1 shadow-2xl backdrop-blur-xl">
+      {/* ============================================================== */}
+      {/* 2. BOTTOM-RIGHT CIRCULAR ROTATION CONTROLLER & ZOOM CONTROLS   */}
+      {/* ============================================================== */}
+      <div className="pointer-events-none absolute bottom-16 md:bottom-4 right-3 md:right-4 z-20 flex flex-col items-end gap-2">
+        {/* Compact Circular Rotation Controller ("Drag to Orbit" Turntable Puck) */}
+        <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-1.5 shadow-[0_8px_24px_rgba(124,92,191,0.15)] backdrop-blur-xl">
+          {/* Rotate Left Button */}
+          <button
+            type="button"
+            onClick={() => rotateOrbit(-0.25)}
+            aria-label="Orbit campus left"
+            title="Orbit campus left (counter-clockwise)"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/75 hover:bg-white text-[#51465F] hover:text-[#2A1D3B] transition border border-white/90 shadow-2xs cursor-pointer active:scale-95"
+          >
+            <RotateCcw size={14} />
+          </button>
+
+          {/* Draggable Turntable Puck */}
+          <div
+            onPointerDown={handleDialPointerDown}
+            onPointerMove={handleDialPointerMove}
+            onPointerUp={handleDialPointerUp}
+            onPointerCancel={handleDialPointerUp}
+            title="Drag horizontally to orbit 3D campus"
+            className={`flex flex-col items-center justify-center px-2.5 py-1 rounded-xl bg-gradient-to-br from-[#FAF5FF] via-[#EDE4F9] to-[#DFD0EF] border border-white shadow-inner cursor-ew-resize select-none touch-none transition-all ${
+              isDialDragging ? 'scale-105 shadow-md' : 'hover:scale-102'
+            }`}
+          >
+            <span className="text-[8px] font-black tracking-wider uppercase text-[#6C5CE7]">
+              Orbit Dial
+            </span>
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className="h-1 w-1 rounded-full bg-[#7C5CBF]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#6C5CE7]" />
+              <span className="h-1 w-1 rounded-full bg-[#7C5CBF]" />
+            </div>
+          </div>
+
+          {/* Rotate Right Button */}
+          <button
+            type="button"
+            onClick={() => rotateOrbit(0.25)}
+            aria-label="Orbit campus right"
+            title="Orbit campus right (clockwise)"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/75 hover:bg-white text-[#51465F] hover:text-[#2A1D3B] transition border border-white/90 shadow-2xs cursor-pointer active:scale-95"
+          >
+            <RotateCw size={14} />
+          </button>
+        </div>
+
+        {/* Zoom Controls */}
+        <div className="pointer-events-auto flex items-center rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-1 shadow-xl backdrop-blur-xl">
           <button
             type="button"
             onClick={() => zoom(0.82)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B] transition cursor-pointer"
             aria-label="Zoom in"
             title="Zoom in"
           >
             <ZoomIn size={16} />
           </button>
-          <div className="mx-1.5 h-px bg-white/10" />
+          <div className="my-1 w-px h-5 bg-[#C9B6DF]/50" />
           <button
             type="button"
             onClick={() => zoom(1.22)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-[#51465F] hover:bg-[#E8DDF2] hover:text-[#2A1D3B] transition cursor-pointer"
             aria-label="Zoom out"
             title="Zoom out"
           >
             <ZoomOut size={16} />
           </button>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* 3. BOTTOM-LEFT CAMPUS OVERVIEW / MINIMAP CARD                  */}
+      {/* ============================================================== */}
+      <div className="pointer-events-none absolute bottom-4 left-3 md:left-4 z-20 max-w-xs">
+        <div className="pointer-events-auto rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD]/95 p-2.5 shadow-xl backdrop-blur-xl text-[#2A1D3B]">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => setIsOverviewExpanded((v) => !v)}
+              className="flex items-center gap-1.5 text-left cursor-pointer group"
+              title="Toggle campus overview landmark selector"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EDE4F9] text-[#6C5CE7] border border-[#C9B6DF]">
+                <Layers size={13} />
+              </div>
+              <div>
+                <div className="text-[11px] font-heading font-bold text-[#2A1D3B] group-hover:text-[#6C5CE7] transition">
+                  Campus Overview
+                </div>
+                <div className="text-[9px] text-[#645378] font-medium">Stage E3 Twin</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsOverviewExpanded((v) => !v)}
+              aria-label={isOverviewExpanded ? 'Collapse campus overview' : 'Expand campus overview'}
+              className="flex h-6 w-6 items-center justify-center rounded-lg hover:bg-[#E8DDF2] text-[#645378] transition cursor-pointer"
+            >
+              {isOverviewExpanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            </button>
+          </div>
+
+          {/* Expandable Overview Zones Grid */}
+          {isOverviewExpanded && (
+            <div className="mt-2 pt-2 border-t border-[#C9B6DF]/60 grid grid-cols-2 gap-1 max-h-48 overflow-y-auto pr-1">
+              {KEY_CAMPUS_ZONES.map((zone) => (
+                <button
+                  key={zone.id}
+                  type="button"
+                  onClick={() => {
+                    onBuildingSelect?.(zone.id)
+                  }}
+                  className="flex flex-col items-start p-1.5 rounded-xl hover:bg-[#EDE4F9] border border-transparent hover:border-[#C9B6DF] transition cursor-pointer text-left"
+                >
+                  <span className="text-[10px] font-bold text-[#2A1D3B] truncate w-full">
+                    {zone.name}
+                  </span>
+                  <span className="text-[8px] text-[#7E708E] font-medium">{zone.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -2068,7 +2260,7 @@ function CampusCanvas({
 
   const containerClasses =
     className ??
-    'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-200px)] md:min-h-[480px] overflow-hidden rounded-3xl border border-[#24364D] bg-[#101827] shadow-xl shadow-black/40'
+    'relative h-[62svh] min-h-[360px] w-full min-w-0 md:h-[calc(100dvh-200px)] md:min-h-[480px] overflow-hidden rounded-3xl border border-[#C9B6DF] bg-[#E8DDF2] shadow-xl shadow-purple-950/10'
 
   const handleFitRoute = useCallback(() => {
     if (routeFrame) {
@@ -2132,20 +2324,20 @@ function CampusCanvas({
         dpr={[1, typeof window !== 'undefined' && window.innerWidth < 768 ? 1.75 : 2]}
         camera={{ position: activeFrame.isometricPosition, fov: 42, near: 0.2, far: 4000 }}
         onCreated={({ gl }) => {
-          gl.setClearColor('#101827', 1)
+          gl.setClearColor('#E8DDF2', 1)
           gl.toneMapping = ACESFilmicToneMapping
-          gl.toneMappingExposure = 1.28
+          gl.toneMappingExposure = 1.18
           gl.shadowMap.enabled = true
           gl.shadowMap.type = PCFSoftShadowMap
         }}
       >
-        <fog attach="fog" args={['#101827', 420, 1800]} />
-        <ambientLight intensity={0.72} color="#F8FAFC" />
-        <hemisphereLight args={['#93C5FD', '#162235', 0.88]} />
+        <fog attach="fog" args={['#E5D9F0', 360, 1600]} />
+        <ambientLight intensity={0.92} color="#F5EDFC" />
+        <hemisphereLight args={['#E0F2FE', '#DFD0EF', 1.05]} />
         <directionalLight
           position={[75, 120, 60]}
-          intensity={2.1}
-          color="#FFFDF5"
+          intensity={2.2}
+          color="#FFFDF7"
           castShadow
           shadow-mapSize={[2048, 2048]}
           shadow-camera-near={10}
@@ -2156,20 +2348,65 @@ function CampusCanvas({
           shadow-camera-bottom={-160}
           shadow-bias={-0.00015}
         />
-        <directionalLight position={[-60, 40, -60]} intensity={0.65} color="#60A5FA" />
-        <directionalLight position={[0, -20, 0]} intensity={0.15} color="#1E293B" />
+        <directionalLight position={[-60, 40, -60]} intensity={0.65} color="#E0D2F7" />
+        <directionalLight position={[0, -20, 0]} intensity={0.12} color="#E8DDF2" />
 
-        {/* Sleek architectural dark ground base */}
-        <mesh position={[activeFrame.center.x, -0.08, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[1400, 1400]} />
-          <meshStandardMaterial color="#0F172A" roughness={0.92} metalness={0.05} />
+        {/* Distant soft pastel horizon ground plane */}
+        <mesh position={[activeFrame.center.x, -0.22, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[2400, 2400]} />
+          <meshStandardMaterial color="#E2D4EE" roughness={0.96} metalness={0.02} />
         </mesh>
 
         {/* Soft shadow-receiving ground plane */}
         <mesh position={[activeFrame.center.x, -0.06, activeFrame.center.z]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[1400, 1400]} />
-          <shadowMaterial opacity={0.32} />
+          <planeGeometry args={[2400, 2400]} />
+          <shadowMaterial opacity={0.22} />
         </mesh>
+
+        {/* Elevated Miniature Campus Diorama Platform (Circular / Elliptical Pedestal with Luminous Rim) */}
+        <group position={[activeFrame.center.x, -0.11, activeFrame.center.z]}>
+          {/* Porcelain platform disc */}
+          <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[Math.max(activeFrame.radius * 1.16, 135), 64]} />
+            <meshStandardMaterial color="#FAF7FD" roughness={0.68} metalness={0.08} />
+          </mesh>
+
+          {/* Luminous soft cyan and lavender perimeter rim glow */}
+          <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry
+              args={[
+                Math.max(activeFrame.radius * 1.155, 134.2),
+                Math.max(activeFrame.radius * 1.17, 136.2),
+                64,
+              ]}
+            />
+            <meshBasicMaterial color="#38BDF8" transparent opacity={0.65} depthWrite={false} />
+          </mesh>
+
+          {/* Outer soft lavender accent ring */}
+          <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry
+              args={[
+                Math.max(activeFrame.radius * 1.168, 136),
+                Math.max(activeFrame.radius * 1.185, 138),
+                64,
+              ]}
+            />
+            <meshBasicMaterial color="#C084FC" transparent opacity={0.4} depthWrite={false} />
+          </mesh>
+
+          {/* Ambient drop shadow under the diorama pedestal */}
+          <mesh position={[0, -0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry
+              args={[
+                Math.max(activeFrame.radius * 1.05, 122),
+                Math.max(activeFrame.radius * 1.22, 142),
+                64,
+              ]}
+            />
+            <meshBasicMaterial color="#7C5CBF" transparent opacity={0.16} depthWrite={false} />
+          </mesh>
+        </group>
 
         <Suspense fallback={null}>
           <ModelErrorBoundary onError={onSceneError}>
@@ -2262,14 +2499,15 @@ function CampusCanvas({
           onFocusBuilding={handleFocusBuilding}
           touchRotateMode={touchRotateMode}
           onToggleTouchRotate={() => setTouchRotateMode((m) => !m)}
+          onBuildingSelect={onBuildingSelect}
         />
       )}
 
       {!isTourActive && !isWelcomeShowcase && showInstructionBadge && (
-        <div className="pointer-events-none absolute bottom-4 left-3 z-20 max-w-[calc(100%-6.5rem)] rounded-xl border border-white/10 bg-[#0B1220]/90 px-3 py-1.5 shadow-lg backdrop-blur-xl md:left-4">
-          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-sm shadow-cyan-400/50" />
-            1-finger pan • 2-finger twist & pinch-zoom (or tap Orbit)
+        <div className="pointer-events-none absolute bottom-4 left-3 z-20 max-w-[calc(100%-6.5rem)] rounded-xl border border-[#C9B6DF] bg-[#FBF8FD]/95 px-3 py-1.5 shadow-md backdrop-blur-xl md:left-4">
+          <div className="flex items-center gap-2 text-[11px] font-medium text-[#51465F]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#7C5CBF] animate-pulse shadow-sm shadow-purple-400/50" />
+            1-finger pan • 2-finger twist &amp; pinch-zoom (or use Orbit turntable)
           </div>
         </div>
       )}

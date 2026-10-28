@@ -7,6 +7,8 @@ import { AdminDashboardScreen } from './screens/AdminDashboardScreen'
 import { AdminFeedbackScreen } from './screens/AdminFeedbackScreen'
 import { BuildingDetailsScreen } from './screens/BuildingDetailsScreen'
 import { CampusExplorerScreen } from './screens/CampusExplorerScreen'
+import { DiscoverScreen } from './screens/DiscoverScreen'
+import { FeedbackCenterScreen } from './screens/FeedbackCenterScreen'
 import { HelpOfflineScreen } from './screens/HelpOfflineScreen'
 import { LoginRoleScreen } from './screens/LoginRoleScreen'
 import { NavigationScreen } from './screens/NavigationScreen'
@@ -36,6 +38,8 @@ function App() {
           <Route index element={<Navigate to="/welcome" replace />} />
           <Route path="welcome" element={<WelcomeScreen />} />
           <Route path="explore" element={<CampusExplorerScreen />} />
+          <Route path="discover" element={<DiscoverScreen />} />
+          <Route path="feedback" element={<FeedbackCenterScreen />} />
           <Route path="search" element={<SearchScreen />} />
           <Route path="navigation" element={<NavigationScreen />} />
 

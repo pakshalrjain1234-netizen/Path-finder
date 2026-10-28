@@ -34,24 +34,24 @@ export function SearchScreen() {
   }, [query, selectedCategory])
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 bg-[#101827] text-[#F1F5F9]">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:p-6 bg-[#E8DDF2] text-[#352A47] min-h-[calc(100vh-4rem)]">
       {/* Search Header Bar */}
-      <div className="rounded-2xl border border-[#293A50] bg-[#192638] shadow-xl">
-        <div className="border-b border-[#293A50] p-4 md:p-5">
-          <div className="flex items-center gap-3 rounded-2xl border border-[#293A50] bg-[#162235] px-3.5 py-2.5 focus-within:border-[#60A5FA] focus-within:ring-1 focus-within:ring-[#60A5FA]/30">
-            <Search size={18} className="text-[#60A5FA] shrink-0" />
+      <div className="rounded-3xl border border-[#C9B6DF] bg-[#FBF8FD] shadow-dream-card">
+        <div className="border-b border-[#C9B6DF] p-4 md:p-5">
+          <div className="flex items-center gap-3 rounded-2xl border border-[#C9B6DF] bg-[#E8DDF2]/60 px-3.5 py-2.5 focus-within:border-[#352A47] focus-within:ring-2 focus-within:ring-[#D2BEE7] transition-all">
+            <Search size={18} className="text-[#352A47] shrink-0" />
             <input
               type="search"
               placeholder="Search campus buildings, blocks, departments, or aliases (e.g. Admin, IT, CSE)..."
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              className="w-full bg-transparent text-sm text-[#F1F5F9] outline-none placeholder:text-[#94A3B8]/60"
+              className="w-full bg-transparent text-sm text-[#352A47] outline-none placeholder:text-[#51465F]/70 font-sans"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="rounded-full p-1 text-[#94A3B8] hover:text-[#F1F5F9]"
+                className="rounded-full p-1 text-[#51465F] hover:text-[#352A47]"
                 title="Clear search query"
               >
                 <X size={16} />
@@ -66,10 +66,10 @@ export function SearchScreen() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                className={`rounded-2xl px-3.5 py-1.5 text-xs font-heading font-bold transition-all whitespace-nowrap cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-[#60A5FA] text-[#0F172A] shadow-md'
-                    : 'bg-[#162235] text-[#94A3B8] hover:bg-[#24364D] hover:text-[#F1F5F9] border border-[#293A50]'
+                    ? 'bg-[#352A47] text-white shadow-dream-elevated'
+                    : 'bg-[#E8DDF2] text-[#51465F] hover:bg-[#D2BEE7] hover:text-[#352A47] border border-[#C9B6DF]'
                 }`}
               >
                 {cat}
@@ -82,24 +82,24 @@ export function SearchScreen() {
         {!query && (
           <div className="p-4 md:p-5">
             <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
-                <History size={15} className="text-[#60A5FA]" />
+              <div className="flex items-center gap-2 text-xs font-heading font-bold uppercase tracking-wider text-[#51465F]">
+                <History size={15} className="text-[#7A4465]" />
                 <span>Frequently Visited Campus Blocks</span>
               </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2.5 sm:grid-cols-2">
               {QUICK_SUGGESTIONS.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setQuery(item.name)}
-                  className="flex items-center justify-between rounded-xl border border-[#293A50] bg-[#162235] p-3 shadow-sm hover:border-[#60A5FA] hover:bg-[#192638] transition-all cursor-pointer"
+                  className="flex items-center justify-between rounded-2xl border border-[#C9B6DF] bg-[#E8DDF2]/50 p-3 shadow-xs hover:border-[#352A47] hover:bg-[#D2BEE7]/60 transition-all cursor-pointer"
                 >
                   <div className="min-w-0 pr-2">
-                    <div className="text-sm font-semibold text-[#F1F5F9] truncate">{item.name}</div>
-                    <div className="text-xs text-[#94A3B8] truncate">{item.subtitle}</div>
+                    <div className="text-sm font-heading font-bold text-[#352A47] truncate">{item.name}</div>
+                    <div className="text-xs font-sans text-[#51465F] truncate">{item.subtitle}</div>
                   </div>
-                  <ArrowUpRight size={16} className="text-[#60A5FA] shrink-0" />
+                  <ArrowUpRight size={16} className="text-[#352A47] shrink-0" />
                 </div>
               ))}
             </div>
@@ -113,31 +113,31 @@ export function SearchScreen() {
           {filtered.map((building) => (
             <article
               key={building.id}
-              className="rounded-2xl border border-[#293A50] bg-[#192638] p-5 shadow-sm hover:border-[#60A5FA]/60 transition-all flex flex-col justify-between"
+              className="rounded-3xl border border-[#C9B6DF] bg-[#FBF8FD] p-5 shadow-dream-soft hover:border-[#352A47] transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#293A50] bg-[#162235] text-[#60A5FA]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#D9B4A3] bg-[#E8C8B9] text-[#352A47] shadow-xs">
                     <Building2 size={22} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#293A50] bg-[#162235] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#60A5FA]">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C9B6DF] bg-[#DFD1EC] px-2.5 py-0.5 text-[10px] font-heading font-bold uppercase tracking-wider text-[#352A47]">
                         <MapPin size={11} />
                         {building.category}
                       </span>
-                      <span className="rounded-full border border-[#293A50] bg-[#162235] px-2 py-0.5 text-[10px] text-[#94A3B8]">
+                      <span className="rounded-full border border-[#C9B6DF] bg-[#E8DDF2] px-2 py-0.5 text-[10px] font-sans text-[#51465F]">
                         {building.floorInfo.label}
                       </span>
                     </div>
-                    <h3 className="mt-1.5 text-base font-bold text-[#F1F5F9] truncate">{building.name}</h3>
+                    <h3 className="mt-1.5 text-base font-heading font-extrabold text-[#352A47] truncate">{building.name}</h3>
                     {building.aliases && building.aliases.length > 0 && (
-                      <p className="mt-0.5 text-xs text-[#94A3B8] truncate">
-                        <span className="text-[#94A3B8]/60">Also known as:</span> {building.aliases.join(', ')}
+                      <p className="mt-0.5 text-xs font-sans text-[#51465F] truncate">
+                        <span className="text-[#51465F]/80">Also known as:</span> {building.aliases.join(', ')}
                       </p>
                     )}
                     {building.knownEntrance && (
-                      <p className="mt-0.5 text-[11px] text-[#60A5FA]/90 flex items-center gap-1 truncate">
+                      <p className="mt-0.5 text-[11px] font-heading font-bold text-[#7A4465] flex items-center gap-1 truncate">
                         <span>Approach:</span> {building.knownEntrance}
                       </p>
                     )}
@@ -145,10 +145,10 @@ export function SearchScreen() {
                   <button
                     type="button"
                     onClick={() => toggle(building.id)}
-                    className={`rounded-xl border p-2 transition-all shrink-0 cursor-pointer ${
+                    className={`rounded-2xl border p-2 transition-all shrink-0 cursor-pointer ${
                       isSaved(building.id)
-                        ? 'border-amber-500/40 bg-amber-500/20 text-amber-300 shadow-sm'
-                        : 'border-[#293A50] bg-[#162235] text-[#94A3B8] hover:bg-[#24364D] hover:text-[#F1F5F9]'
+                        ? 'border-[#D9B4A3] bg-[#E8C8B9] text-[#9E563A] shadow-xs'
+                        : 'border-[#C9B6DF] bg-[#E8DDF2] text-[#51465F] hover:bg-[#D2BEE7] hover:text-[#352A47]'
                     }`}
                     aria-label={isSaved(building.id) ? 'Remove from saved locations' : 'Save location'}
                     title={isSaved(building.id) ? 'Remove from saved' : 'Save location'}
@@ -158,23 +158,23 @@ export function SearchScreen() {
                 </div>
               </div>
 
-              <div className="mt-4 flex gap-2 pt-3 border-t border-[#293A50]">
+              <div className="mt-4 flex gap-2 pt-3 border-t border-[#C9B6DF]">
                 <Link
                   to={`/navigation?to=${building.id}`}
-                  className="flex-1 rounded-xl bg-[#60A5FA] hover:bg-blue-400 px-3 py-2 text-center text-xs font-bold text-[#0F172A] shadow-sm transition-all"
+                  className="flex-1 rounded-2xl bg-[#352A47] hover:bg-[#231B30] px-3 py-2 text-center text-xs font-heading font-bold text-white shadow-dream-soft transition-all"
                 >
                   Directions
                 </Link>
                 <Link
                   to={`/explore?focus=${building.id}`}
-                  className="flex-1 rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-center text-xs font-semibold text-[#60A5FA] hover:bg-[#24364D] transition-all flex items-center justify-center gap-1"
+                  className="flex-1 rounded-2xl border border-[#C9B6DF] bg-[#E8DDF2] px-3 py-2 text-center text-xs font-heading font-bold text-[#352A47] hover:bg-[#D2BEE7] transition-all flex items-center justify-center gap-1 shadow-xs"
                 >
                   <Compass size={13} />
                   <span>3D View</span>
                 </Link>
                 <Link
                   to={`/building/${building.id}`}
-                  className="rounded-xl border border-[#293A50] bg-[#162235] px-3 py-2 text-center text-xs font-semibold text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#24364D] transition-all"
+                  className="rounded-2xl border border-[#C9B6DF] bg-[#FBF8FD] px-3 py-2 text-center text-xs font-heading font-bold text-[#51465F] hover:text-[#352A47] hover:bg-[#E8DDF2] transition-all shadow-xs"
                 >
                   Details
                 </Link>
@@ -184,12 +184,12 @@ export function SearchScreen() {
         </div>
       ) : (
         /* Empty Search State */
-        <div className="rounded-2xl border border-[#293A50] bg-[#192638] p-8 text-center shadow-xl">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#162235] text-[#94A3B8] border border-[#293A50]">
+        <div className="rounded-3xl border border-[#C9B6DF] bg-[#FBF8FD] p-8 text-center shadow-dream-card">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#DFD1EC] text-[#352A47] border border-[#C9B6DF]">
             <Building2 size={28} />
           </div>
-          <h3 className="mt-4 text-base font-bold text-[#F1F5F9]">No buildings found</h3>
-          <p className="mt-1 text-sm text-[#94A3B8]">
+          <h3 className="mt-4 text-base font-heading font-extrabold text-[#352A47]">No buildings found</h3>
+          <p className="mt-1 text-sm font-sans text-[#51465F]">
             No campus blocks match &quot;{query}&quot; in category &quot;{selectedCategory}&quot;.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -201,7 +201,7 @@ export function SearchScreen() {
                   setQuery(name)
                   setSelectedCategory('All')
                 }}
-                className="rounded-xl border border-[#293A50] bg-[#162235] px-3 py-1.5 text-xs font-medium text-[#60A5FA] hover:bg-[#24364D] cursor-pointer"
+                className="rounded-2xl border border-[#C9B6DF] bg-[#E8DDF2] px-3 py-1.5 text-xs font-heading font-bold text-[#352A47] hover:bg-[#D2BEE7] cursor-pointer shadow-xs"
               >
                 Try &quot;{name}&quot;
               </button>
@@ -211,14 +211,14 @@ export function SearchScreen() {
       )}
 
       {/* Honest Campus Notice */}
-      <div className="rounded-2xl border border-[#293A50] bg-[#162235] p-4">
+      <div className="rounded-3xl border border-[#C9B6DF] bg-[#FBF8FD] p-4 shadow-dream-card">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#192638] text-[#60A5FA]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#E8C8B9] text-[#352A47] border border-[#D9B4A3] shadow-xs">
             <Info size={18} />
           </div>
           <div>
-            <div className="text-sm font-semibold text-[#F1F5F9]">Campus Building Registry</div>
-            <p className="mt-1 text-xs text-[#94A3B8] leading-relaxed">
+            <div className="text-sm font-heading font-bold text-[#352A47]">Campus Building Registry</div>
+            <p className="mt-1 text-xs font-sans text-[#51465F] leading-relaxed">
               All displayed buildings and entrances match the authorized MNMJEC campus 3D model and verified walkway graph. Detailed indoor floor layouts remain provisional pending field survey mapping.
             </p>
           </div>
