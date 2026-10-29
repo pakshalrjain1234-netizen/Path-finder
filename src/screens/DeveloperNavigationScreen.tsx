@@ -351,8 +351,8 @@ function DeveloperNavigationScreenInner() {
                     setIsPlaying(false)
                   }}
                   className={`flex-1 rounded-lg py-1.5 font-heading font-bold transition cursor-pointer ${devTab === 'scenarios'
-                      ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
-                      : 'text-[#51465F] hover:text-[#352A47]'
+                    ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                    : 'text-[#51465F] hover:text-[#352A47]'
                     }`}
                 >
                   GPS Scenarios
@@ -364,8 +364,8 @@ function DeveloperNavigationScreenInner() {
                     stopLiveNav()
                   }}
                   className={`flex-1 rounded-lg py-1.5 font-heading font-bold transition cursor-pointer ${devTab === 'virtual_walk'
-                      ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
-                      : 'text-[#51465F] hover:text-[#352A47]'
+                    ? 'bg-[#352A47] text-[#FAF8FC] shadow-sm'
+                    : 'text-[#51465F] hover:text-[#352A47]'
                     }`}
                 >
                   Virtual Walk
@@ -545,8 +545,8 @@ function DeveloperNavigationScreenInner() {
                             type="button"
                             onClick={() => setSimSpeed(speed)}
                             className={`rounded-md px-1.5 py-0.5 font-heading font-bold transition cursor-pointer ${simSpeed === speed
-                                ? 'bg-[#352A47] text-[#FAF8FC]'
-                                : 'text-[#51465F] hover:text-[#352A47]'
+                              ? 'bg-[#352A47] text-[#FAF8FC]'
+                              : 'text-[#51465F] hover:text-[#352A47]'
                               }`}
                           >
                             {speed === 1.5 ? '1x' : speed === 3.0 ? '2x' : '4x'}

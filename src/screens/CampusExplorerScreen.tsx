@@ -185,7 +185,16 @@ export function CampusExplorerScreen() {
           userLocationPoint={classification.modelPoint}
           userLocationAccuracyRadius={classification.accuracyRadiusModel ?? undefined}
           userLocationIsSimulated={classification.isSimulated}
-          userLocationLabel={classification.isSimulated ? 'Simulated Location (Test Mode)' : 'Your Location'}
+          userLocationLabel={
+            classification.isSimulated
+              ? 'Simulated Location (Test Mode)'
+              : classification.rawCoordinates &&
+                  typeof classification.rawCoordinates.accuracy === 'number' &&
+                  Number.isFinite(classification.rawCoordinates.accuracy) &&
+                  classification.rawCoordinates.accuracy >= 0
+                ? `Your Location (±${classification.rawCoordinates.accuracy.toFixed(0)}m)`
+                : 'Your Location'
+          }
           viewTarget={isCameraFollowing && classification.modelPoint ? 'location' : 'campus'}
           onBuildingSelect={(id) => {
             setSelectedBuildingId(id ?? '')
@@ -367,16 +376,16 @@ export function CampusExplorerScreen() {
           </div>
         )}
 
-        {/* Floating Top-Right Tools on Desktop: Take Campus Tour + GPS Location & Feedback */}
+        {/* Floating Tools: Take Campus Tour (Desktop) + GPS Location & Feedback */}
         {!tour.isTourActive && (
-          <div className="pointer-events-none absolute hidden md:flex right-4 top-4 z-30 items-center gap-2.5">
-            {/* Take Campus Tour CTA */}
+          <div className="pointer-events-none absolute right-3 top-[6.75rem] md:right-4 md:top-4 z-30 flex items-center gap-2">
+            {/* Take Campus Tour CTA (Desktop only - mobile accesses tour via bottom nav) */}
             <button
               type="button"
               id="btn-take-campus-tour"
               data-testid="btn-take-campus-tour"
               onClick={() => tour.startTour('full')}
-              className="pointer-events-auto flex h-10 items-center gap-2 rounded-2xl border border-[#D7A894] bg-[#E8C8B9] hover:bg-[#DEC0B0] px-4 text-xs font-heading font-bold text-[#352A47] shadow-dream-soft transition-all hover:-translate-y-0.5 cursor-pointer"
+              className="pointer-events-auto hidden md:flex h-10 items-center gap-2 rounded-2xl border border-[#D7A894] bg-[#E8C8B9] hover:bg-[#DEC0B0] px-4 text-xs font-heading font-bold text-[#352A47] shadow-dream-soft transition-all hover:-translate-y-0.5 cursor-pointer"
               title="Take interactive 3D virtual tour of MNMJEC"
             >
               <Sparkles size={15} className="text-[#352A47]" />
@@ -417,12 +426,13 @@ export function CampusExplorerScreen() {
                 </button>
               )}
 
+              {/* Feedback CTA (Desktop only - mobile accesses feedback via mobile header) */}
               <button
                 id="btn-give-visitor-feedback"
                 data-testid="btn-give-visitor-feedback"
                 type="button"
                 onClick={() => setIsFeedbackModalOpen(true)}
-                className="flex h-8 items-center gap-1.5 rounded-xl border border-[#C9B6DF] bg-[#E8DDF2] hover:bg-[#D2BEE7] px-3 text-xs font-heading font-bold text-[#352A47] transition cursor-pointer"
+                className="hidden md:flex h-8 items-center gap-1.5 rounded-xl border border-[#C9B6DF] bg-[#E8DDF2] hover:bg-[#D2BEE7] px-3 text-xs font-heading font-bold text-[#352A47] transition cursor-pointer"
                 title="Give Website & Navigation Feedback"
               >
                 <MessageSquare size={13} className="text-[#352A47]" />
@@ -432,12 +442,13 @@ export function CampusExplorerScreen() {
           </div>
         )}
 
-        {/* GPS Live Status Banner (top-center float) */}
+        {/* GPS Live Status Banner (top-center float, placed below category bar on mobile) */}
         {!tour.isTourActive && classification.status !== 'idle' && (
-          <div className="pointer-events-none absolute inset-x-4 top-20 z-30 flex justify-center md:top-4">
+          <div className="pointer-events-none absolute inset-x-4 top-36 md:top-4 z-30 flex justify-center">
             <div className="pointer-events-auto max-w-lg w-full">
               <GpsStatusBanner
                 classification={classification}
+                calibrationModel={calibrationModel}
                 geofence={geofence}
                 onStop={stopLocation}
                 onOpenCalibration={() => setIsCalibrationOpen(true)}

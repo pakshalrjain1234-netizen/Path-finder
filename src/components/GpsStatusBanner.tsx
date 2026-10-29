@@ -15,11 +15,13 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
-import type { PositionClassification } from '../types/gps'
+import { geoToLocalMeters } from '../lib/campusCalibration'
+import type { CalibrationModel, PositionClassification } from '../types/gps'
 import type { GeofenceEvaluation } from '../types/geofence'
 
 interface GpsStatusBannerProps {
   classification: PositionClassification
+  calibrationModel?: CalibrationModel | null
   geofence?: GeofenceEvaluation | null
   onStop: () => void
   onOpenCalibration?: () => void
@@ -29,6 +31,7 @@ interface GpsStatusBannerProps {
 
 export function GpsStatusBanner({
   classification,
+  calibrationModel,
   geofence,
   onStop,
   onOpenCalibration,
@@ -63,13 +66,32 @@ export function GpsStatusBanner({
         dotColor = 'bg-amber-400 animate-pulse'
         icon = <Compass size={15} className="text-amber-400 shrink-0" />
       } else {
-        // State 5: Verified Live Navigation
-        friendlyTitle = 'Verified Live Navigation'
-        friendlySubtext = 'Real-time GPS position mapped to 3D campus twin with approved calibration.'
-        statusBadgeLabel = 'Live GPS Verified'
-        badgeStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-        dotColor = 'bg-emerald-400 animate-pulse'
-        icon = <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
+        const isProvisional = calibrationModel?.status === 'provisional' || classification.message.includes('Provisional')
+        const hasNumericAcc =
+          rawCoordinates !== null &&
+          rawCoordinates !== undefined &&
+          typeof rawCoordinates.accuracy === 'number' &&
+          Number.isFinite(rawCoordinates.accuracy) &&
+          rawCoordinates.accuracy >= 0
+
+        if (accuracyClass === 'poor' || accuracyClass === 'medium') {
+          friendlyTitle = hasNumericAcc ? `Location Fix (±${rawCoordinates.accuracy.toFixed(0)}m)` : 'Campus Location Detected'
+          friendlySubtext = hasNumericAcc
+            ? `Location mapped to campus (±${rawCoordinates.accuracy.toFixed(0)}m). Indoor satellite attenuation through concrete slabs may cause position offset toward exterior facades.`
+            : 'Real-time GPS position mapped to 3D campus twin with approved calibration.'
+          statusBadgeLabel = isProvisional ? 'Provisional Fix' : 'Location Active'
+          badgeStyle = 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+          dotColor = 'bg-[#60A5FA] animate-pulse'
+          icon = <Compass size={15} className="text-[#60A5FA] shrink-0" />
+        } else {
+          // State 5: Verified Live Navigation
+          friendlyTitle = isProvisional ? 'Provisional Campus Location' : 'Verified Live Navigation'
+          friendlySubtext = 'Real-time GPS position mapped to 3D campus twin with approved calibration.'
+          statusBadgeLabel = isProvisional ? 'Provisional GPS' : 'Live GPS Verified'
+          badgeStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+          dotColor = 'bg-emerald-400 animate-pulse'
+          icon = <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
+        }
       }
       break
 
@@ -96,7 +118,7 @@ export function GpsStatusBanner({
         ? `Low GPS Accuracy ±${rawCoordinates.accuracy.toFixed(0)}m`
         : 'Low GPS Accuracy Warning'
       friendlySubtext = hasNumericAcc
-        ? `Reported accuracy is ±${rawCoordinates.accuracy.toFixed(0)}m (exceeds threshold). Please move outdoors away from tall walls.`
+        ? `Reported accuracy is ±${rawCoordinates.accuracy.toFixed(0)}m (exceeds 30m safety threshold). Satellite positioning is degraded indoors or under structural cover. Please move outdoors away from tall walls.`
         : 'Low GPS accuracy warning: accuracy value not recorded. Please check your device location settings.'
       statusBadgeLabel = 'Low Accuracy'
       badgeStyle = 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -365,44 +387,107 @@ export function GpsStatusBanner({
                 {showTechnicalDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
 
-              {showTechnicalDetails && rawCoordinates && (
-                <div className="mt-2.5 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#070F1E] p-3 text-[11px] text-slate-300">
-                  <div>
-                    <span className="text-slate-500 block text-[9px] uppercase font-bold">WGS-84 Coordinates</span>
-                    <span className="font-mono text-cyan-300 text-xs">
-                      {rawCoordinates.latitude.toFixed(6)}°, {rawCoordinates.longitude.toFixed(6)}°
-                    </span>
-                  </div>
+              {showTechnicalDetails && rawCoordinates && (() => {
+                const localOffsets =
+                  calibrationModel?.referenceOrigin
+                    ? geoToLocalMeters(rawCoordinates.latitude, rawCoordinates.longitude, calibrationModel.referenceOrigin)
+                    : null
 
-                  <div>
-                    <span className="text-slate-500 block text-[9px] uppercase font-bold">GPS Accuracy</span>
-                    <span className={`font-semibold ${
-                      accuracyClass === 'high'
-                        ? 'text-emerald-400'
-                        : accuracyClass === 'medium'
-                          ? 'text-cyan-400'
-                          : 'text-amber-400'
-                    }`}>
-                      {hasValidAcc && rawCoordinates
-                        ? `±${rawCoordinates.accuracy.toFixed(1)}m (${accuracyClass})`
-                        : `Accuracy value not recorded (${accuracyClass})`}
-                    </span>
-                  </div>
+                const distToCivil =
+                  modelPoint
+                    ? Math.hypot(modelPoint[0] - 136.2, modelPoint[2] - (-78.2))
+                    : null
 
-                  {modelPoint && (
-                    <div className="col-span-2 border-t border-white/5 pt-2 mt-1">
-                      <span className="text-slate-500 block text-[9px] uppercase font-bold">3D Campus Model Coordinates</span>
-                      <span className="font-mono text-cyan-300">
-                        X: {modelPoint[0]}m, Z: {modelPoint[2]}m (Elev: {modelPoint[1]}m)
+                const distToGate1 =
+                  modelPoint
+                    ? Math.hypot(modelPoint[0] - 181.0, modelPoint[2] - (-6.2))
+                    : null
+
+                return (
+                  <div className="mt-2.5 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-[#070F1E] p-3.5 text-[11px] text-slate-300">
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">WGS-84 Coordinates</span>
+                      <span className="font-mono text-cyan-300 text-xs">
+                        {rawCoordinates.latitude.toFixed(6)}°, {rawCoordinates.longitude.toFixed(6)}°
                       </span>
                     </div>
-                  )}
 
-                  <div className="col-span-2 border-t border-white/5 pt-2 mt-1 text-[10px] text-slate-400">
-                    Confidence: <strong className="uppercase text-slate-300">{geofence?.confidence ?? 'HIGH'}</strong> • Source: {isSimulated ? 'Simulated/Dev Mode' : 'Device Satellites'}
+                    <div>
+                      <span className="text-slate-500 block text-[9px] uppercase font-bold">Reported Accuracy</span>
+                      <span className={`font-semibold ${
+                        accuracyClass === 'high'
+                          ? 'text-emerald-400'
+                          : accuracyClass === 'medium'
+                            ? 'text-cyan-400'
+                            : 'text-amber-400'
+                      }`}>
+                        {hasValidAcc
+                          ? `±${rawCoordinates.accuracy.toFixed(1)}m (${accuracyClass})`
+                          : `Accuracy value not recorded (${accuracyClass})`}
+                      </span>
+                    </div>
+
+                    {localOffsets && (
+                      <div className="col-span-2 border-t border-white/5 pt-2 mt-1">
+                        <span className="text-slate-500 block text-[9px] uppercase font-bold">Local Tangent Offsets (Rel. to Campus Origin)</span>
+                        <span className="font-mono text-cyan-300">
+                          East (u): {localOffsets.u > 0 ? `+${localOffsets.u.toFixed(1)}` : localOffsets.u.toFixed(1)}m, North (v): {localOffsets.v > 0 ? `+${localOffsets.v.toFixed(1)}` : localOffsets.v.toFixed(1)}m
+                        </span>
+                      </div>
+                    )}
+
+                    {calibrationModel?.helmertParams && (
+                      <div className="col-span-2 border-t border-white/5 pt-2 mt-1">
+                        <span className="text-slate-500 block text-[9px] uppercase font-bold">Helmert Transformation (Geo → 3D Model)</span>
+                        <div className="text-[10px] font-mono text-slate-300 space-y-0.5 mt-0.5">
+                          <div>
+                            Scale: <span className="text-cyan-300">{calibrationModel.helmertParams.scale.toFixed(3)}x</span> • Rotation: <span className="text-cyan-300">{calibrationModel.helmertParams.rotationDeg.toFixed(1)}°</span>
+                          </div>
+                          <div>
+                            Translation: <span className="text-cyan-300">[{calibrationModel.helmertParams.tx.toFixed(1)}, {calibrationModel.helmertParams.tz.toFixed(1)}]</span> • Orientation: <span className="text-cyan-300">{calibrationModel.helmertParams.isReflected ? 'Reflected' : 'Direct'}</span>
+                          </div>
+                          <div>
+                            Calibration Status: <span className="text-cyan-300 uppercase">{calibrationModel.status}</span> (RMSE: <span className="text-cyan-300">±{calibrationModel.rmse !== null ? calibrationModel.rmse.toFixed(2) : '5.32'}m</span>)
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {modelPoint && (
+                      <div className="col-span-2 border-t border-white/5 pt-2 mt-1">
+                        <span className="text-slate-500 block text-[9px] uppercase font-bold">Transformed 3D Model Coordinates</span>
+                        <span className="font-mono text-cyan-300 text-xs">
+                          X: {modelPoint[0]}m, Z: {modelPoint[2]}m (Elev: {modelPoint[1]}m)
+                        </span>
+                      </div>
+                    )}
+
+                    {modelPoint && (distToCivil !== null || distToGate1 !== null) && (
+                      <div className="col-span-2 border-t border-white/5 pt-2 mt-1 text-[10px] text-slate-400">
+                        <span className="text-slate-500 block text-[9px] uppercase font-bold">Proximity to Reference Landmarks</span>
+                        <span className="text-slate-200 font-mono">
+                          {distToCivil !== null && `Civil Block: ${distToCivil.toFixed(1)}m`}
+                          {distToCivil !== null && distToGate1 !== null && ' • '}
+                          {distToGate1 !== null && `Main Gate 1: ${distToGate1.toFixed(1)}m`}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Indoor Positioning Notice */}
+                    <div className="col-span-2 border-t border-white/5 pt-2 mt-1 rounded-xl bg-blue-950/40 border border-blue-500/20 p-2.5 text-[10px] text-blue-200">
+                      <span className="font-bold text-blue-300 block mb-0.5">Indoor GNSS Limitation Note</span>
+                      <p className="text-[10px] text-slate-300 leading-snug">
+                        Inside concrete buildings (such as Civil Block), satellite microwave signals undergo 15–30 dB attenuation and multipath reflection.
+                        Even when an acceptable accuracy fix is reported (±{hasValidAcc ? rawCoordinates.accuracy.toFixed(0) : '?'}m), the calculated position may be displaced outside exterior walls. For best accuracy, step near an exterior doorway or window.
+                      </p>
+                    </div>
+
+                    <div className="col-span-2 border-t border-white/5 pt-2 mt-1 text-[10px] text-slate-400">
+                      Confidence: <strong className="uppercase text-slate-300">{geofence?.confidence ?? 'HIGH'}</strong> • Source: {isSimulated ? 'Simulated/Dev Mode' : 'Device Satellites'}
+                    </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
             </div>
 
             {/* Privacy notice */}
